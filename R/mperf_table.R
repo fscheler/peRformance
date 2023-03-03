@@ -7,7 +7,7 @@
 #   Test Package:              'Ctrl + Shift + T'
 
 mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="#04103b",
-                      export_format="svg",chart_width=600,chart_height=400)
+                      export_format="svg",chart_width=600,chart_height=400,print_output=T)
 {
 
   if (!require("plotly")) install.packages("plotly")
@@ -326,7 +326,11 @@ mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="
   fig<-fig%>%layout(margin=m)
   fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "monthly_returns_table",width = chart_width,height = chart_height))
 
-  print(printtable)
+  if(print_output==T)
+  {
+    print(printtable)
+  }
+
 
   fig_list<-list("fig"=fig,"printtable"=printtable)
 
