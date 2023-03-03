@@ -1,6 +1,6 @@
 
 
-add_rec_shade<-function(st_date,ed_date,fredr_key,shade_color="darkgray")
+add_rec_shade<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color="darkgray")
 {
   if (!require("fredr")) install.packages("fredr")
   if (!require("ecm")) install.packages("ecm")

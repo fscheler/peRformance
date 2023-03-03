@@ -83,10 +83,10 @@ da<-data.frame(date,asset_ret)
 # Add recession shading using the function and your API Key  
 # to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
   tryCatch({
-    p<-p%>%add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
+    p<-p + add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
   }, error = function(e) {})
 #add formatting  
-  p<-p+
+  p<-p +
     geom_line(size=1,aes(y=asset_ret,color="Time Series"))+
     scale_colour_manual(values = cols)+
     scale_x_date(labels = date_format("%m-%Y"))+
