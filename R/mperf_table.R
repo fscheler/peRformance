@@ -9,7 +9,7 @@
 
 
 
-mperf_table<-function(da,ts_format="returns",chart_height=500,header_color="#3b5171",font_color="#04103b",
+mperf_table<-function(da,ts_format="returns",chart_width=500,header_color="#3b5171",font_color="#04103b",
                       export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T)
 {
 
