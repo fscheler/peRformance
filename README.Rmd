@@ -30,13 +30,13 @@ You can install the development version of peRformance from [GitHub](https://git
 devtools::install_github("fscheler/peRformance")
 ```
 
-## Example application
+## Example application monthly performance overview table
 
 ```{r function_mperf_table,warning=FALSE,message=FALSE}
   library(peRformance)
 
   #Generate an integrated monthly and annual performance overview using plotly
-  date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+  date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
   asset_ret<-rnorm(length(date))/100
   benchmark_ret<-rnorm(length(date))/100
   da<-data.frame(date,asset_ret,benchmark_ret)
@@ -57,10 +57,43 @@ devtools::install_github("fscheler/peRformance")
   
   #You can also configure the export options and download the plotly graphic as a high resolution svg
   df<-mperf_table(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
-                  chart_width=600,chart_height=150,print_output=F)  
+                  chart_export_width=600,chart_export_height=150,print_output=F)  
 
   #Display Plotly Graphic
   df$fig
 
 ```
 
+
+##  Example application recession shading with ggplot2
+
+
+```{r function_recession_shading,warning=FALSE,message=FALSE}
+
+# Create a return time series
+
+date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
+asset_ret<-cumprod(1+rnorm(length(date))/100)
+da<-data.frame(date,asset_ret)
+
+# Initiate a ggplot2 chart
+
+  cols <- c("Time Series" = "#04103b")
+  p<-ggplot(data=da,aes(x=as.Date(date), y=asset_ret))
+# Add recession shading using the function and your API Key  
+# to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
+  tryCatch({
+    p<-p%>%add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
+  }, error = function(e) {})
+#add formatting  
+  p<-p+
+    geom_line(size=1,aes(y=asset_ret,color="Time Series"))+
+    scale_colour_manual(values = cols)+
+    scale_x_date(labels = date_format("%m-%Y"))+
+    xlab("")+
+    ylab("")+
+    theme(legend.position = "bottom",legend.title = element_blank())+
+    theme(plot.margin=margin(l=5,r=10,b=5,t=5))
+  p
+  
+```
