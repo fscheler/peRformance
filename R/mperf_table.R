@@ -1,11 +1,30 @@
-# Hello, world!
+# mperf_table (monthly performance table)
 #
 # This is a function called 'mperf_table' creating a tabular overview of monthly and annual performance
 # returning a plotly table
 #
-# You can learn more about package authoring with RStudio at:
+# The function takes a with up to three columns as input and returns a plotly table and a formated dataframe that
+# can, for instance, be used together with the kable package in Rmarkdown documents
 #
-#   http://r-pkgs.had.co.nz/
+#
+# Example:
+# Create a dataframe with asset and benchmark returns
+#
+#   date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+#   asset_ret<-rnorm(length(date))/100
+#   benchmark_ret<-rnorm(length(date))/100
+#   da<-data.frame(date,asset_ret,benchmark_ret)
+#
+# Generate the performance table:
+#
+#   df<-mperf_table(da)
+#   df$fig
+#
+# Generate the performance table without benchmark
+#
+#   df<-mperf_tableb(da[,c("date","asset_ret")])
+#   df$fig
+#
 #
 # Some useful keyboard shortcuts for package authoring:
 #
