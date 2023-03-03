@@ -39,9 +39,9 @@ mperf_table<-function(da,chart_height=500,ts_format="returns")
   library(caTools)
   library(dplyr)
   library(lubridate)
-
   options(warn = -1)
 
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
   bm_dummy<-ncol(da)
 
   if(bm_dummy==2)
