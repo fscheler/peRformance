@@ -13,22 +13,48 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-mperf_table<-function(da,chart_height=500)
+mperf_table<-function(da,chart_height=500,ts_format="returns")
 {
   library(plotly)
   library(ecm)
   library(caTools)
   library(dplyr)
+  library(lubridate)
 
-  da<-da[,c("date","asset_ret","benchmark_ret")]
+  options(warn = -1)
+
+  bm_dummy<-ncol(da)
+
+  if(bm_dummy==2)
+  {
+    da<-da[,1:2]
+    names(da)<-c("date","asset_ret")
+  }else{
+    da<-da[,1:3]
+    names(da)<-c("date","asset_ret","benchmark_ret")
+  }
+
+
+  if(ts_format=="index")
+  {
+    da$asset_ret<-da$asset_ret/lagpad(da$asset_ret,k=1)-1
+    da$asset_ret[1]<-0
+    da$benchmark_ret<-da$benchmark_ret/lagpad(da$benchmark_ret,k=1)-1
+    da$benchmark_ret[1]<-0
+  }
+
   da$asset_ret<-da$asset_ret+1
-  da$benchmark_ret<-da$benchmark_ret+1
+
   da$yearmon<-substr(da$date,1,7)
   da<-da%>%group_by(yearmon)%>%mutate(mtd=cumprod(asset_ret))
   das <- da %>% group_by(yearmon) %>% do(tail(., n=1))
-
   da<-da%>%group_by(year(date))%>%mutate(ytd=cumprod(asset_ret))
-  da<-da%>%group_by(year(date))%>%mutate(ytd_bm=cumprod(benchmark_ret))
+
+  if(bm_dummy==3)
+  {
+    da$benchmark_ret<-da$benchmark_ret+1
+    da<-da%>%group_by(year(date))%>%mutate(ytd_bm=cumprod(benchmark_ret))
+  }
   dy <- da %>% group_by(year(date)) %>% do(tail(., n=1))
 
 
@@ -68,15 +94,21 @@ mperf_table<-function(da,chart_height=500)
 
   names(ds)<-c("Year","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
   ds$Ann<-dy$ytd
-  ds$Ann_bm<-dy$ytd_bm
+  if(bm_dummy==3)
+  {
+    ds$Ann_bm<-dy$ytd_bm
+  }
+
 
 
   replace_function<-function(x)
   {
+
     x<-as.numeric(x)
     x<-ifelse(is.na(x),"",paste0(round(x-1,4)*100,"%"))
     #x<-ifelse(x<0,paste0("<b>",x,"</b>"),x)
     return(x)
+
   }
 
   ds$Jan<-replace_function(ds$Jan)
@@ -92,13 +124,18 @@ mperf_table<-function(da,chart_height=500)
   ds$Nov<-replace_function(ds$Nov)
   ds$Dec<-replace_function(ds$Dec)
   ds$Ann<-replace_function(ds$Ann)
-  ds$Ann_bm<-replace_function(ds$Ann_bm)
-
+  tryCatch({
+    ds$Ann_bm<-replace_function(ds$Ann_bm)
+  }, error=function(e){})
 
   headerColor<-col_aq2[3]
   rowOddColor<-"white"
   rowEvenColor<-"lightgrey"
 
+
+
+  if(bm_dummy==2)
+  {
 
   fig <- plot_ly(
     height=chart_height,
@@ -119,8 +156,7 @@ mperf_table<-function(da,chart_height=500)
                  '<b>Nov</b>',
                  '<b>Dec</b>',
                  '<b></b>',
-                 '<b>FY</b>',
-                 '<b>Benchmark</b>'
+                 '<b>FY</b>'
       ),
       line = list(color = 'white'),
       fill = list(color = headerColor),
@@ -144,8 +180,7 @@ mperf_table<-function(da,chart_height=500)
         ds$Nov,
         ds$Dec,
         rep("",nrow(ds)),
-        ds$Ann,
-        ds$Ann_bm
+        ds$Ann
       ),
       line = list(color = 'white'),
       fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(ds$Year)/2+1))),
@@ -154,9 +189,6 @@ mperf_table<-function(da,chart_height=500)
       #font = list(color = list(list(c("red","green")),), size = 6.5),
 
     ))
-
-  m<-list(r=0,b=0,t=0,l=0,par=4)
-  fig<-fig%>%layout(margin=m)
 
   printtable =
     as.data.frame(cbind(
@@ -174,8 +206,7 @@ mperf_table<-function(da,chart_height=500)
       ds$Nov,
       ds$Dec,
       rep("",nrow(ds)),
-      ds$Ann,
-      ds$Ann_bm
+      ds$Ann
     ),stringsAsFactors = F)
   names(printtable)<-
     c('Year',
@@ -192,10 +223,110 @@ mperf_table<-function(da,chart_height=500)
       'Nov',
       'Dec',
       '',
-      'FY',
-      'Benchmark'
+      'FY'
     )
 
+  }else{
+    fig <- plot_ly(
+      height=chart_height,
+      type = 'table',
+      columnwidth  = c(60,rep(80,12)),
+      header = list(
+        values = c('<b>Year</b>',
+                   '<b>Jan</b>',
+                   '<b>Feb</b>',
+                   '<b>Mar</b>',
+                   '<b>Apr</b>',
+                   '<b>May</b>',
+                   '<b>Jun</b>',
+                   '<b>Jul</b>',
+                   '<b>Aug</b>',
+                   '<b>Sep</b>',
+                   '<b>Oct</b>',
+                   '<b>Nov</b>',
+                   '<b>Dec</b>',
+                   '<b></b>',
+                   '<b>FY</b>',
+                   '<b>Benchmark</b>'
+        ),
+        line = list(color = 'white'),
+        fill = list(color = headerColor),
+        #align = c(rep('left',3),rep('center',7)),
+        font = list(color = "white", size = 7)
+      ),
+      cells = list(
+        height = 16,
+        values = rbind(
+          ds$Year,
+          ds$Jan,
+          ds$Feb,
+          ds$Mar,
+          ds$Apr,
+          ds$May,
+          ds$Jun,
+          ds$Jul,
+          ds$Aug,
+          ds$Sep,
+          ds$Oct,
+          ds$Nov,
+          ds$Dec,
+          rep("",nrow(ds)),
+          ds$Ann,
+          ds$Ann_bm
+        ),
+        line = list(color = 'white'),
+        fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(ds$Year)/2+1))),
+        align = c('center', 'center','center','center','center', 'center','center', 'center'),
+        font = list(color = c(col_aq2[1]), size = 6)
+        #font = list(color = list(list(c("red","green")),), size = 6.5),
+
+      ))
+
+
+    printtable =
+      as.data.frame(cbind(
+        ds$Year,
+        ds$Jan,
+        ds$Feb,
+        ds$Mar,
+        ds$Apr,
+        ds$May,
+        ds$Jun,
+        ds$Jul,
+        ds$Aug,
+        ds$Sep,
+        ds$Oct,
+        ds$Nov,
+        ds$Dec,
+        rep("",nrow(ds)),
+        ds$Ann,
+        ds$Ann_bm
+      ),stringsAsFactors = F)
+    names(printtable)<-
+      c('Year',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+        '',
+        'FY',
+        'Benchmark'
+      )
+
+  }
+  m<-list(r=0,b=0,t=0,l=0,par=4)
+  fig<-fig%>%layout(margin=m)
+
+
+  print(printtable)
 
   fig_list<-list("fig"=fig,"printtable"=printtable)
 
