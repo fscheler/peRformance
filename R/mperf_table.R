@@ -8,7 +8,7 @@
 
 
 
-mperf_table<-function(da,ts_format="returns",chart_width=500,header_color="#3b5171",font_color="#04103b",
+mperf_table<-function(da,ts_format="returns",chart_height=500,header_color="#3b5171",font_color="#04103b",
                       export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T)
 {
 
@@ -326,7 +326,7 @@ mperf_table<-function(da,ts_format="returns",chart_width=500,header_color="#3b51
   }
   m<-list(r=0,b=0,t=0,l=0,par=4)
   fig<-fig%>%layout(margin=m)
-  fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "monthly_returns_table",width = chart_width,height = chart_height))
+  fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "monthly_returns_table",width = chart_export_width,height = chart_export_height))
 
   if(print_output==T)
   {
