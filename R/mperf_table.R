@@ -6,7 +6,7 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5171",font_color="#04103b",
+mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="#04103b",
                       export_format="svg",chart_width=600,chart_height=400)
 {
 
@@ -138,7 +138,7 @@ mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5
   {
 
   fig <- plot_ly(
-    height=chart_height,
+    #height=chart_height,
     type = 'table',
     columnwidth  = c(60,rep(80,12)),
     header = list(
