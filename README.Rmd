@@ -55,6 +55,8 @@ devtools::install_github("fscheler/peRformance")
   
   df<-mperf_table(da,ts_format="index")  
 
+  #Display Plotly Graphic
+  df$fig
 
 ```
 
