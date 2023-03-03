@@ -34,6 +34,12 @@
 
 mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5171",font_color="#04103b")
 {
+
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("ecm")) install.packages("ecm")
+  if (!require("caTools")) install.packages("caTools")
+  if (!require("dplyr")) install.packages("dplyr")
+  if (!require("lubridate")) install.packages("lubridate")
   library(plotly)
   library(ecm)
   library(caTools)
