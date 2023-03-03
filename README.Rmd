@@ -1,0 +1,60 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  dpi=300
+)
+```
+
+# peRformance
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of peRformance is to provide a range of functions to visually analyze and benchmark asset returns.
+
+## Installation
+
+You can install the development version of peRformance from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("fscheler/peRformance")
+```
+
+## Example application
+
+```{r function_mperf_table,warning=FALSE,message=FALSE}
+  library(peRformance)
+
+  #Generate an integrated monthly and annual performance overview using plotly
+  date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+  asset_ret<-rnorm(length(date))/100
+  benchmark_ret<-rnorm(length(date))/100
+  da<-data.frame(date,asset_ret,benchmark_ret)
+
+  #Including Benchmark Returns
+  df<-mperf_table(da,ts_format="returns")  
+
+  #Excluding Benchmark Returns  
+  df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns")
+  
+  #Using Index instead of Return Time Series
+  date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+  asset_ret<-cumprod(1+rnorm(length(date))/100)
+  benchmark_ret<-cumprod(1+rnorm(length(date))/100)
+  da<-data.frame(date,asset_ret,benchmark_ret)
+  
+  df<-mperf_table(da,ts_format="index")  
+
+
+```
+
