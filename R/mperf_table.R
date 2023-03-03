@@ -1,30 +1,4 @@
-# mperf_table (monthly performance table)
-#
-# This is a function called 'mperf_table' creating a tabular overview of monthly and annual performance
-# returning a plotly table
-#
-# The function takes a with up to three columns as input and returns a plotly table and a formated dataframe that
-# can, for instance, be used together with the kable package in Rmarkdown documents
-#
-#
-# Example:
-# Create a dataframe with asset and benchmark returns
-#
-#   date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
-#   asset_ret<-rnorm(length(date))/100
-#   benchmark_ret<-rnorm(length(date))/100
-#   da<-data.frame(date,asset_ret,benchmark_ret)
-#
-# Generate the performance table:
-#
-#   df<-mperf_table(da)
-#   df$fig
-#
-# Generate the performance table without benchmark
-#
-#   df<-mperf_tableb(da[,c("date","asset_ret")])
-#   df$fig
-#
+
 #
 # Some useful keyboard shortcuts for package authoring:
 #
@@ -32,7 +6,7 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5171",font_color="#04103b")
+mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5171",font_color="#04103b",export_format="svg",chart_width=600,chart_height=400)
 {
 
   if (!require("plotly")) install.packages("plotly")
@@ -349,7 +323,7 @@ mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5
   }
   m<-list(r=0,b=0,t=0,l=0,par=4)
   fig<-fig%>%layout(margin=m)
-
+  fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "monthly_returns_table",width = chart_width,height = chart_height))
 
   print(printtable)
 
