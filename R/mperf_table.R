@@ -231,7 +231,7 @@ mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="
 
   }else{
     fig <- plot_ly(
-      height=chart_height,
+      #height=chart_height,
       type = 'table',
       columnwidth  = c(60,rep(80,12)),
       header = list(
