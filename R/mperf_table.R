@@ -32,7 +32,7 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-mperf_table<-function(da,chart_height=500,ts_format="returns")
+mperf_table<-function(da,chart_height=500,ts_format="returns",header_color="#3b5171",font_color="#04103b")
 {
   library(plotly)
   library(ecm)
@@ -41,7 +41,7 @@ mperf_table<-function(da,chart_height=500,ts_format="returns")
   library(lubridate)
   options(warn = -1)
 
-  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+
   bm_dummy<-ncol(da)
 
   if(bm_dummy==2)
@@ -147,7 +147,7 @@ mperf_table<-function(da,chart_height=500,ts_format="returns")
     ds$Ann_bm<-replace_function(ds$Ann_bm)
   }, error=function(e){})
 
-  headerColor<-col_aq2[3]
+  headerColor<-header_color
   rowOddColor<-"white"
   rowEvenColor<-"lightgrey"
 
@@ -204,7 +204,7 @@ mperf_table<-function(da,chart_height=500,ts_format="returns")
       line = list(color = 'white'),
       fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(ds$Year)/2+1))),
       align = c('center', 'center','center','center','center', 'center','center', 'center'),
-      font = list(color = c(col_aq2[1]), size = 6)
+      font = list(color = c(font_color), size = 6)
       #font = list(color = list(list(c("red","green")),), size = 6.5),
 
     ))
@@ -296,7 +296,7 @@ mperf_table<-function(da,chart_height=500,ts_format="returns")
         line = list(color = 'white'),
         fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(ds$Year)/2+1))),
         align = c('center', 'center','center','center','center', 'center','center', 'center'),
-        font = list(color = c(col_aq2[1]), size = 6)
+        font = list(color = c(font_color), size = 6)
         #font = list(color = list(list(c("red","green")),), size = 6.5),
 
       ))
