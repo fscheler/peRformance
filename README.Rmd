@@ -45,7 +45,7 @@ devtools::install_github("fscheler/peRformance")
   df<-mperf_table(da,ts_format="returns")  
 
   #Excluding Benchmark Returns  
-  df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns")
+  df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
   
   #Using Index instead of Return Time Series
   date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
@@ -53,7 +53,11 @@ devtools::install_github("fscheler/peRformance")
   benchmark_ret<-cumprod(1+rnorm(length(date))/100)
   da<-data.frame(date,asset_ret,benchmark_ret)
   
-  df<-mperf_table(da,ts_format="index")  
+  df<-mperf_table(da,ts_format="index",print_output=F)  
+  
+  #You can also configure the export options and download the plotly graphic as a high resolution svg
+  df<-mperf_table(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
+                  chart_width=600,chart_height=150,print_output=F)  
 
   #Display Plotly Graphic
   df$fig
