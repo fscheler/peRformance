@@ -2,7 +2,7 @@
 
 
 
-dRawdowns<-function(da,graphics=F)
+dRawdowns<-function(da,ret_format='returns',graphics=F)
 {
   if (!require("ecm")) install.packages("ecm")
   if (!require("plotly")) install.packages("ggplot2")
@@ -13,8 +13,16 @@ dRawdowns<-function(da,graphics=F)
   library(plotly)
   library(dplyr)
 
-  names(da)<-c("date","asset_ret")
-  da$asset_idx<-cumprod(1+da$asset_ret)
+  if(ret_format=='returns')
+  {
+    names(da)<-c("date","asset_ret")
+    da$asset_idx<-cumprod(1+da$asset_ret)
+  }else{
+    names(da)<-c("date","asset_idx")
+    da$asset_ret<-da$asset_idx/lagpad(da$asset_idx,k=1)-1
+    da$asset_ret[1]<-0
+  }
+
   da$asset_idx[1]<-1
 
   da$md<-da$asset_idx/cummax(da$asset_idx)-1
