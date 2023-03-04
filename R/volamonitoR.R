@@ -5,13 +5,15 @@
 volamonitoR<-function(tr,ret_format="returns",vola_monitoring_slider=90,svg_export_width=800,svg_export_height=450, chart_title1="Volatility Z-Scores",chart_title2="Performance & Signals",threshold1=3,threshold2=4,threshold3=5)
 {
 
+  if (!require("ecm")) install.packages("ecm")
+  if (!require("plotly")) install.packages("ggplot2")
+  if (!require("caTools")) install.packages("caTools")
+
   library(ecm)
   library(caTools)
   library(plotly)
 
   col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#969696"))
-
-
 
   if(ret_format=='returns')
   {
