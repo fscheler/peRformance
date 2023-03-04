@@ -6,7 +6,7 @@ volamonitoR<-function(tr,ret_format="returns",vola_monitoring_slider=90,svg_expo
 {
 
   if (!require("ecm")) install.packages("ecm")
-  if (!require("plotly")) install.packages("ggplot2")
+  if (!require("plotly")) install.packages("plotly")
   if (!require("caTools")) install.packages("caTools")
 
   library(ecm)
