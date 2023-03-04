@@ -1,7 +1,5 @@
 
 
-
-
 dRawdowns<-function(da,ret_format='returns',graphics=F)
 {
   if (!require("ecm")) install.packages("ecm")
@@ -22,6 +20,8 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
     da$asset_ret<-da$asset_idx/lagpad(da$asset_idx,k=1)-1
     da$asset_ret[1]<-0
   }
+  da$date<-as.Date(da$date)
+  da<-da[order(da$date),]
 
   da$asset_idx[1]<-1
 
@@ -32,21 +32,21 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
 
   ds<-da[da$md<0,]
   ds<-ds%>%group_by(mdn)%>%mutate(trough=min(md))
-  ds$through_date<-ifelse(ds$md==ds$trough,ds$date,0)
-  ds<-ds%>%group_by(mdn)%>%summarise(st_date=head(date,1),ed_date=tail(date,1),trough=min(md),through_date=as.Date(max(through_date),origin="1970-01-01"))
-  ds$through_date
+  ds$trough_date<-ifelse(ds$md==ds$trough,ds$date,0)
+  ds<-ds%>%group_by(mdn)%>%summarise(st_date=head(date,1),ed_date=tail(date,1),trough=min(md),trough_date=as.Date(max(trough_date),origin="1970-01-01"))
+  ds$trough_date
 
-  ds$peak2through<-ds$through_date-ds$st_date
+  ds$peak2trough<-ds$trough_date-ds$st_date
   ds$peak2recovery<-ds$ed_date-ds$st_date
-  ds$through2recovery<-ds$ed_date-ds$through_date
+  ds$trough2recovery<-ds$ed_date-ds$trough_date
 
   pos_observations<-nrow(da[da$asset_ret>=0,])
   neg_observations<-nrow(da[da$asset_ret<0,])
 
 
   longest_drawdown<-max(ds$peak2recovery)
-  longest_peak2through<-max(ds$peak2through)
-  longest_recovery<-max(ds$through2recovery)
+  longest_peak2trough<-max(ds$peak2trough)
+  longest_recovery<-max(ds$trough2recovery)
   max_drawdown<-min(ds$trough)
   ann_return<-((tail(da$asset_idx,1)/head(da$asset_idx,1))^(365.25/(as.numeric(tail(da$date,1)-head(da$date,1))))-1)
 
@@ -74,7 +74,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
 
   res_list<-list(
     'longest_drawdown'=longest_drawdown,
-    'longest_peak2through'=longest_peak2through,
+    'longest_peak2trough'=longest_peak2trough,
     'longest_recovery'=longest_recovery,
     'max_drawdown'=max_drawdown,
     'ann_return'=ann_return,
@@ -113,7 +113,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
 
     res_list<-list(
       'longest_drawdown'=longest_drawdown,
-      'longest_peak2trough'=longest_peak2through,
+      'longest_peak2trough'=longest_peak2trough,
       'longest_recovery'=longest_recovery,
       'max_drawdown'=max_drawdown,
       'ann_return'=ann_return,
