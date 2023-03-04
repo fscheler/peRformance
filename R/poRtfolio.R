@@ -41,7 +41,7 @@ alloc_pie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l
 }
 
 
-alloc_tree<-function(df,chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
+alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
 {
   if (!require("scales")) install.packages("scales")
   if (!require("plotly")) install.packages("plotly")
