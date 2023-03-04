@@ -107,6 +107,7 @@ da<-data.frame(date,asset_ret)
 ##  Example application dRawdowns
 
 Analyse frequence, magnitude and length of drawdowns in a given time series.
+Please note: If the time series ends in a drawdown, the last peak2recovery and trough2recovery values display the number of periods since the last trough and the date of the last observation even if this does not mark a complete recovery.
 
 ```{r function_drawdown_analysis,warning=FALSE,message=FALSE}
 
@@ -115,11 +116,11 @@ date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
 asset_ret<-rnorm(length(date))/100
 da<-data.frame(date,asset_ret)
 
-df<-dRawdowns(da)
+df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 #Some example output
 df$longest_drawdown
-df$longest_peak2through
+df$longest_peak2trough
 #Count number of drawdowns with a trough below threshold value
 df$n
 ```

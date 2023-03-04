@@ -38,26 +38,26 @@ financial time series.
 
   #Including Benchmark Returns
   df<-mperf_table(da,ts_format="returns")  
-#>   Year    Jan    Feb    Mar    Apr     May     Jun     Jul    Aug    Sep    Oct
-#> 1 2007 -6.41% -1.26%  9.77%  5.95%  -0.23%  -7.04%   3.45%  1.64% -3.18% -2.22%
-#> 2 2008  3.62%  0.72% -6.49%  1.84%   -4.2%   9.08%  -3.88%  0.35%  0.76% -7.77%
-#> 3 2009 -0.86% -3.46%  4.84%  7.03%   6.06%   1.39%   7.73%  6.33% -7.32% 13.62%
-#> 4 2010 -0.71%  7.98%  1.65% -2.26% -10.06% -12.89%   2.36%  7.15% -9.31% -3.37%
-#> 5 2011  1.12%  0.23% -3.52%  3.22%   5.37%   5.01%   1.66% -7.16% -2.98%  2.94%
-#> 6 2012  -7.6% -4.14%  2.65% -0.94%   0.65%   -3.5% -13.51% -0.72%  5.33%  5.01%
-#> 7 2013 -7.68%  0.09% -5.88%  2.65%  -9.69%  10.86%  -3.19% 11.18%  3.27%  3.12%
-#> 8 2014  1.87%  1.52% -4.26%  6.74%  -5.68%   2.37%   0.98%   5.4% -6.27%  -0.3%
-#> 9 2015 -0.32%                                                                  
+#>   Year    Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct
+#> 1 2007   1.9% -3.51%  6.93%  6.67% -1.21% -8.65% -7.93%  -0.2% -7.66% -1.49%
+#> 2 2008 -0.56% -1.03% -5.14%  0.76% -2.88%  3.01%  6.13% -1.68% -8.81% -4.74%
+#> 3 2009 -3.97% -0.89% -3.64% -3.18% -7.61% -5.76% -1.98%  8.73%  5.11%     7%
+#> 4 2010 -7.19% -3.28% -4.97%  2.81%  0.74%  0.22% -5.34%  1.88% -6.48% -3.27%
+#> 5 2011  7.68% 15.28%  13.8%  7.03%  -1.8% -4.45%  5.27% -0.65% -4.64%  1.04%
+#> 6 2012  3.74% -2.41% -3.71%  4.92% -3.16% -2.62%  1.02%  0.54% -6.73%  2.46%
+#> 7 2013  1.84%  4.43%  -2.3%  9.85% -3.16%  -3.2% -8.95% -5.74%   3.4%  2.38%
+#> 8 2014 -0.44% -2.46%  4.96% -6.08% -0.53%  6.13%  -0.1% 10.25%  1.71%  -2.3%
+#> 9 2015  -2.6%                                                               
 #>      Nov    Dec       FY Benchmark
-#> 1 -1.51%  2.26%   -0.05%    35.08%
-#> 2 -9.09% -9.96%   -23.8%    -12.4%
-#> 3  1.01% -1.16%    39.1%   -31.65%
-#> 4 -2.71% -2.58%  -23.97%    -4.92%
-#> 5 -1.77% -2.49%    0.82%   -29.21%
-#> 6  1.65% -4.66%  -19.48%     7.16%
-#> 7  0.82%  -2.8%    0.39%    39.19%
-#> 8  4.67%  5.75%   12.34%    -8.48%
-#> 9                 -0.32%     1.04%
+#> 1 -1.06%  -9.7%  -24.42%    -9.67%
+#> 2   2.6% -6.42%   -18.1%   -28.13%
+#> 3 -6.72% -1.43%   -14.8%   -18.09%
+#> 4 -1.05%  8.93%  -16.73%     8.14%
+#> 5 -10.8% -2.74%   24.02%   -27.59%
+#> 6 -7.25% -4.89%  -17.41%   -18.13%
+#> 7 -2.85% -2.22%   -7.64%     7.06%
+#> 8 -0.17%  0.82%   11.32%    14.35%
+#> 9                  -2.6%    -1.09%
 
   #Excluding Benchmark Returns  
   df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
@@ -123,7 +123,10 @@ da<-data.frame(date,asset_ret)
 ## Example application dRawdowns
 
 Analyse frequence, magnitude and length of drawdowns in a given time
-series.
+series. Please note: If the time series ends in a drawdown, the last
+peak2recovery and trough2recovery values display the number of periods
+since the last trough and the date of the last observation even if this
+does not mark a complete recovery.
 
 ``` r
 
@@ -132,23 +135,23 @@ date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
 asset_ret<-rnorm(length(date))/100
 da<-data.frame(date,asset_ret)
 
-df<-dRawdowns(da)
+df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 #Some example output
 df$longest_drawdown
-#> Time difference of 1807 days
-df$longest_peak2through
-#> Time difference of 1366 days
+#> Time difference of 1602 days
+df$longest_peak2trough
+#> Time difference of 596 days
 #Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00            2
-#> 2  -0.05            1
-#> 3  -0.10            1
+#> 1   0.00           23
+#> 2  -0.05            3
+#> 3  -0.10            2
 #> 4  -0.20            1
 #> 5  -0.30            1
-#> 6  -0.40            1
-#> 7  -0.50            1
+#> 6  -0.40            0
+#> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
 ```
