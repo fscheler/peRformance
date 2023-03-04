@@ -34,7 +34,7 @@ alloc_pie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l
            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
            yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
-  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "drilldown.svg",width = chart_export_width,height = chart_export_height))
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
 
   return(p)
 
@@ -81,7 +81,7 @@ alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_ex
                    labels=regions$assets,
                    parents=regions$Parent_Label,
                    values= as.numeric(regions$sum),
-                   marker=list(colors=c(cols,'white')),
+                   marker=list(colors=c(cols,'#020b2b')),
                    #width=1100,
                    #height=600,
                    #hovertemplate  = paste(gp$Child_Label, "<br>", gp$IssueValue,"%"),
@@ -89,12 +89,14 @@ alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_ex
                                          as.numeric(regions$sum)*100,"%",
                                          '<extra></extra>'),
                    branchvalues="total",
-                   outsidetextfont=list(size=22, color= "#04103b"),
+                   outsidetextfont=list(size=22, color= "white"),
                    #insidetextfont=list(size=22),
                    #textfont=list(size=22),
                    text=paste0("",round(regions$perc*100,1),"% <br>")
     )%>%
       layout(margin=m)
+
+    tree<-tree %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_tree",width = chart_export_width,height = chart_export_height))
 
     return(tree)
 
