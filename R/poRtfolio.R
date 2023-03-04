@@ -1,7 +1,7 @@
 
 
 
-alloc_pie<-function(df,chart_export_width=600,chart_export_height=400)
+alloc_pie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4))
 {
 
   if (!require("scales")) install.packages("scales")
@@ -16,8 +16,6 @@ alloc_pie<-function(df,chart_export_width=600,chart_export_height=400)
   names(df)<-c("assets","weights")
   df<-df%>%group_by(assets)%>%summarize(weights=sum(weights))
   df$weights<-df$weights/sum(df$weights)
-
-  m <- list(l = 100,r = 100,b = 100,t = 100,pad = 4)
 
   col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
   #col_aq2<-as.character(c("#04103b","#D1E2EC","#dd0400"))
@@ -38,12 +36,12 @@ alloc_pie<-function(df,chart_export_width=600,chart_export_height=400)
 
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "drilldown.svg",width = chart_export_width,height = chart_export_height))
 
-  p
+  return(p)
 
 }
 
 
-alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=400)
+alloc_tree<-function(df,chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
 {
   if (!require("scales")) install.packages("scales")
   if (!require("plotly")) install.packages("plotly")
@@ -71,7 +69,7 @@ alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_ex
     regions<-as.data.frame(regions,stringsAsFactors=F)
     regions$perc<-as.numeric(regions$perc)
 
-    m<-list(r=0,l=0,b=0,t=0,par=4)
+    #m<-list(r=0,l=0,b=0,t=0,par=4)
 
     col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
     #col_aq2<-as.character(c("#04103b","#D1E2EC","#dd0400"))
