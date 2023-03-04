@@ -105,7 +105,7 @@ dRawdowns<-function(da,graphics=F)
 
     res_list<-list(
       'longest_drawdown'=longest_drawdown,
-      'longest_peak2through'=longest_peak2through,
+      'longest_peak2trough'=longest_peak2through,
       'longest_recovery'=longest_recovery,
       'max_drawdown'=max_drawdown,
       'ann_return'=ann_return,

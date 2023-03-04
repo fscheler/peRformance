@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of peRformance is to provide a range of functions to visually analyze and benchmark asset returns.
+The goal of peRformance is to provide a range of functions to study and visualize market or economic data and analyize and benchmark asset returns.
 
 ## Installation
 
@@ -31,6 +31,9 @@ devtools::install_github("fscheler/peRformance")
 ```
 
 ## Example application monthly performance overview table
+
+Create a monthly and annual performance overview table in plotly and a printable version that can be used in markdown documents with the kable package.
+Monthly tables are a popular tool in analysis and comparison of financial time series.
 
 ```{r function_mperf_table,warning=FALSE,message=FALSE}
   library(peRformance)
@@ -67,6 +70,8 @@ devtools::install_github("fscheler/peRformance")
 
 ##  Example application recession shading with ggplot2
 
+Apply NBER recession shading to any ggplot2 time series graphic, directly loading the recession indicator from the St Louis Fed.
+Please note, that this function requires an API key that can be generated for free on the Fed's website (https://fred.stlouisfed.org/docs/api/api_key.html).
 
 ```{r function_recession_shading,warning=FALSE,message=FALSE}
 
@@ -96,4 +101,25 @@ da<-data.frame(date,asset_ret)
     theme(plot.margin=margin(l=5,r=10,b=5,t=5))
   p
   
+```
+
+
+##  Example application dRawdowns
+
+Analyse frequence, magnitude and length of drawdowns in a given time series.
+
+```{r function_drawdown_analysis,warning=FALSE,message=FALSE}
+
+#Study lenght, magnitude and frequency of drawdowns in a time series
+date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+asset_ret<-rnorm(length(date))/100
+da<-data.frame(date,asset_ret)
+
+df<-dRawdowns(da)
+
+#Some example output
+df$longest_drawdown
+df$longest_peak2through
+#Count number of drawdowns with a trough below threshold value
+df$n
 ```

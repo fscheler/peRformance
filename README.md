@@ -6,8 +6,9 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of peRformance is to provide a range of functions to visually
-analyze and benchmark asset returns.
+The goal of peRformance is to provide a range of functions to study and
+visualize market or economic data and analyize and benchmark asset
+returns.
 
 ## Installation
 
@@ -21,6 +22,11 @@ devtools::install_github("fscheler/peRformance")
 
 ## Example application monthly performance overview table
 
+Create a monthly and annual performance overview table in plotly and a
+printable version that can be used in markdown documents with the kable
+package. Monthly tables are a popular tool in analysis and comparison of
+financial time series.
+
 ``` r
   library(peRformance)
 
@@ -32,26 +38,26 @@ devtools::install_github("fscheler/peRformance")
 
   #Including Benchmark Returns
   df<-mperf_table(da,ts_format="returns")  
-#>   Year    Jan     Feb    Mar     Apr    May    Jun     Jul    Aug    Sep    Oct
-#> 1 2007 -5.56%  -4.42%  1.87%  -2.39% -0.32%  6.42%   5.54% -2.74%  3.11%  3.83%
-#> 2 2008  2.49%  -0.52%  -7.8%  -5.91% -6.07%  0.05% -10.73% -8.58% -7.67%  9.97%
-#> 3 2009 -4.23%   4.26% -5.87%  -4.37%  5.24%  3.89%  -8.98% -5.73%  3.44% -1.52%
-#> 4 2010   3.7%   2.83%  1.41% -16.49%  1.08% -3.21%  -2.18%  7.59%  7.52% -5.23%
-#> 5 2011  4.07%  -1.37%  -1.7%  -1.03%   5.1% -4.73%  -1.72%  0.25% -1.03%  -4.4%
-#> 6 2012  4.03% -10.44%  4.29%  -0.34%  0.33%  5.47%   7.18%  2.74% -9.37% -0.04%
-#> 7 2013  0.44%   2.69% -4.54%  -9.93%  6.53% -4.54%   3.42% -1.41% -2.78% -1.12%
-#> 8 2014  1.71%  -5.13%  8.03%   5.88% -6.42% -5.53%   8.11% -2.25% 14.36%   1.3%
-#> 9 2015   1.3%                                                                  
+#>   Year    Jan    Feb    Mar    Apr     May     Jun     Jul    Aug    Sep    Oct
+#> 1 2007 -6.41% -1.26%  9.77%  5.95%  -0.23%  -7.04%   3.45%  1.64% -3.18% -2.22%
+#> 2 2008  3.62%  0.72% -6.49%  1.84%   -4.2%   9.08%  -3.88%  0.35%  0.76% -7.77%
+#> 3 2009 -0.86% -3.46%  4.84%  7.03%   6.06%   1.39%   7.73%  6.33% -7.32% 13.62%
+#> 4 2010 -0.71%  7.98%  1.65% -2.26% -10.06% -12.89%   2.36%  7.15% -9.31% -3.37%
+#> 5 2011  1.12%  0.23% -3.52%  3.22%   5.37%   5.01%   1.66% -7.16% -2.98%  2.94%
+#> 6 2012  -7.6% -4.14%  2.65% -0.94%   0.65%   -3.5% -13.51% -0.72%  5.33%  5.01%
+#> 7 2013 -7.68%  0.09% -5.88%  2.65%  -9.69%  10.86%  -3.19% 11.18%  3.27%  3.12%
+#> 8 2014  1.87%  1.52% -4.26%  6.74%  -5.68%   2.37%   0.98%   5.4% -6.27%  -0.3%
+#> 9 2015 -0.32%                                                                  
 #>      Nov    Dec       FY Benchmark
-#> 1 -4.34% 13.25%   13.36%     5.91%
-#> 2 -6.36% -6.22%  -39.51%     5.73%
-#> 3  2.65% -7.35%  -18.32%     -6.1%
-#> 4 -0.09%  0.05%   -5.31%      3.3%
-#> 5  5.31%  -3.1%   -4.88%    -3.64%
-#> 6 -3.99% -0.05%   -1.92%     -6.5%
-#> 7 -5.47% -2.51%  -18.53%    -36.6%
-#> 8  0.49%  3.51%   24.26%    22.22%
-#> 9                   1.3%     0.08%
+#> 1 -1.51%  2.26%   -0.05%    35.08%
+#> 2 -9.09% -9.96%   -23.8%    -12.4%
+#> 3  1.01% -1.16%    39.1%   -31.65%
+#> 4 -2.71% -2.58%  -23.97%    -4.92%
+#> 5 -1.77% -2.49%    0.82%   -29.21%
+#> 6  1.65% -4.66%  -19.48%     7.16%
+#> 7  0.82%  -2.8%    0.39%    39.19%
+#> 8  4.67%  5.75%   12.34%    -8.48%
+#> 9                 -0.32%     1.04%
 
   #Excluding Benchmark Returns  
   df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
@@ -75,6 +81,12 @@ devtools::install_github("fscheler/peRformance")
 <img src="man/figures/README-function_mperf_table-1.png" width="100%" />
 
 ## Example application recession shading with ggplot2
+
+Apply NBER recession shading to any ggplot2 time series graphic,
+directly loading the recession indicator from the St Louis Fed. Please
+note, that this function requires an API key that can be generated for
+free on the Fed’s website
+(<https://fred.stlouisfed.org/docs/api/api_key.html>).
 
 ``` r
 
@@ -107,3 +119,36 @@ da<-data.frame(date,asset_ret)
 ```
 
 <img src="man/figures/README-function_recession_shading-1.png" width="100%" />
+
+## Example application dRawdowns
+
+Analyse frequence, magnitude and length of drawdowns in a given time
+series.
+
+``` r
+
+#Study lenght, magnitude and frequency of drawdowns in a time series
+date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+asset_ret<-rnorm(length(date))/100
+da<-data.frame(date,asset_ret)
+
+df<-dRawdowns(da)
+
+#Some example output
+df$longest_drawdown
+#> Time difference of 1807 days
+df$longest_peak2through
+#> Time difference of 1366 days
+#Count number of drawdowns with a trough below threshold value
+df$n
+#>   ranges observations
+#> 1   0.00            2
+#> 2  -0.05            1
+#> 3  -0.10            1
+#> 4  -0.20            1
+#> 5  -0.30            1
+#> 6  -0.40            1
+#> 7  -0.50            1
+#> 8   0.60            0
+#> 9  -0.70            0
+```
