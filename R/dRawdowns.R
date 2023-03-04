@@ -23,8 +23,6 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
   da$date<-as.Date(da$date)
   da<-da[order(da$date),]
 
-  da$asset_idx[1]<-1
-
   da$md<-da$asset_idx/cummax(da$asset_idx)-1
 
   da$mdst<-ifelse(da$md<0 & lagpad(da$md,k=1)==0,1,0)
