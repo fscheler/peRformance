@@ -106,7 +106,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
     dd_ts<-plot_ly(da,x=~date,y=~asset_idx/cummax(asset_idx),type="scatter",mode="line",line=list(color=col_aq2[1]))%>%
       layout(title="Maximum Drawdown %",xaxis = list(title=""), yaxis = list(title="",tickformat=".0%"),showlegend=F)
 
-    perf_ts<-plot_ly(da,x=~date,y=~asset_idx,type="scatter",mode="line",line=list(color=col_aq2[1]))%>%
+    perf_ts<-plot_ly(da,x=~date,y=~asset_idx/head(asset_idx,1),type="scatter",mode="line",line=list(color=col_aq2[1]))%>%
       layout(title="Performance %",xaxis = list(title=""), yaxis = list(title="",tickformat=".0%"),showlegend=F)
 
     res_list<-list(
