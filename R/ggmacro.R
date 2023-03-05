@@ -43,3 +43,5 @@ add_rec_shade<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shad
     return(rec_shade)
   }
 }
+
+
