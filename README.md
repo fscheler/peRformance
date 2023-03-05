@@ -30,39 +30,39 @@ financial time series.
 ``` r
   library(peRformance)
 
-  #Generate an integrated monthly and annual performance overview using plotly
+  # Generate an integrated monthly and annual performance overview using plotly
   date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
   asset_ret<-rnorm(length(date))/100
   benchmark_ret<-rnorm(length(date))/100
   da<-data.frame(date,asset_ret,benchmark_ret)
 
-  #Including Benchmark Returns
+  # Including Benchmark Returns
   df<-mperf_table(da,ts_format="returns")  
 #>   Year    Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct
-#> 1 2007   1.9% -3.51%  6.93%  6.67% -1.21% -8.65% -7.93%  -0.2% -7.66% -1.49%
-#> 2 2008 -0.56% -1.03% -5.14%  0.76% -2.88%  3.01%  6.13% -1.68% -8.81% -4.74%
-#> 3 2009 -3.97% -0.89% -3.64% -3.18% -7.61% -5.76% -1.98%  8.73%  5.11%     7%
-#> 4 2010 -7.19% -3.28% -4.97%  2.81%  0.74%  0.22% -5.34%  1.88% -6.48% -3.27%
-#> 5 2011  7.68% 15.28%  13.8%  7.03%  -1.8% -4.45%  5.27% -0.65% -4.64%  1.04%
-#> 6 2012  3.74% -2.41% -3.71%  4.92% -3.16% -2.62%  1.02%  0.54% -6.73%  2.46%
-#> 7 2013  1.84%  4.43%  -2.3%  9.85% -3.16%  -3.2% -8.95% -5.74%   3.4%  2.38%
-#> 8 2014 -0.44% -2.46%  4.96% -6.08% -0.53%  6.13%  -0.1% 10.25%  1.71%  -2.3%
-#> 9 2015  -2.6%                                                               
-#>      Nov    Dec       FY Benchmark
-#> 1 -1.06%  -9.7%  -24.42%    -9.67%
-#> 2   2.6% -6.42%   -18.1%   -28.13%
-#> 3 -6.72% -1.43%   -14.8%   -18.09%
-#> 4 -1.05%  8.93%  -16.73%     8.14%
-#> 5 -10.8% -2.74%   24.02%   -27.59%
-#> 6 -7.25% -4.89%  -17.41%   -18.13%
-#> 7 -2.85% -2.22%   -7.64%     7.06%
-#> 8 -0.17%  0.82%   11.32%    14.35%
-#> 9                  -2.6%    -1.09%
+#> 1 2007    -5%  1.83% -7.74%  0.19%  4.91% -0.87% -4.66%   0.1%  2.62%  2.77%
+#> 2 2008 -2.25%  3.78%  9.62%  0.89%  7.05%  0.66%  6.13%  4.96% -0.78% -2.04%
+#> 3 2009 -6.26% -0.64% -0.33%  4.69%  0.74%  5.32% 14.01%  5.75%  -0.8% -0.04%
+#> 4 2010 -4.33%  -6.7%  7.78% -1.61% -2.87%  0.45%  9.34%  5.65%  3.05% -4.29%
+#> 5 2011 -5.48% 10.65% -0.88% -9.31%  8.44%  -4.5%    -2% -0.79%   6.2% -0.65%
+#> 6 2012 -2.38%    -3%  1.73%  3.67% -8.71%  1.73%  5.22%  7.69%  4.22%  1.59%
+#> 7 2013 -7.79% -2.28%   3.5%  8.64% -2.36% -2.82% -4.26% -7.19% -0.52%  9.19%
+#> 8 2014 -0.92% -0.36% -7.73% -5.15%  3.56%  5.27% 12.74% -1.15%  9.58%  -0.4%
+#> 9 2015 -0.26%                                                               
+#>      Nov    Dec      FY Benchmark
+#> 1  7.59% -0.28%   0.42%       16%
+#> 2   5.1%  2.82%  41.45%    16.19%
+#> 3 -8.94%  6.01%  18.99%    -13.2%
+#> 4 -3.49%   3.4%   5.02%    26.29%
+#> 5  3.64%  9.54%  13.39%    10.68%
+#> 6 -3.67%  4.05%  11.54%   -13.08%
+#> 7  0.85% 15.65%   8.21%     7.86%
+#> 8 13.82% -7.67%  20.42%   -15.95%
+#> 9                -0.26%      0.5%
 
   #Excluding Benchmark Returns  
   df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
   
-  #Using Index instead of Return Time Series
+  # Using Index instead of Return Time Series
   date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
   asset_ret<-cumprod(1+rnorm(length(date))/100)
   benchmark_ret<-cumprod(1+rnorm(length(date))/100)
@@ -70,11 +70,11 @@ financial time series.
   
   df<-mperf_table(da,ts_format="index",print_output=F)  
   
-  #You can also configure the export options and download the plotly graphic as a high resolution svg
+  # You can also configure the export options and download the plotly graphic as a high resolution svg
   df<-mperf_table(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
                   chart_export_width=600,chart_export_height=150,print_output=F)  
 
-  #Display Plotly Graphic
+  # Display Plotly Graphic
   df$fig
 ```
 
@@ -90,8 +90,7 @@ free on the Fed’s website
 
 ``` r
 
-# Create a return time series
-
+# Generate a random return time series
 date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
 asset_ret<-cumprod(1+rnorm(length(date))/100)
 da<-data.frame(date,asset_ret)
@@ -106,7 +105,7 @@ da<-data.frame(date,asset_ret)
     p<-p + add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
   }, error = function(e) {})
 #> NULL
-#add formatting  
+# add formatting  
   p<-p +
     geom_line(size=1,aes(y=asset_ret,color="Time Series"))+
     scale_colour_manual(values = cols)+
@@ -130,28 +129,67 @@ does not mark a complete recovery.
 
 ``` r
 
-#Study lenght, magnitude and frequency of drawdowns in a time series
+# Generate a random return time series
 date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
 asset_ret<-rnorm(length(date))/100
 da<-data.frame(date,asset_ret)
 
+# Analyze the number, magnitude and length of drawdowns
 df<-dRawdowns(da,ret_format='returns',graphics=F)
 
-#Some example output
+# Some example output
 df$longest_drawdown
-#> Time difference of 1602 days
+#> Time difference of 1095 days
 df$longest_peak2trough
-#> Time difference of 596 days
-#Count number of drawdowns with a trough below threshold value
+#> Time difference of 775 days
+# Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00           23
-#> 2  -0.05            3
-#> 3  -0.10            2
+#> 1   0.00           19
+#> 2  -0.05            6
+#> 3  -0.10            3
 #> 4  -0.20            1
 #> 5  -0.30            1
 #> 6  -0.40            0
 #> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
+```
+
+sequence of random returns \## Example application rrScat & rrScatEff
+functions
+
+The rrScat functions provide visual insights into the risk/return
+profile of a given sample of assets. rrScat displays the annualized risk
+(standard deviation) of returns and the annualized return in a scatter
+plot. rrScatEff provides an interface to the ROI optimizer of the
+PortfolioAnalytics package and plots the efficient frontier alongisde
+the given assets.
+
+``` r
+
+# Generate a dataframe of random asset returns
+date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+Asset1<-rnorm(length(date))/100+0.0005
+Asset2<-rnorm(length(date))/100+0.0005
+Asset3<-rnorm(length(date))/100+0.0005
+Asset4<-rnorm(length(date))/100+0.0005
+da<-data.frame(date,Asset1,Asset2,Asset3,Asset4)
+
+# Plot the risk/return scatter
+df<-rrScat(da,ret_format="returns",table_format='wide')
+df$rr_ggplot
+```
+
+<img src="man/figures/README-function_risk_return_scatter-1.png" width="100%" />
+
+``` r
+
+# Plot the risk/return scatter and the efficient frontier
+p<-rrScatEff(da,ret_format="returns",table_format='wide')
+
+# The function can also handle data in long format. 
+# For this, the data should be arranged as follows: date, id, values
+long <- melt(setDT(da), id.vars = "date")
+p<-rrScatEff(long,ret_format="returns",table_format='long')
 ```

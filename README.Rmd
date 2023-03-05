@@ -38,19 +38,19 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
 ```{r function_mperf_table,warning=FALSE,message=FALSE}
   library(peRformance)
 
-  #Generate an integrated monthly and annual performance overview using plotly
+  # Generate an integrated monthly and annual performance overview using plotly
   date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
   asset_ret<-rnorm(length(date))/100
   benchmark_ret<-rnorm(length(date))/100
   da<-data.frame(date,asset_ret,benchmark_ret)
 
-  #Including Benchmark Returns
+  # Including Benchmark Returns
   df<-mperf_table(da,ts_format="returns")  
 
   #Excluding Benchmark Returns  
   df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
   
-  #Using Index instead of Return Time Series
+  # Using Index instead of Return Time Series
   date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
   asset_ret<-cumprod(1+rnorm(length(date))/100)
   benchmark_ret<-cumprod(1+rnorm(length(date))/100)
@@ -58,11 +58,11 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
   
   df<-mperf_table(da,ts_format="index",print_output=F)  
   
-  #You can also configure the export options and download the plotly graphic as a high resolution svg
+  # You can also configure the export options and download the plotly graphic as a high resolution svg
   df<-mperf_table(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
                   chart_export_width=600,chart_export_height=150,print_output=F)  
 
-  #Display Plotly Graphic
+  # Display Plotly Graphic
   df$fig
 
 ```
@@ -75,8 +75,7 @@ Please note, that this function requires an API key that can be generated for fr
 
 ```{r function_recession_shading,warning=FALSE,message=FALSE}
 
-# Create a return time series
-
+# Generate a random return time series
 date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
 asset_ret<-cumprod(1+rnorm(length(date))/100)
 da<-data.frame(date,asset_ret)
@@ -90,7 +89,7 @@ da<-data.frame(date,asset_ret)
   tryCatch({
     p<-p + add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
   }, error = function(e) {})
-#add formatting  
+# add formatting  
   p<-p +
     geom_line(size=1,aes(y=asset_ret,color="Time Series"))+
     scale_colour_manual(values = cols)+
@@ -111,16 +110,48 @@ Please note: If the time series ends in a drawdown, the last peak2recovery and t
 
 ```{r function_drawdown_analysis,warning=FALSE,message=FALSE}
 
-#Study lenght, magnitude and frequency of drawdowns in a time series
+# Generate a random return time series
 date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
 asset_ret<-rnorm(length(date))/100
 da<-data.frame(date,asset_ret)
 
+# Analyze the number, magnitude and length of drawdowns
 df<-dRawdowns(da,ret_format='returns',graphics=F)
 
-#Some example output
+# Some example output
 df$longest_drawdown
 df$longest_peak2trough
-#Count number of drawdowns with a trough below threshold value
+# Count number of drawdowns with a trough below threshold value
 df$n
+
+```
+sequence of random returns
+##    Example application rrScat & rrScatEff functions
+
+The rrScat functions provide visual insights into the risk/return profile of a given sample of assets.
+rrScat displays the annualized risk (standard deviation) of returns and the annualized return in a scatter plot.
+rrScatEff provides an interface to the ROI optimizer of the PortfolioAnalytics package and plots the efficient frontier alongisde the given assets.
+
+```{r function_risk_return_scatter,warning=FALSE,message=FALSE}
+
+# Generate a dataframe of random asset returns
+date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
+Asset1<-rnorm(length(date))/100+0.0005
+Asset2<-rnorm(length(date))/100+0.0005
+Asset3<-rnorm(length(date))/100+0.0005
+Asset4<-rnorm(length(date))/100+0.0005
+da<-data.frame(date,Asset1,Asset2,Asset3,Asset4)
+
+# Plot the risk/return scatter
+df<-rrScat(da,ret_format="returns",table_format='wide')
+df$rr_ggplot
+
+# Plot the risk/return scatter and the efficient frontier
+p<-rrScatEff(da,ret_format="returns",table_format='wide')
+
+# The function can also handle data in long format. 
+# For this, the data should be arranged as follows: date, id, values
+long <- melt(setDT(da), id.vars = "date")
+p<-rrScatEff(long,ret_format="returns",table_format='long')
+
 ```
