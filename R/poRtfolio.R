@@ -103,7 +103,7 @@ alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_ex
 }
 
 
-risk_return_scatter<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4))
+rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4))
 {
 
   if (!require("data.table")) install.packages("data.table")
@@ -194,12 +194,19 @@ risk_return_scatter<-function(da,ret_format="returns",table_format='wide',graphi
 }
 
 
-risk_return_scatter_eff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4))
+rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4))
 {
+  if (!require("purrr")) install.packages("data.table")
+  if (!require("PortfolioAnalytics")) install.packages("dplyr")
+  if (!require("ecm")) install.packages("ecm")
+  if (!require("plotly")) install.packages("lubridate")
+  if (!require("scales")) install.packages("scales")
+
   library(purrr)
   library(PortfolioAnalytics)
   library(ecm)
   library(plotly)
+  library(scales)
 
   calc_ret<-function(x)
   {
