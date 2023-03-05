@@ -222,13 +222,13 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
     return(x)
   }
 
-  dls<-risk_return_scatter(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
+  dls<-rrScat(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
 
   if(table_format!='wide')
   {
     names(da)<-c("date",'id','value')
     da$date<-as.Date(da$date)
-    da<-dcast(as.data.table(da), date ~ id, value.var = "value")
+    da<-data.table::dcast(as.data.table(da), date ~ id, value.var = "value")
   }else{
     names(da)[1]<-"date"
     da$date<-as.Date(da$date)
