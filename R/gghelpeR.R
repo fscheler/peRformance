@@ -385,7 +385,7 @@ lm_eqn <- function(m){
 
 
 
-scoreGauge<-function(chart_value=30,chart_title="Economic Situation",chart_export_width=600,chart_export_height=400)
+scoreGauge<-function(score_value=30,min_value=0,max_value=100,chart_title="Economic Situation",chart_export_width=600,chart_export_height=400)
 {
   #************Charting Function********************
   #Create Chart
@@ -395,31 +395,33 @@ scoreGauge<-function(chart_value=30,chart_title="Economic Situation",chart_expor
 
   library(plotly)
 
+  steps<-(max_value-min_value)/8
+
   fig <- plot_ly(
     type = "indicator",
     mode = "gauge+number",
-    value = chart_value,
+    value = score_value,
     title = list(text = chart_title, font = list(size = 50)),
     delta = list(reference = 1, increasing = list(color = "white")),
     gauge = list(
-      axis = list(range = list(NULL, 100), tickwidth = 1, tickcolor = "white",font=list(color="white")),
+      axis = list(range = list(min_value, max_value), tickwidth = 1, tickcolor = "white",font=list(color="white")),
       bar = list(color = col_aq[1]),
       bgcolor = "white",
       borderwidth = 2,
       bordercolor = "white",
       steps = list(
-        list(range = c(0, 12.5), color = cols_gr[1]),
-        list(range = c(12.5, 25), color = cols_gr[2]),
-        list(range = c(25, 37.5), color = cols_gr[3]),
-        list(range = c(37.5, 50), color = cols_gr[4]),
-        list(range = c(50, 62.5), color = cols_gr[5]),
-        list(range = c(62.5, 75), color = cols_gr[6]),
-        list(range = c(75, 87.5), color = cols_gr[7]),
-        list(range = c(87.5, 100), color = cols_gr[8])),
+        list(range = c(min_value, min_value+steps), color = cols_gr[1]),
+        list(range = c(min_value+steps, min_value+steps*2), color = cols_gr[2]),
+        list(range = c(min_value+steps*2,min_value+steps*3), color = cols_gr[3]),
+        list(range = c(min_value+steps*3, min_value+steps*4), color = cols_gr[4]),
+        list(range = c(min_value+steps*4, min_value+steps*5), color = cols_gr[5]),
+        list(range = c(min_value+steps*5, min_value+steps*6), color = cols_gr[6]),
+        list(range = c(min_value+steps*6,min_value+steps*7), color = cols_gr[7]),
+        list(range = c(min_value+steps*7,min_value+steps*8), color = cols_gr[8])),
       threshold = list(
         line = list(color = col_aq[1], width = 4),
         thickness = 0.75,
-        value = 50)))
+        value = (max_value-min_value)/2)))
   fig <- fig %>%
     layout(
       margin = list(l=20,r=30,t=50,b=0),
