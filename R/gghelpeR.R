@@ -385,14 +385,7 @@ lm_eqn <- function(m){
 
 
 
-#Export as SVG
-#library(svglite)
-#For Latex Publication
-
-#For PowerPoint
-
-
-plotly_gauge_charting_function<-function(chart_value=30,chart_title="Economic Situation",chart_export_width=600,chart_export_height=400)
+scoreGauge<-function(chart_value=30,chart_title="Economic Situation",chart_export_width=600,chart_export_height=400)
 {
   #************Charting Function********************
   #Create Chart
@@ -438,14 +431,4 @@ plotly_gauge_charting_function<-function(chart_value=30,chart_title="Economic Si
 
   return(fig)
 
-}
-
-
-
-
-save_gauges<-function(es,gauge_name="gauge_economic_situation.svg",target_folder="")
-{
-  setwd(target_folder)
-  #es<-plotly_gauge_charting_function(chart_value=75,chart_title="Economic Situation")
-  orca(es,gauge_name)
 }
