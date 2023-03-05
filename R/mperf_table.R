@@ -8,7 +8,6 @@
 
 
 
-
 mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="#04103b",
                       export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T)
 {
@@ -42,8 +41,10 @@ mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="
   {
     da$asset_ret<-da$asset_ret/lagpad(da$asset_ret,k=1)-1
     da$asset_ret[1]<-0
-    da$benchmark_ret<-da$benchmark_ret/lagpad(da$benchmark_ret,k=1)-1
-    da$benchmark_ret[1]<-0
+    tryCatch({
+      da$benchmark_ret<-da$benchmark_ret/lagpad(da$benchmark_ret,k=1)-1
+      da$benchmark_ret[1]<-0
+    }, error=function(e){})
   }
 
   da$asset_ret<-da$asset_ret+1
@@ -338,3 +339,5 @@ mperf_table<-function(da,ts_format="returns",header_color="#3b5171",font_color="
   fig_list<-list("fig"=fig,"printtable"=printtable)
 
 }
+
+
