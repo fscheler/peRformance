@@ -1,6 +1,6 @@
 
 
-dRawdowns<-function(da,ret_format='returns',graphics=F)
+dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
   if (!require("ecm")) install.packages("ecm")
   if (!require("plotly")) install.packages("ggplot2")
@@ -100,14 +100,16 @@ dRawdowns<-function(da,ret_format='returns',graphics=F)
       bargap=0.1)
     #fig<-fig%>%add_segments(x = 1, xend = 1, y = 0.3, yend = 0,type="scatter",mode="line",line=list(color=col_aq2[2]),marker=list(color="white"))
     dd_dist<-dd_dist%>%layout(showlegend=F,xaxis=list(title="Drawdowns",tickformat="0%"),yaxis = list(title="Probability",tickformat="0%"))
-    dd_dist
+    dd_dist<-dd_dist %>% config(toImageButtonOptions = list( format = "svg",filename = "drawdown_distribution",width = chart_export_width,height = chart_export_height))
 
 
     dd_ts<-plot_ly(da,x=~date,y=~asset_idx/cummax(asset_idx),type="scatter",mode="line",line=list(color=col_aq2[1]))%>%
       layout(title="Maximum Drawdown %",xaxis = list(title=""), yaxis = list(title="",tickformat=".0%"),showlegend=F)
+    dd_ts<-dd_ts %>% config(toImageButtonOptions = list( format = "svg",filename = "drawdowns",width = chart_export_width,height = chart_export_height))
 
     perf_ts<-plot_ly(da,x=~date,y=~asset_idx/head(asset_idx,1),type="scatter",mode="line",line=list(color=col_aq2[1]))%>%
       layout(title="Performance %",xaxis = list(title=""), yaxis = list(title="",tickformat=".0%"),showlegend=F)
+    perf_ts<-perf_ts %>% config(toImageButtonOptions = list( format = "svg",filename = "indexed_returns",width = chart_export_width,height = chart_export_height))
 
     res_list<-list(
       'longest_drawdown'=longest_drawdown,
