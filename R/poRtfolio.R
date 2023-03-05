@@ -112,6 +112,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
   if (!require("lubridate")) install.packages("lubridate")
   if (!require("plotly")) install.packages("plotly")
   if (!require("scales")) install.packages("scales")
+  if (!require("reshape2")) install.packages("reshape2")
 
   library(data.table)
   library(dplyr)
@@ -124,7 +125,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
   da$date<-as.Date(da$date)
   if(table_format=='wide')
   {
-    dl <- melt(setDT(da), id.vars = "date")
+    dl <- reshape2::melt(setDT(da), id.vars = "date")
   }else{
     dl<-da
   }
