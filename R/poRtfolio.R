@@ -273,6 +273,11 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
   eff$ret_ann<-rowSums(map2_dfc(eff, dls$ret_ann, `*`))
   eff$sd_ann<-ef$frontier[,2]*252^0.5
 
+  col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
+  #col_aq2<-as.character(c("#04103b","#D1E2EC","#dd0400"))
+  cols = colorRampPalette(col_aq2)(nrow(df))
+  #show_col(cols)
+
   p<-plot_ly(eff, x=~sd_ann, y=~ret_ann,type='scatter',mode='line', colors = cols,line=list(color='grey'))%>%
     add_trace( x=dls$sd_ann,y=dls$ret_ann,color = dls$variable,marker=list(size=12),mode='markers')%>%
     layout(margin = m,title="Risk & Return",
