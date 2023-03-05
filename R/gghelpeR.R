@@ -14,108 +14,6 @@ col_w_light<-function(number_cols)
   return(cols)
 }
 
-#----------------------------------------------------------------------------------------------------------------------------
-add_bear_shade<-function(st_date,ed_date,shade_color="darkgray",threshold=0.1,mode="runmax",days=252)
-{
-  #st_date<-"2000-01-01"
-  #ed_date<-Sys.Date()
-  library(fredr)
-  library(ecm)
-  library(ggplot2)
-  library(dplyr)
-  library(tidyverse)
-  #mb <- read_csv(paste0("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/","market_breadth.csv"))
-  mb <- read_csv("https://cloud.amadeusquantamental.lu/owncloud/index.php/s/gka11HDskZE2rPA/download")
-  mb<-mb[mb$date>st_date & mb$date<ed_date,]
-
-  if(mode=="runmax")
-  {
-    mb$max_drawdown<-mb$PX_LAST/runmax(mb$PX_LAST,days,align="right")-1
-  }else{
-    mb$max_drawdown<-mb$PX_LAST/cummax(mb$PX_LAST)-1
-  }
-  #plot(mb$PX_LAST/runmax(mb$PX_LAST,250)-1)
-  #plot(mb$PX_LAST/cummax(mb$PX_LAST)-1)
-
-  mb$dddummy<-ifelse(mb$max_drawdown<0,1,0)
-  mb$ddcount<-ifelse(mb$dddummy==1 & lagpad(mb$dddummy,k=1)==0,1,0)
-  mb$ddcount[1]<-0
-  mb$dds<-cumsum(mb$ddcount)
-  mb$dds<-ifelse(mb$dddummy==0,0,mb$dds)
-
-  mb<-mb %>% group_by(dds) %>% mutate(through=min(max_drawdown))
-
-  mb$dd10<-ifelse(mb$through<(-threshold),1,0)
-  mb$regime<-ifelse(mb$dddummy==1 & mb$max_drawdown==mb$through,"recovery",NA)
-  mb$regime<-ifelse(mb$dddummy==1 & lagpad(mb$dddummy,k=1)==0,"bear",mb$regime)
-  mb<-mb%>%group_by(dds)%>%mutate(regime=na.locf(regime,na.rm=F))
-  mb$dd10_bear<-ifelse(mb$through<(-threshold) & mb$regime=="bear",1,0)
-
-  mb$bear_start<-ifelse(mb$dd10_bear==1 & lagpad(mb$dd10_bear,k=1)==0,1,NA)
-  mb$bear_end<-ifelse(mb$dd10_bear==0 & lagpad(mb$dd10_bear,k=1)==1,1,NA)
-  mb<-as.data.table(mb)
-
-  bear_starts<-(mb[bear_start==1,]$date)
-  bear_ends<-(mb[bear_end==1,]$date)
-  if(length(bear_starts)>length(bear_starts))
-  {
-    bear_ends<-c(bear_ends,Sys.Date())
-  }
-  if(length(bear_starts)>length(bear_starts))
-  {
-    bear_starts<-tail(bear_starts,length(bear_starts)-1)
-  }
-  recs<-as.data.frame(cbind(bear_starts,bear_ends),stringsAsFactors=F)
-  names(recs)<-c("recession.start","recession.end")
-  recs$recession.start<-as.Date(recs$recession.start)
-  recs$recession.end<-as.Date(recs$recession.end)
-
-  if(nrow(recs)>0)
-  {
-    rec_shade<-geom_rect(data=recs, inherit.aes=F, aes(xmin=recession.start, xmax=recession.end, ymin=-Inf, ymax=+Inf), fill=shade_color, alpha=0.5)
-    rec_shade<-list("rec_shade"=rec_shade,"mb"=mb)
-    return(rec_shade)
-  }
-}
-
-#----------------------------------------------------------------------------------------------------------------------------
-add_rec_shade<-function(st_date,ed_date,shade_color="darkgray")
-{
-  library(fredr)
-  library(ecm)
-  library(ggplot2)
-  library(dplyr)
-  fredr_set_key("267ec659142c1bbeb7637d657488acaa")
-
-  #st_date<-as.Date("2000-12-31")
-  #ed_date<-as.Date(Sys.Date())
-  #shade_color<-"darkgray"
-
-  recession<-fredr(series_id = "USRECD",observation_start = as.Date(st_date),observation_end = as.Date(ed_date))
-
-  recession$diff<-recession$value-lagpad(recession$value,k=1)
-  recession<-recession[!is.na(recession$diff),]
-  recession.start<-recession[recession$diff==1,]$date
-  recession.end<-recession[recession$diff==(-1),]$date
-
-  if(length(recession.start)>length(recession.end))
-  {recession.end<-c(recession.end,Sys.Date())}
-  if(length(recession.end)>length(recession.start))
-  {recession.start<-c(min(recession$date),recession.start)}
-
-  recs<-as.data.frame(cbind(recession.start,recession.end))
-  recs$recession.start<-as.Date(as.numeric(recs$recession.start),origin=as.Date("1970-01-01"))
-  recs$recession.end<-as.Date(recs$recession.end,origin=as.Date("1970-01-01"))
-
-  if(nrow(recs)>0)
-  {
-    rec_shade<-geom_rect(data=recs, inherit.aes=F, aes(xmin=recession.start, xmax=recession.end, ymin=-Inf, ymax=+Inf), fill=shade_color, alpha=0.5)
-
-    return(rec_shade)
-  }
-}
-
-
 
 theme_w_small<-
   function (base_size = 12, base_family = "")
@@ -347,41 +245,6 @@ theme_aq_black_pie<-
 
 
 
-add_w_logo<-function()
-{
-  library(png)
-  library(gridExtra)
-  library(grid)
-  logo = readPNG("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/wlogo1.png")
-  grid::grid.raster(logo, x = 0.005, y = 0.01, just = c('left', 'bottom'), width = unit(0.8, 'inches'))
-}
-
-add_aq_logo<-function()
-{
-  library(png)
-  library(gridExtra)
-  library(grid)
-  logo = readPNG("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/AMADEUS_logo_quantamental.png")
-  grid::grid.raster(logo, x = 0.005, y = 0.01, just = c('left', 'bottom'), width = unit(1.4, 'inches'))
-}
-
-add_ac_logo_old<-function()
-{
-  library(png)
-  library(gridExtra)
-  library(grid)
-  logo = readPNG("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/amadeus_logo.png")
-  grid::grid.raster(logo, x = 0.005, y = 0.01, just = c('left', 'bottom'), width = unit(1.1, 'inches'),name="with_logo")
-}
-
-add_ac_logo<-function(p1)
-{
-  library(png)
-  library(gridExtra)
-  library(grid)
-  logo = readPNG("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/amadeus_logo.png")
-  p2<-grid.arrange(p1,grid::rasterGrob(logo, x = 0.005, y = 1.1, just = c('left', 'bottom'), width = unit(1.2, 'inches'),name="with_logo"),heights=c(4,0))
-}
 #----------------------------------------------------------------------------------------------------------------------------
 get_w_color<-function()
 {
@@ -525,23 +388,15 @@ lm_eqn <- function(m){
 #Export as SVG
 #library(svglite)
 #For Latex Publication
-#ggsave(file="P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/test.svg", plot=p1, width=10, height=6)
 
 #For PowerPoint
-#ggsave(file="P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/test.svg", plot=p1, width=10, height=10)
 
 
-
-plotly_gauge_charting_function<-function(chart_value=30,chart_title="Economic Situation")
+plotly_gauge_charting_function<-function(chart_value=30,chart_title="Economic Situation",chart_export_width=600,chart_export_height=400)
 {
   #************Charting Function********************
   #Create Chart
-  #file.edit("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/ggplot_functions.R")
-  source("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/ggplot_functions.R")
-  #file.edit("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/ggplot_functions.R")
-  col_w<-get_w_color()
-  col_aq<-get_aq_color()
-
+  col_aq<-as.character(c("#04103b","#dd0400","#3b5171"))
   cols_gr<-c("#632523", "#953735", "#D99694", "#E6B9B8", "#D7E4BD", "#C3D69B", "#77933C", "#4F6228")
   #cols_gr = colorRampPalette(col_gr)(10)
 
@@ -578,11 +433,17 @@ plotly_gauge_charting_function<-function(chart_value=30,chart_title="Economic Si
       paper_bgcolor = "white",
       font = list(color = col_aq[1], family = "Arial"))
 
+  fig<-fig %>% config(toImageButtonOptions = list( format = "svg",filename = "scoring_gauge",width = chart_export_width,height = chart_export_height))
+
+
   return(fig)
 
 }
 
-save_gauges<-function(es,gauge_name="gauge_economic_situation.svg",target_folder="P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/Market_Balance_Sheet/Output/Charts/")
+
+
+
+save_gauges<-function(es,gauge_name="gauge_economic_situation.svg",target_folder="")
 {
   setwd(target_folder)
   #es<-plotly_gauge_charting_function(chart_value=75,chart_title="Economic Situation")
