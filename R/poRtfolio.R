@@ -1,7 +1,114 @@
 
 
 
-alloc_pie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4))
+#assets<-c("EUR","USD","CHF","GBP","JPY")
+#gross<-c(0.3,0.4,0.1,0.05,0.15)
+#net<-c(0.45,0.4,0.1,0.05,0.00)
+#da<-data.frame(assets,gross,net)
+#FXallocBar(da)
+#allocBar(da)
+
+
+#NAV
+trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=400,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+{
+  if (!require("dplyr")) install.packages("dplyr")
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("lubridate")) install.packages("lubridate")
+
+  library(dplyr)
+  library(plotly)
+  library(lubridate)
+
+  da<-da[,1:2]
+
+  if(ret_format=="returns")
+  {
+    names(da)<-c("date","ret")
+    da$idx<-cumprod(1+da$ret)
+  }else{
+    names(da)<-c("date","idx")
+  }
+
+  da$date<-as.Date(da$date)
+  da<-da%>%group_by(year(date))%>%mutate(ytd=idx/head(idx,1)-1)
+
+  da$ytd_pos<-ifelse(da$ytd>=0,da$ytd,0)
+  da$ytd_neg<-ifelse(da$ytd<0,da$ytd,0)
+
+
+  p<-
+    plot_ly(da,x=~date,y=~idx/head(idx,1),type="scatter",mode="line",line=list(color="#04103b"),height=chart_height)%>%
+    add_trace(x=~date,y=~ytd_neg,fill="tozeroy", mode = 'none',fillcolor ="#dd0400",line = list(width = 0.01))%>%
+    add_trace(x=~date,y=~ytd_pos,fill="tozeroy", mode = 'none',fillcolor = "darkgreen",line = list(width = 0.01))%>%
+    layout(margin=m,title=chart_title,xaxis = list(title=""), yaxis = list(title="",tickformat=".0%"),showlegend=F)
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
+
+  return(p)
+}
+
+
+
+allocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+{
+  if (!require("dplyr")) install.packages("dplyr")
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("lubridate")) install.packages("lubridate")
+
+  library(dplyr)
+  library(plotly)
+  library(lubridate)
+
+  da<-da[,1:2]
+  names(da)<-c("assets","weight")
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
+  y_axis_caption<-""
+  #chart_font_size<-16
+
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
+
+  p <- plot_ly(da, x = as.numeric(da$weight), y =da$assets ,height=chart_height, type = 'bar', name = 'Portfolio',marker = list(color = col_aq2[1]))
+  p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
+
+  return(p)
+}
+
+
+FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+{
+
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("reshape2")) install.packages("reshape2")
+
+  library(plotly)
+  library(reshape2)
+
+  da<-da[,1:3]
+  names(da)<-c("assets","gross","net")
+
+
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
+  y_axis_caption<-""
+  #chart_font_size<-16
+
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$gross), decreasing = F)])
+
+  p <- da %>% plot_ly()
+  p <- p %>% add_trace(x = ~net, y = ~assets, type = 'bar',
+                       text = paste0(round(da$net*100),"%"), textposition = 'auto',
+                       marker = list(color = '#3b5171',
+                                     line = list(color = 'white', width = 1.5)),name="Net")
+  p <- p %>% add_trace(x = ~gross, y = ~assets, type = 'bar',
+                       text = paste0(round(da$gross*100),"%"), textposition = 'auto',
+                       marker = list(color = '#04103b',
+                                     line = list(color = 'white', width = 1.5)),name="Gross")
+  p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
+
+  return(p)
+}
+
+
+allocPie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4))
 {
 
   if (!require("scales")) install.packages("scales")
@@ -41,7 +148,7 @@ alloc_pie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l
 }
 
 
-alloc_tree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
+allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
 {
   if (!require("scales")) install.packages("scales")
   if (!require("plotly")) install.packages("plotly")
@@ -160,7 +267,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
   rr_plotly<-
     plot_ly(dls, x=~sd_ann, y=~ret_ann,type='scatter',mode='markers',color = ~variable, colors = cols,marker=list(size=12)) %>%
     layout(margin = m,title="Risk & Return",xaxis = list(title="Risk",tickformat =".1%",range = list(0, max(dls$sd_ann*1.2))), yaxis = list(title="Return",tickformat =".1%",range = list(0, max(dls$ret_ann*1.2))),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
-
+  rr_plotly<-rr_plotly %>% config(toImageButtonOptions = list( format = "svg",filename = "risk_return_scatter",width = chart_export_width,height = chart_export_height))
 
   rr_ggplot<<-
     #GGplot scatter
@@ -283,7 +390,138 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
     layout(margin = m,title="Risk & Return",
            xaxis = list(title="Risk",tickformat =".1%",range = list(min(eff$sd_ann/1.1), max(dls$sd_ann*1.1))),
            yaxis = list(title="Return",tickformat =".1%",range = list(min(dls$ret_ann/1.1,eff$ret_ann/1.2), max(dls$ret_ann*1.1))),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
-
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "efficient_frontier",width = chart_export_width,height = chart_export_height))
   return(p)
 }
+
+
+
+
+
+
+
+
+styleBox<-function(
+    number_categories_horizontal=5,
+    number_categories_vertical=3,
+    highlight_category=4,
+    main_color="#5777a7",
+    highlight_color="#dd0400",
+    chart_font_size=14,
+    chart_caption_1="Risk",
+    chart_caption_2="Return",
+    opacity_scale_factor=0.5,
+    chart_export_width=500,
+    chart_export_height=150
+)
+{
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("dplyr")) install.packages("dplyr")
+
+  library(plotly)
+  library(dplyr)
+
+  number_categories<-number_categories_horizontal*number_categories_vertical
+  if(highlight_category>number_categories)
+  { highlight_category<-number_categories }
+
+  cols<-rep(main_color,number_categories)
+  cols[highlight_category]<-highlight_color
+
+
+
+  st_list<-list(
+    "fillcolor" = cols[1],
+    "line" = list("color"="rgb(0,0,0)", "width"=2),
+    "opacity" = (1/number_categories*1),
+    "type" = "rect",
+    "x0" = 0,
+    "x1" = (1/number_categories*1),
+    "xref" = "paper",
+    "y0" = 0,
+    "y1" = (1/number_categories*1),
+    "yref" = "paper"
+  )
+  dups <- list(st_list)[rep(1,number_categories)]
+  for(i in 1:number_categories_horizontal)
+  {
+    for(j in 1:number_categories_vertical)
+    {
+      dups[[i+(j-1)*number_categories_horizontal]]$fillcolor<-cols[i+(j-1)*number_categories_horizontal]
+      dups[[i+(j-1)*number_categories_horizontal]]$x0<-(1/number_categories_horizontal)*(i-1)
+      dups[[i+(j-1)*number_categories_horizontal]]$x1<-(1/number_categories_horizontal)*(i)
+      dups[[i+(j-1)*number_categories_horizontal]]$y0<-(1/number_categories_vertical)*(j-1)
+      dups[[i+(j-1)*number_categories_horizontal]]$y1<-(1/number_categories_vertical)*(j)
+      dups[[i+(j-1)*number_categories_horizontal]]$opacity<-1/(number_categories_horizontal-i+number_categories_vertical-j)^opacity_scale_factor
+    }
+  }
+
+
+
+  p <- plot_ly(x = list("1"), y = list("1"), hoverinfo = "none",
+                               marker = list("opacity" = 0), mode = "markers", name = "B", type = "scatter",
+                               width = 700,
+                               height = 280) %>%
+    layout(title = "",
+           annotations = list(
+             list(
+               "x" = 0.990130093458,
+               "y" = 1.00181709504,
+               "align" = "left",
+               "font" = list("size" = chart_font_size,color="#04103b"),
+               "showarrow" = FALSE,
+               "text" = paste0("<b>",chart_caption_1,"</b>"),
+               "xref" = "x",
+               "yref" = "y"
+             ),
+             list(
+               "x"= 1.00001816013,
+               "y"= 1.35907755794e-16,
+               "font" = list("size" = chart_font_size,color="#04103b"),
+               "showarrow" = FALSE,
+               "text" = paste0("<b>",chart_caption_2,"</b>"),
+               "xref" = "x",
+               "yref" = "y"
+             )
+           ),
+
+           hovermode = "closest",
+           margin = list("r" = 30, "t" = 20, "b" = 0, "l" = 30),
+
+
+           shapes = dups,
+           xaxis = list(
+             "autorange" = TRUE,
+             "range" = list(0.989694747864, 1.00064057995),
+             "showgrid" = FALSE,
+             "showline" = FALSE,
+             "showticklabels" = FALSE,
+             "title"  = "<br>",
+             "type" = "linear",
+             "zeroline" = FALSE
+           ),
+           yaxis = list(
+             "autorange" = TRUE,
+             "range" = list(-0.0358637178721, 1.06395696354),
+             "showgrid" = FALSE,
+             "showline" = FALSE,
+             "showticklabels" = FALSE,
+             "title"  = "<br>",
+             "type" = "linear",
+             "zeroline" = FALSE
+           )
+
+    )
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "stylebox",width = chart_export_width,height = chart_export_height))
+
+  return(p)
+
+}
+
+
+#p<-style_box_flex(number_categories_horizontal=6,number_categories_vertical=6,highlight_category=1,chart_font_size=25,chart_caption_1="Risk",chart_caption_2="Return",opacity_scale_factor=0.2)
+#p
+#orca(p,"style_box_plot.svg",width = 700,height = 250)
+
+
 
