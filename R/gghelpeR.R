@@ -3,21 +3,6 @@
 library(svglite)
 
 #----------------------------------------------------------------------------------------------------------------------------
-get_db_connection<-function(dbname)
-{
-  library(pool)
-  # pool connection
-  pool <<- dbPool(
-    drv = RMySQL::MySQL(),
-    dbname = dbname,
-    #host = "167.99.95.195",
-    host = "172.40.0.17",
-    username = "root",
-    #password = "Amad3usCap1tal2018",
-    password = "AmCap2019*",
-    port=3306
-  )
-}
 
 col_w_light<-function(number_cols)
 {
