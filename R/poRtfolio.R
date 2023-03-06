@@ -79,6 +79,7 @@ allocBar<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_
 
   p <- plot_ly(da, x = as.numeric(da$weight), y =da$assets ,height=chart_height, type = 'bar', name = 'Portfolio',marker = list(color = col_aq2[1]))
   p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
 
   return(p)
 }
@@ -115,6 +116,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
                        marker = list(color = '#04103b',
                                      line = list(color = 'white', width = 1.5)),name="Gross")
   p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
 
   return(p)
 }
