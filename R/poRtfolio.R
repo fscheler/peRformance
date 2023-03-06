@@ -8,6 +8,10 @@
 #FXallocBar(da)
 #allocBar(da)
 
+#Export table without quotes
+#write.table(pf,"yourpath",sep = ";",row.names = F,col.names=T, quote = FALSE)
+
+
 
 #NAV
 trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=400,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
