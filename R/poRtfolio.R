@@ -49,7 +49,7 @@ trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=
 
 
 
-allocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+allocBar<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
   if (!require("dplyr")) install.packages("dplyr")
   if (!require("plotly")) install.packages("plotly")
@@ -59,11 +59,16 @@ allocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",ch
   library(plotly)
   library(lubridate)
 
+  da<-as.data.frame(da)
   da<-da[,1:2]
+
   names(da)<-c("assets","weight")
+  da$weight<-as.numeric(da$weight)
   col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
   y_axis_caption<-""
   #chart_font_size<-16
+
+  da<-da%>%group_by(assets)%>%summarize(weight=sum(as.numeric(weight)))
 
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
 
@@ -90,6 +95,8 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
   col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
   y_axis_caption<-""
   #chart_font_size<-16
+
+  da<-da%>%group_by(assets)%>%summarize(gross=sum(as.numeric(gross)),net=sum(as.numeric(net)))
 
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$gross), decreasing = F)])
 
