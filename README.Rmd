@@ -90,6 +90,7 @@ da<-data.frame(date,asset_ret)
     p<-p + add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
   }, error = function(e) {})
 # add formatting  
+  library(scales)
   p<-p +
     geom_line(size=1,aes(y=asset_ret,color="Time Series"))+
     scale_colour_manual(values = cols)+
@@ -155,3 +156,23 @@ long <- melt(setDT(da), id.vars = "date")
 p<-rrScatEff(long,ret_format="returns",table_format='long')
 
 ```
+
+##  Dependencies
+
+The package depends on the following packages:
+
+  lubridate
+  fredr
+  ecm
+  ggplot2
+  dplyr
+  scales
+  fredr
+  purrr
+  PortfolioAnalytics
+  ecm
+  plotly
+  tidyverse
+  caTools
+  zoo
+  data.table
