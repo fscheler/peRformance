@@ -161,18 +161,18 @@ p<-rrScatEff(long,ret_format="returns",table_format='long')
 
 The package depends on the following packages:
 
-  lubridate
-  fredr
-  ecm
-  ggplot2
-  dplyr
-  scales
-  fredr
-  purrr
-  PortfolioAnalytics
-  ecm
-  plotly
-  tidyverse
-  caTools
-  zoo
+  lubridate,
+  fredr,
+  ecm,
+  ggplot2,
+  dplyr,
+  scales,
+  fredr,
+  purrr,
+  PortfolioAnalytics,
+  ecm,
+  plotly,
+  tidyverse,
+  caTools,
+  zoo,
   data.table
