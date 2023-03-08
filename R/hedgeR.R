@@ -43,7 +43,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
                        gui$fxforwards_gui[names(gui$fxforwards_gui) %ni% c("EURJPY","Dates")]/10000)
   forwards_perc[,"EURJPY"]<-forwards_perc[,"EURJPY"]/100
   forwards_perc<-forwards_perc[,names(gui$fxrates_gui)]
-  forwards_perc<-cbind(forwards_perc[,"Dates"],
+  forwards_perc<-cbind(subset(forwards_perc,select=Dates),
                        subset(forwards_perc,select=-Dates)/subset(gui$fxrates_gui,select=-Dates))
   names(forwards_perc)<-names(gui$fxrates_gui)
 
@@ -55,8 +55,8 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     selcol<-as.character(paste0("EUR",base_currency))
 
     gui$fxrates_gui<-as.data.table(gui$fxrates_gui)
-    gui$fxrates_gui<-cbind(gui$fxrates_gui[,"Dates"],subset(gui$fxrates_gui,select=-Dates)/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
-    gui$fxrates_gui<-cbind(gui$fxrates_gui[,"Dates"],subset(gui$fxrates_gui,select=-Dates)/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
+    gui$fxrates_gui<-cbind(subset(gui$fxrates_gui,select=Dates),subset(gui$fxrates_gui,select=-Dates)/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
+    gui$fxrates_gui<-cbind(subset(gui$fxrates_gui,select=Dates),subset(gui$fxrates_gui,select=-Dates)/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
     names(gui$fxrates_gui)<-gsub("EUR",base_currency,names(gui$fxrates_gui))
     names(gui$fxrates_gui)[names(gui$fxrates_gui)==paste0(base_currency)]<-paste0(base_currency,"EUR")
     names(gui$fxrates_gui)[names(gui$fxrates_gui)==paste0(base_currency,base_currency)]<-base_currency
@@ -65,8 +65,8 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 
     #Translate FX Forward Rates
     forwards_perc<-as.data.table(forwards_perc)
-    forwards_perc<-cbind(forwards_perc[,"Dates"],-subset(forwards_perc,select=-Dates)+as.matrix(subset(forwards_perc,select=(selcol))))
-    forwards_perc<-cbind(forwards_perc[,"Dates"],-subset(forwards_perc,select=-Dates)+as.matrix(subset(forwards_perc,select=(selcol))))
+    forwards_perc<-cbind(subset(forwards_perc,select=Dates),-subset(forwards_perc,select=-Dates)+as.matrix(subset(forwards_perc,select=(selcol))))
+    forwards_perc<-cbind(subset(forwards_perc,select=Dates),-subset(forwards_perc,select=-Dates)+as.matrix(subset(forwards_perc,select=(selcol))))
     names(forwards_perc)<-gsub("EUR",base_currency,names(gui$fxforwards_gui))
     names(forwards_perc)[names(forwards_perc)==paste0(base_currency)]<-paste0(base_currency,"EUR")
     names(forwards_perc)[names(forwards_perc)==paste0(base_currency,base_currency)]<-base_currency
@@ -89,7 +89,8 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     }else{
       hedge_perf<-fx_performance*hedge_cost
     }
-    hedge_perf<-cbind(gui$fxrates_gui[,"Dates"],hedge_perf)
+
+    hedge_perf<-cbind(subset(gui$fxrates_gui,select=Dates),hedge_perf)
     #plot(hedge_perf$CHFEUR,type="l")
     #plot(hedge_perf$CHFUSD,type="l")
 
@@ -108,7 +109,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     }else{
       hedge_perf<-fx_performance/hedge_cost
     }
-    hedge_perf<-cbind(gui$fxrates_gui[,"Dates"],as.data.frame(hedge_perf))
+    hedge_perf<-cbind(subset(gui$fxrates_gui,select=Dates),as.data.frame(hedge_perf))
     colnames(hedge_perf)[1]<-"Dates"
   }
 
