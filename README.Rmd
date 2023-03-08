@@ -157,6 +157,31 @@ p<-rrScatEff(long,ret_format="returns",table_format='long')
 
 ```
 
+##  Foreign Exchange Hedging
+
+Investors are frequently exposed to the risk of foreign exchange rate changes. The very good underlying performance of an investment, demoninated in a foreign currency, can be (over)compensated easily by a depreciation in the respective currency's value compared to the investor's home currency.
+For this reason, investors regularly insure themselves (hedge) against this risk using Swaps or Forward contracts. However, the price of these hedges depends on the relative interest rates level. As a rule of thumb, investor's can't escape their home country's interest rate environment without taking foreign exchange risk. If interest rates in the foreign currency are higher, ceteris paribus, hedging will cost money and vice versa if foreign interest rates are lower.
+The cost of a hedge can, therefore, be simulated easily using the interest rate differential. The FXhedgeR provides a generic function that calculates the cost of carry of the hedge of any currency pair based on two dataframes of historical FX rates and forwards points (both can be obtained for instance from Bloomberg). For major currencies, the function uses an example dataset hosted on GitHub by default which, however, may not be up-to-date.
+
+```{r function_synthetic_fx_hedging,warning=FALSE,message=FALSE}
+
+# Obtain the carry paid/earned by hedging USD exposure for a Singapore based investor
+# A negative figure means, the hedge costs money, a postive figure indicates that the investor is earning carry.
+df<-FXhedgeR(base_currency='SGD',exp_currency='USD')
+tail(df$forwards_perc,1)
+
+# Obtain the carry paid/earned by hedging GBP exposure for a Swiss investor with user-given data
+df<-
+FXhedgeR(base_currency='CHF',exp_currency='GBP',
+         fxrates_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_rates.csv'),delim = ";",show_col_types = FALSE),
+         fxforwards_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_forwards.csv'),delim = ";",show_col_types = FALSE)
+)
+
+head(df$hedge_perf)
+tail(df$forwards_perc)
+
+```
+
 ##  Dependencies
 
 The package depends on the following packages:
@@ -175,4 +200,6 @@ The package depends on the following packages:
   tidyverse,
   caTools,
   zoo,
-  data.table
+  data.table,
+  tibble,
+  library

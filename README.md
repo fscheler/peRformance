@@ -38,26 +38,26 @@ financial time series.
 
   # Including Benchmark Returns
   df<-mperf_table(da,ts_format="returns")  
-#>   Year     Jan     Feb    Mar     Apr     May    Jun    Jul    Aug     Sep
-#> 1 2007  -3.03% -11.06%  4.23%  -0.97%  -3.91% -2.31% -2.08% 10.79%  -7.42%
-#> 2 2008  -9.13%   2.63%  0.34%  -4.24%   1.09%  4.32% -0.81%  9.45%  -0.04%
-#> 3 2009    6.6%  -3.03% -5.26%   1.23%  -0.18% -0.52% -1.92%  1.99% -10.68%
-#> 4 2010  -0.16%   3.77% -2.92%   0.72% -10.34% -0.31% -5.59%  -5.8%   6.36%
-#> 5 2011   6.86%   7.69%  6.24%  -0.81%    7.4%  3.03% -4.01%  2.42%   0.85%
-#> 6 2012  13.78%   3.64%  3.86%   2.72%  -1.35% -3.33% -0.79%  7.13%  -8.08%
-#> 7 2013 -10.69%   5.66% -3.78%   12.8%  -7.49%   2.9% -2.58%  0.32%  -3.29%
-#> 8 2014  -4.07%  -9.05% -4.52% -12.78%   2.29%  0.64%  0.64%  3.07%    5.1%
-#> 9 2015   1.08%                                                            
-#>       Oct    Nov    Dec       FY Benchmark
-#> 1   0.07% -4.61% -5.87%  -24.59%   -34.61%
-#> 2  -8.17%  5.83%  0.77%    0.42%    16.83%
-#> 3 -10.57% -0.31%  11.5%  -12.56%    21.16%
-#> 4  -3.82%  10.3% -5.25%  -13.91%    -5.34%
-#> 5   2.01%  6.69% -0.23%   44.46%    -5.36%
-#> 6   5.19% -1.97% -7.18%    12.2%   -15.22%
-#> 7   0.48%  4.27%  1.02%   -2.46%   -12.29%
-#> 8   9.63%  2.44%  3.42%    -5.3%     3.44%
-#> 9                          1.08%     0.36%
+#>   Year    Jan     Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct
+#> 1 2007 -4.89%   7.74% -1.21% -0.77%  8.56% -3.59% -3.62%  3.05%  8.33%  5.36%
+#> 2 2008 -2.87%   6.33%  3.29%  5.24% -0.49% -6.08%  3.22%  2.94% -6.13% -2.19%
+#> 3 2009  4.17%   0.11% -8.36%  4.23%  -4.1%  5.69%  13.1%  1.75% -5.14%   3.3%
+#> 4 2010 -3.08%  -0.85% -2.46%  0.14% -0.61%  1.81%  0.36% -2.32%  -1.1% -0.86%
+#> 5 2011  -3.5%  -3.51% -5.09% -2.87%  2.07%  6.44%  2.73% -2.71% -0.74%  -2.4%
+#> 6 2012  1.72%  -5.15%  5.16%  0.13% -0.39% -2.68%  1.39%  -5.6%  5.75%  -6.3%
+#> 7 2013  1.29% -12.84%  0.67% -2.02%  -8.1% -8.65%  5.03% -2.88% -6.71%  0.66%
+#> 8 2014  4.52%   9.33% 13.27% -8.29%  3.68% 14.03% -3.91% -9.21% 11.05%  4.31%
+#> 9 2015 -0.13%                                                                
+#>       Nov    Dec       FY Benchmark
+#> 1 -10.63%  1.88%    8.51%    -3.13%
+#> 2   1.32%  7.22%    11.2%    -18.1%
+#> 3    3.7%  2.54%   21.06%     27.8%
+#> 4  -3.24%  2.46%   -9.51%   -15.42%
+#> 5   2.43%  1.93%    -5.7%     3.19%
+#> 6  10.71% -2.81%    0.49%     6.42%
+#> 7   3.39%  5.51%  -23.61%    14.85%
+#> 8  -2.88% -4.95%   30.91%    11.86%
+#> 9                  -0.13%    -2.07%
 
   #Excluding Benchmark Returns  
   df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
@@ -140,18 +140,18 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 993 days
+#> Time difference of 1432 days
 df$longest_peak2trough
-#> Time difference of 371 days
+#> Time difference of 1185 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00           42
-#> 2  -0.05            4
-#> 3  -0.10            3
+#> 1   0.00           11
+#> 2  -0.05            2
+#> 3  -0.10            2
 #> 4  -0.20            2
 #> 5  -0.30            1
-#> 6  -0.40            0
+#> 6  -0.40            1
 #> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
@@ -195,9 +195,65 @@ long <- melt(setDT(da), id.vars = "date")
 p<-rrScatEff(long,ret_format="returns",table_format='long')
 ```
 
+## Foreign Exchange Hedging
+
+Investors are frequently exposed to the risk of foreign exchange rate
+changes. The very good underlying performance of an investment,
+demoninated in a foreign currency, can be (over)compensated easily by a
+depreciation in the respective currency’s value compared to the
+investor’s home currency. For this reason, investors regularly insure
+themselves (hedge) against this risk using Swaps or Forward contracts.
+However, the price of these hedges depends on the relative interest
+rates level. As a rule of thumb, investor’s can’t escape their home
+country’s interest rate environment without taking foreign exchange
+risk. If interest rates in the foreign currency are higher, ceteris
+paribus, hedging will cost money and vice versa if foreign interest
+rates are lower. The cost of a hedge can, therefore, be simulated easily
+using the interest rate differential. The FXhedgeR provides a generic
+function that calculates the cost of carry of the hedge of any currency
+pair based on two dataframes of historical FX rates and forwards points
+(both can be obtained for instance from Bloomberg). For major
+currencies, the function uses an example dataset hosted on GitHub by
+default which, however, may not be up-to-date.
+
+``` r
+
+# Obtain the carry paid/earned by hedging USD exposure for a Singapore based investor
+# A negative figure means, the hedge costs money, a postive figure indicates that the investor is earning carry.
+df<-FXhedgeR(base_currency='SGD',exp_currency='USD')
+tail(df$forwards_perc,1)
+#>         Dates    Hedge
+#> 1: 2023-03-07 0.013948
+
+# Obtain the carry paid/earned by hedging GBP exposure for a Swiss investor with user-given data
+df<-
+FXhedgeR(base_currency='CHF',exp_currency='GBP',
+         fxrates_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_rates.csv'),delim = ";",show_col_types = FALSE),
+         fxforwards_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_forwards.csv'),delim = ";",show_col_types = FALSE)
+)
+
+head(df$hedge_perf)
+#>         Dates     Hedge
+#> 1: 1999-05-20 1.0001607
+#> 2: 1999-05-21 1.0003214
+#> 3: 1999-05-24 1.0060352
+#> 4: 1999-05-25 1.0099296
+#> 5: 1999-05-26 0.9983723
+#> 6: 1999-05-27 0.9966876
+tail(df$forwards_perc)
+#>         Dates      Hedge
+#> 1: 2023-02-28 0.03138301
+#> 2: 2023-03-01 0.03035254
+#> 3: 2023-03-02 0.02991483
+#> 4: 2023-03-03 0.02987529
+#> 5: 2023-03-06 0.02821794
+#> 6: 2023-03-07 0.02795312
+```
+
 ## Dependencies
 
 The package depends on the following packages:
 
 lubridate, fredr, ecm, ggplot2, dplyr, scales, fredr, purrr,
-PortfolioAnalytics, ecm, plotly, tidyverse, caTools, zoo, data.table
+PortfolioAnalytics, ecm, plotly, tidyverse, caTools, zoo, data.table,
+tibble, library
