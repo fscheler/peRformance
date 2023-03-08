@@ -1,8 +1,7 @@
 
 
 
-
-FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=T)
+FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
 {
 
   options(warn=-1)
@@ -17,12 +16,17 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=T)
   library (readr)
   library(tibble)
 
-  #fxrates_gui<-dbGetQuery(pool,paste0("select * from gaa.gaa_fx_rates"))
-  fxrates_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_rates.csv'),delim = ";",show_col_types = FALSE)
+  if(is.null(fxrates_gui)){
+    #fxrates_gui<-dbGetQuery(pool,paste0("select * from gaa.gaa_fx_rates"))
+    fxrates_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_rates.csv'),delim = ";",show_col_types = FALSE)
+  }
   fxrates_gui<- as_tibble(fxrates_gui[duplicated(fxrates_gui$Dates)==FALSE,])
 
-  #fxforwards_gui<-  dbGetQuery(pool,"select * from gaa.gaa_fx_fowards")
-  fxforwards_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_forwards.csv'),delim = ";",show_col_types = FALSE)
+  if(is.null(fxforwards_gui=NULL))
+  {
+    #fxforwards_gui<-  dbGetQuery(pool,"select * from gaa.gaa_fx_fowards")
+    fxforwards_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_forwards.csv'),delim = ";",show_col_types = FALSE)
+  }
   fxforwards_gui<- as_tibble(fxforwards_gui[duplicated(fxforwards_gui$Dates)==FALSE,])
 
   gui<-list(
@@ -120,5 +124,6 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=T)
 
 #df<-FXhedgeR()
 #tail(df$forwards_perc,1)
+
 
 
