@@ -1,6 +1,7 @@
 
 
 
+
 FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
 {
 
