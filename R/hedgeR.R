@@ -22,7 +22,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
   }
   fxrates_gui<- as_tibble(fxrates_gui[duplicated(fxrates_gui$Dates)==FALSE,])
 
-  if(is.null(fxforwards_gui=NULL))
+  if(is.null(fxforwards_gui))
   {
     #fxforwards_gui<-  dbGetQuery(pool,"select * from gaa.gaa_fx_fowards")
     fxforwards_gui=read_delim(url('https://raw.githubusercontent.com/fscheler/opendata/main/fx_forwards.csv'),delim = ";",show_col_types = FALSE)
