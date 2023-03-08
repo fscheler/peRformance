@@ -55,14 +55,14 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     selcol<-as.character(paste0("EUR",base_currency))
 
     gui$fxrates_gui<-as.data.table(gui$fxrates_gui)
-    gui$fxrates_gui<-cbind(gui$fxrates_gui[,"Dates"],as.data.table(gui$fxrates_gui)[,-"Dates"]/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
+    gui$fxrates_gui<-cbind(gui$fxrates_gui[,"Dates"],subset(gui$fxrates_gui,select=-Dates)/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
     names(gui$fxrates_gui)<-gsub("EUR",base_currency,names(gui$fxrates_gui))
     names(gui$fxrates_gui)[names(gui$fxrates_gui)==paste0(base_currency)]<-paste0(base_currency,"EUR")
     names(gui$fxrates_gui)[names(gui$fxrates_gui)==paste0(base_currency,base_currency)]<-base_currency
 
     #Translate FX Forward Rates
     forwards_perc<-as.data.table(forwards_perc)
-    forwards_perc<-cbind(forwards_perc[,"Dates"],-as.data.table(forwards_perc)[,-"Dates"]+as.matrix(subset(forwards_perc,select=(selcol))))
+    forwards_perc<-cbind(forwards_perc[,"Dates"],-subset(forwards_perc,select=-Dates)+as.matrix(subset(forwards_perc,select=(selcol))))
     names(forwards_perc)<-gsub("EUR",base_currency,names(gui$fxforwards_gui))
     names(forwards_perc)[names(forwards_perc)==paste0(base_currency)]<-paste0(base_currency,"EUR")
     names(forwards_perc)[names(forwards_perc)==paste0(base_currency,base_currency)]<-base_currency
@@ -73,10 +73,10 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     cumprod_apply<-function(x)
     { x<-cumprod(1+x) }
 
-    fx_performance<-apply(as.data.table(gui$fxrates_gui)[,-"Dates"],2,divide_head)
+    fx_performance<-apply(subset(gui$fxrates_gui,select=-Dates),2,divide_head)
     #plot(fx_performance[,1],type="l")
 
-    hedge_cost<-apply(as.data.table(forwards_perc[,-"Dates"]/252),2,cumprod_apply)
+    hedge_cost<-apply((subset(forwards_perc,select=-Dates)/252),2,cumprod_apply)
     #plot(hedge_cost[,1],type="l")
 
     if(just_convert==T)
@@ -122,7 +122,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 
 }
 
-#df<-FXhedgeR()
+#df<-FXhedgeRa()
 #tail(df$forwards_perc,1)
 
 
