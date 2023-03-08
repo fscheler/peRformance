@@ -2,7 +2,7 @@
 
 
 
-FXhedge<-function(base_currency='USD',exp_currency='EUR',just_convert=T)
+FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=T)
 {
 
   options(warn=-1)
@@ -118,7 +118,7 @@ FXhedge<-function(base_currency='USD',exp_currency='EUR',just_convert=T)
 
 }
 
-#df<-FXhedge()
+#df<-FXhedgeR()
 #tail(df$forwards_perc,1)
 
 
