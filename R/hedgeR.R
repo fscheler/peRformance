@@ -34,7 +34,6 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     "fxforwards_gui"=fxforwards_gui
   )
 
-  options(warn = -1)
   `%ni%` <- Negate(`%in%`)
   #Calculate FX Rates Depending on Base Currency
 
@@ -55,14 +54,14 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     selcol<-as.character(paste0("EUR",base_currency))
 
     gui$fxrates_gui<-as.data.table(gui$fxrates_gui)
-    gui$fxrates_gui<-cbind(gui$fxrates_gui[,"Dates"],gui$fxrates_gui[,-"Dates"]/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
+    gui$fxrates_gui<-cbind(gui$fxrates_gui[,"Dates"],as.data.table(gui$fxrates_gui)[,-"Dates"]/as.matrix(subset(gui$fxrates_gui,select=(selcol))))
     names(gui$fxrates_gui)<-gsub("EUR",base_currency,names(gui$fxrates_gui))
     names(gui$fxrates_gui)[names(gui$fxrates_gui)==paste0(base_currency)]<-paste0(base_currency,"EUR")
     names(gui$fxrates_gui)[names(gui$fxrates_gui)==paste0(base_currency,base_currency)]<-base_currency
 
     #Translate FX Forward Rates
     forwards_perc<-as.data.table(forwards_perc)
-    forwards_perc<-cbind(forwards_perc[,"Dates"],-forwards_perc[,-"Dates"]+as.matrix(subset(forwards_perc,select=(selcol))))
+    forwards_perc<-cbind(forwards_perc[,"Dates"],-as.data.table(forwards_perc)[,-"Dates"]+as.matrix(subset(forwards_perc,select=(selcol))))
     names(forwards_perc)<-gsub("EUR",base_currency,names(gui$fxforwards_gui))
     names(forwards_perc)[names(forwards_perc)==paste0(base_currency)]<-paste0(base_currency,"EUR")
     names(forwards_perc)[names(forwards_perc)==paste0(base_currency,base_currency)]<-base_currency
