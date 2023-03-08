@@ -201,5 +201,4 @@ The package depends on the following packages:
   caTools,
   zoo,
   data.table,
-  tibble,
-  library
+  tibble
