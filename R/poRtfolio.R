@@ -280,7 +280,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 
   rr_plotly<-
     plot_ly(dls, x=~sd_ann, y=~ret_ann,type='scatter',mode='markers',color = ~variable, colors = cols,marker=list(size=12)) %>%
-    layout(margin = m,title="Risk & Return",xaxis = list(title="Risk",tickformat =".1%",range = list(0, max(dls$sd_ann*1.2))), yaxis = list(title="Return",tickformat =".1%",range = list(0, max(dls$ret_ann*1.2))),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
+    layout(margin = m,title="Risk & Return",xaxis = list(title="Risk",tickformat =".1%",range = list(0, max(dls$sd_ann*1.2))), yaxis = list(title="Return",tickformat =".1%"),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
   rr_plotly<-rr_plotly %>% config(toImageButtonOptions = list( format = "svg",filename = "risk_return_scatter",width = chart_export_width,height = chart_export_height))
 
   rr_ggplot<<-
@@ -302,8 +302,8 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
     theme(legend.position = "bottom",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(15,0,30,0))+
     guides(colour = guide_legend(nrow = 2))+
     theme(plot.margin=margin(l=5,r=10,b=5,t=5))+
-    scale_x_continuous(labels = scales::percent_format(accuracy=.1),limits=c(0, max(dls$sd_ann*1.2)))+
-    scale_y_continuous(labels = scales::percent_format(accuracy=.1),limits=c(0, max(dls$ret_ann*1.2)))+
+    scale_x_continuous(labels = scales::percent_format(accuracy=.1))+
+    scale_y_continuous(labels = scales::percent_format(accuracy=.1))+
     theme(panel.grid.major.x = element_line(colour = "#D8D8D8"))
 
     res_list<-list("dls"=dls,"rr_plotly"=rr_plotly,"rr_ggplot"=rr_ggplot)
@@ -403,7 +403,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
     add_trace( x=dls$sd_ann,y=dls$ret_ann,color = dls$variable,marker=list(size=12),mode='markers')%>%
     layout(margin = m,title="Risk & Return",
            xaxis = list(title="Risk",tickformat =".1%",range = list(min(eff$sd_ann/1.1), max(dls$sd_ann*1.1))),
-           yaxis = list(title="Return",tickformat =".1%",range = list(min(dls$ret_ann/1.1,eff$ret_ann/1.2), max(dls$ret_ann*1.1))),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
+           yaxis = list(title="Return",tickformat =".1%"),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "efficient_frontier",width = chart_export_width,height = chart_export_height))
   return(p)
 }
