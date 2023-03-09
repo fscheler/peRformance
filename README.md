@@ -27,7 +27,7 @@ devtools::install_github("fscheler/peRformance")
 library(peRformance)
 ```
 
-## Example application monthly performance overview table
+## Example application monthly performance overview table (mperfT)
 
 Create a monthly and annual performance overview table in plotly and a
 printable version that can be used in markdown documents with the kable
@@ -43,30 +43,30 @@ financial time series.
   da<-data.frame(date,asset_ret,benchmark_ret)
 
   # Including Benchmark Returns
-  df<-mperf_table(da,ts_format="returns")  
-#>   Year     Jan    Feb    Mar    Apr    May    Jun    Jul     Aug    Sep    Oct
-#> 1 2007  -7.35%  -2.1%  8.58%  0.69%  7.75%   1.7%  3.58%  -3.79%  -5.5%  9.43%
-#> 2 2008  -0.67% -2.41%  -3.3%  6.72% -7.65% -5.86% -7.08%   2.78%   0.8% -0.56%
-#> 3 2009 -16.79% -6.81%  1.59%  2.45%  2.24%  5.44%   3.2% -11.51% -4.13% -0.41%
-#> 4 2010  -0.43% -2.62% -3.34%   4.5%  1.16% -1.48%  6.73%  -5.72% -1.61% -5.03%
-#> 5 2011   1.21%   4.3%  4.35% -7.28%  -7.9% -2.62% -0.11%  -0.27%   0.1%  4.16%
-#> 6 2012    3.8%  1.12% -2.58% -0.99% -4.79%  5.97% -9.38%  -2.07% -0.74% -1.11%
-#> 7 2013  -3.31%  3.02% -3.38% -5.79% -1.95%  1.94% -2.97%   0.19% -3.45%  -3.4%
-#> 8 2014   6.36%  1.65%  0.88%  3.76%   0.4%  -0.9% -2.35%  11.02%  2.21% -2.71%
-#> 9 2015   0.57%                                                                
-#>      Nov    Dec       FY Benchmark
-#> 1  3.23% -2.38%   12.84%    -8.07%
-#> 2  5.82%  0.56%  -11.42%   -15.75%
-#> 3  2.37% -10.7%  -30.65%     6.31%
-#> 4 -0.97% 10.22%    0.18%   -12.33%
-#> 5 -1.67%  2.97%   -3.67%   -16.37%
-#> 6  4.17%  7.01%   -0.82%   -28.12%
-#> 7 -1.88%   6.3%   -14.3%    -9.33%
-#> 8 -1.53%  3.49%   23.69%    16.64%
-#> 9                  0.57%     -1.1%
+  df<-mperfT(da,ts_format="returns")  
+#>   Year     Jan     Feb     Mar     Apr    May    Jun    Jul    Aug    Sep
+#> 1 2007   -0.3%   5.53%  -0.98%   1.04% -4.77% -5.68%  8.69%  6.51% 13.16%
+#> 2 2008   8.08%   0.38%   3.36%  -2.78%  0.71% -2.82%  2.25% -0.94% -3.77%
+#> 3 2009  -1.34%  -4.79% -15.17% -11.74% -9.55% -1.61%  2.55%  4.65%  5.12%
+#> 4 2010  -6.61%  -1.76%  -0.05%  -0.59%  5.02%  0.84%  7.47%  6.88%  5.56%
+#> 5 2011   3.68%   5.54%   1.91%  -0.48%  -0.5% -8.06% 11.12% -1.36% 15.39%
+#> 6 2012   2.26%   1.85%  -8.69%   2.39% -0.31%   0.9%  7.19% -2.03%   2.4%
+#> 7 2013 -10.92% -10.35%  -3.89%  -5.26%  -1.8%  5.14% -3.79% -0.07% 10.49%
+#> 8 2014   5.85%  -4.49%   1.95%   1.29%  8.64% -0.55%  1.02%  1.57% -0.91%
+#> 9 2015   0.17%                                                           
+#>      Oct    Nov     Dec       FY Benchmark
+#> 1 -7.17% -5.73% -10.27%   -2.74%     9.47%
+#> 2  2.86%  2.29%    4.9%   14.79%    -12.4%
+#> 3  1.09% -3.36%   2.55%  -29.26%   -23.95%
+#> 4  0.75% 12.83%  -6.35%    24.6%    19.65%
+#> 5   4.3% -6.93%  -4.14%   19.48%     4.81%
+#> 6 11.88%  4.95%   10.6%   36.79%    33.49%
+#> 7  4.28% -3.61%   0.79%   -19.2%     3.68%
+#> 8 14.82%  3.59%  13.36%   54.63%    -8.27%
+#> 9                          0.17%     0.18%
 
   #Excluding Benchmark Returns  
-  df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
+  df<-mperfT(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
   
   # Using Index instead of Return Time Series
   date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
@@ -74,10 +74,10 @@ financial time series.
   benchmark_ret<-cumprod(1+rnorm(length(date))/100)
   da<-data.frame(date,asset_ret,benchmark_ret)
   
-  df<-mperf_table(da,ts_format="index",print_output=F)  
+  df<-mperfT(da,ts_format="index",print_output=F)  
   
   # You can also configure the export options and download the plotly graphic as a high resolution svg
-  df<-mperf_table(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
+  df<-mperfT(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
                   chart_export_width=800,chart_export_height=150,print_output=F)  
 
   # Display Plotly Graphic
@@ -86,7 +86,7 @@ financial time series.
 
 <img src="./mtable.svg" width="100%" />
 
-## Example application recession shading with ggplot2
+## Example application recession shading with ggplot2 (ggRec)
 
 Apply NBER recession shading to any ggplot2 time series graphic,
 directly loading the recession indicator from the St Louis Fed. Please
@@ -149,19 +149,19 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 1675 days
+#> Time difference of 884 days
 df$longest_peak2trough
-#> Time difference of 1494 days
+#> Time difference of 802 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00           10
-#> 2  -0.05            3
-#> 3  -0.10            1
-#> 4  -0.20            1
+#> 1   0.00           18
+#> 2  -0.05            5
+#> 3  -0.10            3
+#> 4  -0.20            2
 #> 5  -0.30            1
 #> 6  -0.40            1
-#> 7  -0.50            0
+#> 7  -0.50            1
 #> 8   0.60            0
 #> 9  -0.70            0
 ```
