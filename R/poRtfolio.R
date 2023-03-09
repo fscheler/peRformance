@@ -316,7 +316,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 }
 
 
-rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4))
+rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30)
 {
   if (!require("purrr")) install.packages("data.table")
   if (!require("PortfolioAnalytics")) install.packages("dplyr")
@@ -379,7 +379,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
   #                                  search_size=2000,
   #                                  trace=TRUE)
 
-  ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = 30,risk_aversion = NULL, match.col = "ES", search_size = 500)
+  ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
 
