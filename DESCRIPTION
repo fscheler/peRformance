@@ -4,7 +4,7 @@ Title: Functions for financial research and portfolio management
 Version: 2.0.0
 Author: Fabian Scheler
 Maintainer: fscheler@proton.me
-Description: The package provides a range of functions to support the process of portfolio visualization/reporting,  
+Description: The package provides a range of functions to support the process of portfolio visualization 
     performance analysis, portfolio optimization as well as financial market research.
 License: AFL-3.0
 Encoding: UTF-8
