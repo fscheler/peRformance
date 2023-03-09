@@ -2,7 +2,7 @@
 
 
 
-FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
+FXhedgeRb<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
 {
 
   options(warn=-1)
@@ -87,9 +87,9 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     {
       hedge_perf<-fx_performance
     }else{
-      hedge_perf<-fx_performance*hedge_cost
+      hedge_perf<-fx_performance/hedge_cost
     }
-    cumulative_hedge_cost<-cbind(subset(hedge_cost_perc,select=Dates),1/subset(hedge_cost,select=c(paste0(base_currency,exp_currency))))
+    cumulative_hedge_cost<-cbind(subset(forwards_perc,select=Dates),1/subset(hedge_cost,select=c(paste0(base_currency,exp_currency))))
     hedge_cost_perc<-subset(forwards_perc,select=c("Dates",paste0(base_currency,exp_currency)))
     names(hedge_cost_perc)<-c("Dates","Hedge")
     hedge_cost_perc$Hedge<-hedge_cost_perc$Hedge*-1
@@ -113,7 +113,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
     }else{
       hedge_perf<-fx_performance/hedge_cost
     }
-    cumulative_hedge_cost<-cbind(subset(hedge_cost_perc,select=Dates),1/subset(hedge_cost,select=c(paste0(base_currency,exp_currency))))
+    cumulative_hedge_cost<-cbind(subset(forwards_perc,select=Dates),1/subset(hedge_cost,select=c(paste0(base_currency,exp_currency))))
     hedge_cost_perc<-subset(forwards_perc,select=c("Dates",paste0(base_currency,exp_currency)))
     names(hedge_cost_perc)<-c("Dates","Hedge")
     hedge_cost_perc$Hedge<-hedge_cost_perc$Hedge*-1
@@ -128,7 +128,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 
   names(cumulative_hedge_cost)<-c("Dates","Hedge")
 
-  hl<-list('hedge_perf'=hedge_perf,'forwards_perc'=hedge_cost_perc,'cumulative_hedge_cost'=cumulative_hedge_cost)
+  hl<-list('hedge_perf'=hedge_perf,'hedge_cost_perc'=hedge_cost_perc,'cumulative_hedge_cost'=cumulative_hedge_cost)
 
   options(warn=0)
 
@@ -136,11 +136,19 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 
 }
 
-#df<-FXhedgeR(base_currency='EUR',exp_currency='JPY',just_convert=F)
+#df<-FXhedgeRb(base_currency='USD',exp_currency='JPY',just_convert=F)
 
 #tail(df$forwards_perc,1)
 #library(plotly)
 #head(df$cumulative_hedge_cost)
-#plot_ly(df$cumulative_hedge_cost,x=~Dates,y=~Hedge)
-#plot_ly(df$forwards_perc,x=~Dates,y=~Hedge)
+#plot_ly(df$cumulative_hedge_cost,x=~as.Date(Dates),y=~Hedge,type="scatter",mode="line")
+#plot_ly(df$hedge_perf,x=~as.Date(Dates),y=~Hedge,type="scatter",mode="line")
+#plot_ly(df$hedge_cost_perc,x=~as.Date(Dates),y=~Hedge,type="scatter",mode="line")
+
+
+#df1<-synthetic_hedge(base_currency='USD',exp_currency='JPY',just_convert=F)
+
+#plot_ly(df1$cumulative_hedge_cost,x=~as.Date(Dates),y=~Hedge,type="scatter",mode="line")
+#plot_ly(df1$hedge_perf,x=~as.Date(Dates),y=~Hedge,type="scatter",mode="line")
+#plot_ly(df1$hedge_cost_perc,x=~as.Date(Dates),y=~Hedge,type="scatter",mode="line")
 
