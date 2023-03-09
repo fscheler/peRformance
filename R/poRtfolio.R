@@ -381,13 +381,6 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
 
   ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = 20,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
-
-
-  #as.numeric(ef$frontier[,4:ncol(ef$frontier)])
-  #global_wd<<-"C:/FS/quantamental_platform/Docker_ShinyPortfolioOptimizer/app3/"
-  #source(paste0(global_wd,"public_optimizer_functions/custom_moments_optimizer_hacked.R"))
-  #opt_qu <- PortfolioAnalytics::optimize.portfolio(R, portfolio=init.portf, optimize_method="ROI")
-
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
 
 
