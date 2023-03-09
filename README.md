@@ -12,8 +12,20 @@ returns.
 
 ## Installation
 
-You can install the development version of peRformance from
-[GitHub](https://github.com/) with:
+You can install and load the development version of peRformance from
+[GitHub](https://github.com/) with the following commands (if not yet
+installed, install devtools from CRAN first):
+
+``` r
+# Install devtools if required
+# install.packages("devtools")
+
+# Install the package
+devtools::install_github("fscheler/peRformance")
+
+# Load the package
+library(peRformance)
+```
 
 ## Example application monthly performance overview table
 
@@ -54,18 +66,18 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 1236 days
+#> Time difference of 775 days
 df$longest_peak2trough
-#> Time difference of 857 days
+#> Time difference of 629 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00           20
-#> 2  -0.05            5
-#> 3  -0.10            2
-#> 4  -0.20            2
+#> 1   0.00           32
+#> 2  -0.05            8
+#> 3  -0.10            3
+#> 4  -0.20            1
 #> 5  -0.30            1
-#> 6  -0.40            1
+#> 6  -0.40            0
 #> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0

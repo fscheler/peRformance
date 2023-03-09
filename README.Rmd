@@ -25,12 +25,14 @@ The goal of peRformance is to provide a range of functions to study and visualiz
 
 ## Installation
 
-You can install the development version of peRformance from [GitHub](https://github.com/) with:
+You can install and load the development version of peRformance from [GitHub](https://github.com/) with the following commands 
+(if not yet installed, install devtools from CRAN first):
 
-``` {r,warning=FALSE,message=FALSE, include=FALSE,echo=T}
-# Install the package
-
+``` {r,warning=FALSE,message=FALSE,warning=FALSE,message=FALSE,echo=T}
+# Install devtools if required
 # install.packages("devtools")
+
+# Install the package
 devtools::install_github("fscheler/peRformance")
 
 # Load the package
