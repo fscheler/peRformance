@@ -360,7 +360,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
 
   if(ret_format!="returns")
   {
-    R<-apply(R,2,calc_log_ret)
+    R<-apply(R,2,calc_ret)
   }
 
   funds <- colnames(R)
@@ -379,7 +379,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
   #                                  search_size=2000,
   #                                  trace=TRUE)
 
-  ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = 20,risk_aversion = NULL, match.col = "ES", search_size = 500)
+  ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = 30,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
 
