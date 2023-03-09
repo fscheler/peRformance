@@ -2,7 +2,7 @@
 
 
 
-FXhedgeRb<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
+FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
 {
 
   options(warn=-1)
@@ -136,7 +136,7 @@ FXhedgeRb<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrate
 
 }
 
-#df<-FXhedgeRb(base_currency='USD',exp_currency='JPY',just_convert=F)
+#df<-FXhedgeR(base_currency='USD',exp_currency='JPY',just_convert=F)
 
 #tail(df$forwards_perc,1)
 #library(plotly)
