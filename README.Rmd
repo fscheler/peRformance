@@ -1,6 +1,9 @@
+
 ---
-  html_document:
-    keep_md: true
+ date: "`r format(Sys.Date())`"
+ output:
+   html_document:
+     keep_md: TRUE
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -256,9 +259,3 @@ The package depends on the following packages:
   data.table,
   tibble
 
-
-```{r, include=FALSE}
-   # add this chunk to end of mycode.rmd
-   file.rename(from="scripts/README.md", 
-               to="README.md")
-```
