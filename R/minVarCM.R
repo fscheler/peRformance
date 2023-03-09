@@ -928,8 +928,8 @@ minVarCM<-function(da,ret_format="returns",table_format='wide',
           r = c(coVarMat),empirical = T
         )    
       
-      print(index(R))
-      Rsim$dates<-as.Date(index(R))
+
+      Rsim$dates<-as.Date(da$date)
       Rsim<-read.zoo(Rsim,index.column="dates")
       Rsim<-as.xts(Rsim)
       #Rsim<-log(1+Rsim)
