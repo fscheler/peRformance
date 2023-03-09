@@ -255,3 +255,10 @@ The package depends on the following packages:
   zoo,
   data.table,
   tibble
+
+
+```{r, include=FALSE}
+   # add this chunk to end of mycode.rmd
+   file.rename(from="scripts/README.md", 
+               to="README.md")
+```
