@@ -787,7 +787,7 @@ optimize.portfolio.h<-
 
 
 minVarCM<-function(da,ret_format="returns",table_format='wide',
-                          resampling_switch=T,resampling_switch_cov_lambda=0.5,return_periodicity_settings=0,
+                          resampling_switch=T,resampling_switch_cov_lambda=0.5,
                           ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30)
 {
 
@@ -889,6 +889,7 @@ minVarCM<-function(da,ret_format="returns",table_format='wide',
       }
       
       #Prepare Efficient Frontier
+      return_periodicity_settings=0
       ret_lag<-return_periodicity_settings
       return_periodicity_num<-1*ret_lag
       
@@ -944,7 +945,7 @@ minVarCM<-function(da,ret_format="returns",table_format='wide',
       n<-names(opt_qu$weights)
       p<-allocTree(data.frame(n,w),parent_label="Minimum Variance Portfolio")
       
-      optimization_list<-list("p"=p,"R"=R,"Remp"=R,"Rsim"=Rsim,"init.portf"=init.portf,"return_periodicity_num"=return_periodicity_num)
+      optimization_list<-list("p"=p,"R"=R,"Remp"=R,"Rsim"=Rsim,"init.portf"=init.portf,"opt_qu"=opt_qu)
 
       return(optimization_list)
       
