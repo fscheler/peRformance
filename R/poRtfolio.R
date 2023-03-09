@@ -399,13 +399,37 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
   cols = colorRampPalette(col_aq2)(nrow(df))
   #show_col(cols)
 
-  p<-plot_ly(eff, x=~sd_ann, y=~ret_ann,type='scatter',mode='line', colors = cols,line=list(color='grey'))%>%
-    add_trace( x=dls$sd_ann,y=dls$ret_ann,color = dls$variable,marker=list(size=12),mode='markers')%>%
+  p<-plot_ly(eff, x=~sd_ann, y=~ret_ann,type='scatter',mode='line', colors = cols,line=list(color='grey'),name='Efficient Frontier')%>%
+    add_trace( x=dls$sd_ann,y=dls$ret_ann,color = dls$variable,marker=list(size=12),mode='markers',name=dls$variable)%>%
     layout(margin = m,title="Risk & Return",
            xaxis = list(title="Risk",tickformat =".1%",range = list(min(eff$sd_ann/1.1), max(dls$sd_ann*1.1))),
            yaxis = list(title="Return",tickformat =".1%"),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "efficient_frontier",width = chart_export_width,height = chart_export_height))
-  return(p)
+
+
+  rr_ggplot<<-
+    #GGplot scatter
+    ggplot(NULL, aes(sd_ann, ret_ann)) +
+    geom_point(cex=5,data = dls,aes(color=factor(variable))) +
+    geom_line(data = eff)+
+    scale_color_manual(values=cols)+
+    theme_aq_black_default_font(base_size=14)+
+    #size 22 for overleaf
+    labs(color='')+
+    labs(title="Risk & Return",subtitle="Annualized values in % including efficient frontier",x ="")+
+    labs(caption = 'Source: Created with the peRformance package')+
+    xlab("Risk")+
+    ylab("Excess Return")+
+    theme(legend.position = "bottom",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(15,0,30,0))+
+    guides(colour = guide_legend(nrow = 2))+
+    theme(plot.margin=margin(l=5,r=10,b=5,t=5))+
+    scale_x_continuous(labels = scales::percent_format(accuracy=.1))+
+    scale_y_continuous(labels = scales::percent_format(accuracy=.1))+
+    theme(panel.grid.major.x = element_line(colour = "#D8D8D8"))
+
+  reslist<-list("eff_plotly"=p,"eff_ggplot"=rr_ggplot)
+
+  return(reslist)
 }
 
 
