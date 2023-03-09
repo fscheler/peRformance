@@ -193,7 +193,7 @@ eff<-rrScatEff(long,ret_format="returns",table_format='long')
 eff$eff_ggplot
 ```
 
-##  Foreign Exchange Hedging
+##  Modeling synthetic foreign exchange hedging (FXhedgeR)
 
 Investors are frequently exposed to the risk of foreign exchange rate changes. The very good underlying performance of an investment, demoninated in a foreign currency, can be (over)compensated easily by a depreciation in the respective currency's value compared to the investor's home currency.
 For this reason, investors regularly insure themselves (hedge) against this risk using Swaps or Forward contracts. However, the price of these hedges depends on the relative interest rates level. As a rule of thumb, investor's can't escape their home country's interest rate environment without taking foreign exchange risk. If interest rates in the foreign currency are higher, ceteris paribus, hedging will cost money and vice versa if foreign interest rates are lower.

@@ -22,6 +22,14 @@ installed, install devtools from CRAN first):
 
 # Install the package
 devtools::install_github("fscheler/peRformance")
+#> * checking for file 'C:\Users\Fabian\AppData\Local\Temp\Rtmp8UaffV\remotes946872a61f92\fscheler-peRformance-9dc47a5/DESCRIPTION' ... OK
+#> * preparing 'peRformance':
+#> * checking DESCRIPTION meta-information ... OK
+#> * checking for LF line-endings in source and make files and shell scripts
+#> * checking for empty or unneeded directories
+#> Omitted 'LazyData' from DESCRIPTION
+#> * building 'peRformance_0.1.0.tar.gz'
+#> 
 
 # Load the package
 library(peRformance)
@@ -44,26 +52,26 @@ financial time series.
 
   # Including Benchmark Returns
   df<-mperfT(da,ts_format="returns")  
-#>   Year     Jan     Feb     Mar     Apr    May    Jun    Jul    Aug    Sep
-#> 1 2007   -0.3%   5.53%  -0.98%   1.04% -4.77% -5.68%  8.69%  6.51% 13.16%
-#> 2 2008   8.08%   0.38%   3.36%  -2.78%  0.71% -2.82%  2.25% -0.94% -3.77%
-#> 3 2009  -1.34%  -4.79% -15.17% -11.74% -9.55% -1.61%  2.55%  4.65%  5.12%
-#> 4 2010  -6.61%  -1.76%  -0.05%  -0.59%  5.02%  0.84%  7.47%  6.88%  5.56%
-#> 5 2011   3.68%   5.54%   1.91%  -0.48%  -0.5% -8.06% 11.12% -1.36% 15.39%
-#> 6 2012   2.26%   1.85%  -8.69%   2.39% -0.31%   0.9%  7.19% -2.03%   2.4%
-#> 7 2013 -10.92% -10.35%  -3.89%  -5.26%  -1.8%  5.14% -3.79% -0.07% 10.49%
-#> 8 2014   5.85%  -4.49%   1.95%   1.29%  8.64% -0.55%  1.02%  1.57% -0.91%
-#> 9 2015   0.17%                                                           
-#>      Oct    Nov     Dec       FY Benchmark
-#> 1 -7.17% -5.73% -10.27%   -2.74%     9.47%
-#> 2  2.86%  2.29%    4.9%   14.79%    -12.4%
-#> 3  1.09% -3.36%   2.55%  -29.26%   -23.95%
-#> 4  0.75% 12.83%  -6.35%    24.6%    19.65%
-#> 5   4.3% -6.93%  -4.14%   19.48%     4.81%
-#> 6 11.88%  4.95%   10.6%   36.79%    33.49%
-#> 7  4.28% -3.61%   0.79%   -19.2%     3.68%
-#> 8 14.82%  3.59%  13.36%   54.63%    -8.27%
-#> 9                          0.17%     0.18%
+#>   Year    Jan    Feb    Mar    Apr    May    Jun     Jul    Aug    Sep    Oct
+#> 1 2007 -3.39%  0.79% 10.01% 14.63%  -3.5% -1.78%   1.47% -0.27% -6.44%  6.48%
+#> 2 2008 -1.03%  -4.1% -1.14% -6.74%  5.94%  0.75%   1.51%  3.44% -7.87%  1.73%
+#> 3 2009  0.42%  2.03%  0.42% -0.36% -6.24%  1.74%   2.28% -3.76%  0.45%  -7.1%
+#> 4 2010 -0.03% -0.72% -5.84% -3.77%  7.81% -1.95%  11.06%  4.95%  1.61%  1.73%
+#> 5 2011 -4.92% -1.82%  0.26%  3.68% 12.22%   0.9% -11.78% -6.95%  5.84%  -1.9%
+#> 6 2012 -4.39% -3.43% 13.44% -3.37%  14.7%  2.11%  11.26% -9.23%  0.73%  1.83%
+#> 7 2013 -5.99% -1.65%  -1.2% -1.25%  3.72% -0.11%  -7.39%  7.26%  6.07%  6.47%
+#> 8 2014  8.15%  5.85%  7.04%  3.54% -1.75% -8.98%   3.02% -2.19%  7.64% -2.08%
+#> 9 2015  1.55%                                                                
+#>      Nov    Dec      FY Benchmark
+#> 1  2.56% -0.83%  19.34%    16.16%
+#> 2 -6.89% -8.52%  -21.7%    25.96%
+#> 3 -1.35%  1.88%  -9.73%    -9.19%
+#> 4 -6.67%  0.32%   7.23%    -11.1%
+#> 5  0.97% -1.64%     -7%    29.35%
+#> 6 -4.02% -2.75%   14.6%     1.05%
+#> 7   0.4%  2.11%   7.49%    13.04%
+#> 8  0.81%  3.37%  25.57%     4.49%
+#> 9                 1.55%    -1.32%
 
   #Excluding Benchmark Returns  
   df<-mperfT(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
@@ -149,19 +157,19 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 884 days
+#> Time difference of 744 days
 df$longest_peak2trough
-#> Time difference of 802 days
+#> Time difference of 687 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00           18
-#> 2  -0.05            5
-#> 3  -0.10            3
-#> 4  -0.20            2
+#> 1   0.00           26
+#> 2  -0.05            6
+#> 3  -0.10            4
+#> 4  -0.20            1
 #> 5  -0.30            1
 #> 6  -0.40            1
-#> 7  -0.50            1
+#> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
 ```
@@ -207,7 +215,7 @@ eff$eff_ggplot
 
 <img src="man/figures/README-function_risk_return_scatter-2.png" width="100%" />
 
-## Foreign Exchange Hedging
+## Modeling synthetic foreign exchange hedging (FXhedgeR)
 
 Investors are frequently exposed to the risk of foreign exchange rate
 changes. The very good underlying performance of an investment,
