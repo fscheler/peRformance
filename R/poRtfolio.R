@@ -396,7 +396,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
 
   col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
   #col_aq2<-as.character(c("#04103b","#D1E2EC","#dd0400"))
-  cols = colorRampPalette(col_aq2)(nrow(df))
+  cols = colorRampPalette(col_aq2)(nrow(dls))
   #show_col(cols)
 
   p<-plot_ly(eff, x=~sd_ann, y=~ret_ann,type='scatter',mode='line', colors = cols,line=list(color='grey'),name='Efficient Frontier')%>%
