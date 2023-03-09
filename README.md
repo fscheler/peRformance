@@ -54,18 +54,18 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 1193 days
+#> Time difference of 1236 days
 df$longest_peak2trough
-#> Time difference of 967 days
+#> Time difference of 857 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00            9
-#> 2  -0.05            3
+#> 1   0.00           20
+#> 2  -0.05            5
 #> 3  -0.10            2
 #> 4  -0.20            2
-#> 5  -0.30            0
-#> 6  -0.40            0
+#> 5  -0.30            1
+#> 6  -0.40            1
 #> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
@@ -180,7 +180,7 @@ tail(df$cumulative_hedge_cost)
 
 ## Dependencies
 
-The package depends on the following packages:
+The package references the following packages:
 
 lubridate, fredr, ecm, ggplot2, dplyr, scales, fredr, purrr,
 PortfolioAnalytics, ecm, plotly, tidyverse, caTools, zoo, data.table,

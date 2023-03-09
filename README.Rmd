@@ -66,7 +66,7 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
   
   # You can also configure the export options and download the plotly graphic as a high resolution svg
   df<-mperf_table(da,ts_format="index",header_color="#3b5171",font_color="#04103b",export_format="svg",
-                  chart_export_width=600,chart_export_height=150,print_output=F)  
+                  chart_export_width=800,chart_export_height=150,print_output=F)  
 
   # Display Plotly Graphic
   df$fig
@@ -245,7 +245,7 @@ tail(df$cumulative_hedge_cost)
 
 ##  Dependencies
 
-The package depends on the following packages:
+The package references the following packages:
 
   lubridate,
   fredr,
