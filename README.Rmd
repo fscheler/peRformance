@@ -44,7 +44,7 @@ library(peRformance)
 Create a monthly and annual performance overview table in plotly and a printable version that can be used in markdown documents with the kable package.
 Monthly tables are a popular tool in analysis and comparison of financial time series.
 
-```{r function_mperf_table,warning=FALSE,message=FALSE, fig.width=9,fig.height=0.5,dpi=300, include=FALSE,echo=T}
+```{r function_mperf_table,warning=FALSE,message=FALSE, fig.width=9,fig.height=0.5,dpi=300}
 
   # Generate an integrated monthly and annual performance overview using plotly
   date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
@@ -71,7 +71,7 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
                   chart_export_width=800,chart_export_height=150,print_output=F)  
 
   # Display Plotly Graphic
-  df$fig
+  #df$fig
 
 ```
 
@@ -86,7 +86,7 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
 Apply NBER recession shading to any ggplot2 time series graphic, directly loading the recession indicator from the St Louis Fed.
 Please note, that this function requires an API key that can be generated for free on the Fed's website (https://fred.stlouisfed.org/docs/api/api_key.html).
 
-```{r function_recession_shading,warning=FALSE,message=FALSE, include=FALSE,echo=T}
+```{r function_recession_shading,warning=FALSE,message=FALSE}
 
 # Generate a random return time series
 date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
@@ -161,7 +161,7 @@ df$longest_peak2trough
 df$n
 
 ```
-sequence of random returns
+
 ##    Example application rrScat & rrScatEff functions
 
 The rrScat functions provide visual insights into the risk/return profile of a given sample of assets.
