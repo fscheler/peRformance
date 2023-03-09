@@ -1,4 +1,3 @@
-
 ---
  date: "2023-03-09"
  output:
@@ -45,26 +44,26 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
 
   # Including Benchmark Returns
   df<-mperf_table(da,ts_format="returns")  
-#>   Year    Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct
-#> 1 2007 -2.01%  1.84%  -0.5% -5.71% -7.83%  1.21% -1.98%  6.71%  2.14% -9.95%
-#> 2 2008  0.72% -2.26%  3.64%  8.42%   1.4%  1.38%  0.92%    -3% -7.75% -0.19%
-#> 3 2009  6.86%  -4.9% -8.62%  5.14% -4.78%  8.16% -2.55% -1.64% -0.18%  0.34%
-#> 4 2010   5.3%     6% -5.74% -6.18%  5.13%   0.1% -6.43% -3.85% -2.23% -5.16%
-#> 5 2011  0.89%  4.72% -5.09%  -6.9% -0.14% -1.74%  1.71%    -2% -6.28%  0.88%
-#> 6 2012 -0.49%  2.08%  2.37% -1.28% 12.13%  2.81%  0.02%  9.09%  1.83% -4.78%
-#> 7 2013 10.32%   -10% -4.71% -8.24%  10.1%    -9%  1.87%  10.3%  9.12% -4.66%
-#> 8 2014  8.99% -4.88% 10.75%  6.74% -5.79% -3.78% -0.14% -3.01% -4.07% -3.88%
-#> 9 2015 -1.28%                                                               
-#>      Nov     Dec       FY Benchmark
-#> 1 -2.85% -11.59%  -27.83%   -25.33%
-#> 2  -1.1%  -5.12%   -3.81%    18.43%
-#> 3  5.23%  -5.49%   -3.99%    -5.99%
-#> 4 -6.98%  -3.86%  -22.51%    -5.25%
-#> 5  4.09%  -4.01%  -13.75%    24.01%
-#> 6 -0.06%  -3.34%   20.94%    -9.85%
-#> 7  2.37%  -1.73%    2.29%     30.8%
-#> 8 -3.72% -12.06%  -15.99%    41.24%
-#> 9                  -1.28%    -0.18%
+#>   Year    Jan    Feb    Mar    Apr    May    Jun    Jul    Aug     Sep     Oct
+#> 1 2007  5.61% -4.82% -1.83% -1.23%   8.4%  4.89%  0.18% -3.25%  -3.97%   -7.8%
+#> 2 2008 -3.52%  1.34%  4.74% -0.84%  2.07%  8.92% -4.43% -4.14%  -2.73%  -9.59%
+#> 3 2009  6.24% -0.44% -2.63% -4.62%  4.31%  4.57%  7.65% 10.37%   4.04%   2.32%
+#> 4 2010 -5.54% -4.38%  2.53% -4.78% -0.73% -8.78%  2.57%  5.17% -10.63%   3.26%
+#> 5 2011 -4.09%  9.21%   2.5%  7.49%     2%  8.38% -4.17%  6.96%   0.35%  -5.69%
+#> 6 2012  3.72% -5.03% 10.02% -0.97% -3.96% 13.49%  9.05%  1.66%  10.23%   0.32%
+#> 7 2013   7.9% -4.82% -5.06% -2.47% -2.24% -0.58%  4.74% -4.53%  -3.54% -10.25%
+#> 8 2014  6.35%  2.02% -0.93%  5.71% -0.79% -6.02%  7.39%  1.09%  -6.84%  -6.13%
+#> 9 2015  -0.9%                                                                 
+#>      Nov    Dec       FY Benchmark
+#> 1 -1.51% -2.31%   -8.49%    -4.43%
+#> 2 -1.39% -2.66%  -12.69%    23.11%
+#> 3 -5.59% -3.34%   23.67%    32.82%
+#> 4 -1.87% -6.07%  -26.72%    -3.56%
+#> 5  5.52%  1.29%   32.27%     1.65%
+#> 6 -2.02% 10.44%   55.16%    21.51%
+#> 7 -5.93% -0.03%  -24.75%    -5.82%
+#> 8 -1.76%  0.31%   -0.87%   -20.63%
+#> 9                  -0.9%     0.94%
 
   #Excluding Benchmark Returns  
   df<-mperf_table(da[,c("date","asset_ret")],ts_format="returns",print_output=F)
@@ -82,12 +81,13 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
                   chart_export_width=600,chart_export_height=150,print_output=F)  
 
   # Display Plotly Graphic
-  df$fig
+  
+  htmltools::tagList(list(df$fig))
 ```
 
 ```{=html}
-<div id="htmlwidget-7b391ddf4f3a25a70b36" style="width:100%;height:150px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7b391ddf4f3a25a70b36">{"x":{"visdat":{"55286bf431a1":["function () ","plotlyVisDat"]},"cur_data":"55286bf431a1","attrs":{"55286bf431a1":{"columnwidth":[60,80,80,80,80,80,80,80,80,80,80,80,80],"header":{"values":["<b>Year<\/b>","<b>Jan<\/b>","<b>Feb<\/b>","<b>Mar<\/b>","<b>Apr<\/b>","<b>May<\/b>","<b>Jun<\/b>","<b>Jul<\/b>","<b>Aug<\/b>","<b>Sep<\/b>","<b>Oct<\/b>","<b>Nov<\/b>","<b>Dec<\/b>","<b><\/b>","<b>FY<\/b>","<b>Benchmark<\/b>"],"line":{"color":"white"},"fill":{"color":"#3b5171"},"font":{"color":"white","size":7}},"cells":{"height":16,"values":[["2010","2011","2012","2013","2014","2015"],["0.88%","-4.23%","-5.25%","0.76%","-4%","-1.38%"],["3.74%","7.09%","7.66%","-0.44%","-0.48%",""],["0.73%","-7.15%","-5.79%","21.1%","-5.74%",""],["1.52%","1.45%","5.05%","8.44%","0.42%",""],["-3.7%","3.02%","-1.12%","-4.8%","3.91%",""],["2.56%","-2.63%","1.11%","-5.43%","3.16%",""],["10.15%","5.03%","6.19%","10.44%","-5.6%",""],["1.35%","-7.28%","8.99%","-3%","-2.41%",""],["-1.85%","4.33%","-9.2%","-7.91%","-1.96%",""],["-2.18%","0.14%","-10.4%","-8.23%","0.19%",""],["7.55%","3.03%","-7.3%","-1.85%","-5.49%",""],["4.85%","6.69%","9.28%","-3.26%","3.75%",""],["","","","","",""],["27.75%","8.39%","-3.72%","1.95%","-13.98%","-1.38%"],["-10.31%","-6.63%","-7.51%","-2.29%","-0.59%","2%"]],"line":{"color":"white"},"fill":{"color":[["white","lightgrey","white","lightgrey","white","lightgrey","white","lightgrey"]]},"align":["center","center","center","center","center","center","center","center"],"font":{"color":"#04103b","size":6}},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"table"}},"layout":{"margin":{"b":0,"l":0,"t":0,"r":0,"par":4},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"toImageButtonOptions":{"format":"svg","filename":"monthly_returns_table","width":600,"height":150}},"data":[{"columnwidth":[60,80,80,80,80,80,80,80,80,80,80,80,80],"header":{"values":["<b>Year<\/b>","<b>Jan<\/b>","<b>Feb<\/b>","<b>Mar<\/b>","<b>Apr<\/b>","<b>May<\/b>","<b>Jun<\/b>","<b>Jul<\/b>","<b>Aug<\/b>","<b>Sep<\/b>","<b>Oct<\/b>","<b>Nov<\/b>","<b>Dec<\/b>","<b><\/b>","<b>FY<\/b>","<b>Benchmark<\/b>"],"line":{"color":"white"},"fill":{"color":"#3b5171"},"font":{"color":"white","size":7}},"cells":{"height":16,"values":[["2010","2011","2012","2013","2014","2015"],["0.88%","-4.23%","-5.25%","0.76%","-4%","-1.38%"],["3.74%","7.09%","7.66%","-0.44%","-0.48%",""],["0.73%","-7.15%","-5.79%","21.1%","-5.74%",""],["1.52%","1.45%","5.05%","8.44%","0.42%",""],["-3.7%","3.02%","-1.12%","-4.8%","3.91%",""],["2.56%","-2.63%","1.11%","-5.43%","3.16%",""],["10.15%","5.03%","6.19%","10.44%","-5.6%",""],["1.35%","-7.28%","8.99%","-3%","-2.41%",""],["-1.85%","4.33%","-9.2%","-7.91%","-1.96%",""],["-2.18%","0.14%","-10.4%","-8.23%","0.19%",""],["7.55%","3.03%","-7.3%","-1.85%","-5.49%",""],["4.85%","6.69%","9.28%","-3.26%","3.75%",""],["","","","","",""],["27.75%","8.39%","-3.72%","1.95%","-13.98%","-1.38%"],["-10.31%","-6.63%","-7.51%","-2.29%","-0.59%","2%"]],"line":{"color":"white"},"fill":{"color":[["white","lightgrey","white","lightgrey","white","lightgrey","white","lightgrey"]]},"align":["center","center","center","center","center","center","center","center"],"font":{"color":"#04103b","size":6}},"type":"table","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ea7a9602d42db54d4a82" style="width:100%;height:400px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ea7a9602d42db54d4a82">{"x":{"visdat":{"4283c6266a":["function () ","plotlyVisDat"]},"cur_data":"4283c6266a","attrs":{"4283c6266a":{"columnwidth":[60,80,80,80,80,80,80,80,80,80,80,80,80],"header":{"values":["<b>Year<\/b>","<b>Jan<\/b>","<b>Feb<\/b>","<b>Mar<\/b>","<b>Apr<\/b>","<b>May<\/b>","<b>Jun<\/b>","<b>Jul<\/b>","<b>Aug<\/b>","<b>Sep<\/b>","<b>Oct<\/b>","<b>Nov<\/b>","<b>Dec<\/b>","<b><\/b>","<b>FY<\/b>","<b>Benchmark<\/b>"],"line":{"color":"white"},"fill":{"color":"#3b5171"},"font":{"color":"white","size":7}},"cells":{"height":16,"values":[["2010","2011","2012","2013","2014","2015"],["-8.04%","-14.04%","-5.54%","5.83%","-6.09%","-0.11%"],["-9.42%","12.99%","-2.92%","0.4%","1.74%",""],["2.2%","-3.79%","-1%","-0.94%","0.98%",""],["-1.36%","6.56%","-3.42%","-4.53%","-3.56%",""],["10.79%","-3.77%","1.56%","5.88%","0.64%",""],["7.68%","0.76%","1.31%","8.93%","-3.11%",""],["2.74%","2.71%","-3.24%","-1.62%","-0.66%",""],["5.61%","-4.03%","-5.28%","13.97%","-0.37%",""],["-5.26%","-0.85%","1.61%","-7.34%","9.5%",""],["10.91%","0.44%","-0.25%","3.37%","2.14%",""],["-4.88%","0.22%","3.18%","5.1%","4.92%",""],["-4%","3.15%","3.73%","3.14%","-11.29%",""],["","","","","",""],["4.31%","-2.03%","-10.3%","34.94%","-6.52%","-0.11%"],["-16.1%","-30.19%","-4.45%","37.7%","18.96%","0.68%"]],"line":{"color":"white"},"fill":{"color":[["white","lightgrey","white","lightgrey","white","lightgrey","white","lightgrey"]]},"align":["center","center","center","center","center","center","center","center"],"font":{"color":"#04103b","size":6}},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"table"}},"layout":{"margin":{"b":0,"l":0,"t":0,"r":0,"par":4},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"toImageButtonOptions":{"format":"svg","filename":"monthly_returns_table","width":600,"height":150}},"data":[{"columnwidth":[60,80,80,80,80,80,80,80,80,80,80,80,80],"header":{"values":["<b>Year<\/b>","<b>Jan<\/b>","<b>Feb<\/b>","<b>Mar<\/b>","<b>Apr<\/b>","<b>May<\/b>","<b>Jun<\/b>","<b>Jul<\/b>","<b>Aug<\/b>","<b>Sep<\/b>","<b>Oct<\/b>","<b>Nov<\/b>","<b>Dec<\/b>","<b><\/b>","<b>FY<\/b>","<b>Benchmark<\/b>"],"line":{"color":"white"},"fill":{"color":"#3b5171"},"font":{"color":"white","size":7}},"cells":{"height":16,"values":[["2010","2011","2012","2013","2014","2015"],["-8.04%","-14.04%","-5.54%","5.83%","-6.09%","-0.11%"],["-9.42%","12.99%","-2.92%","0.4%","1.74%",""],["2.2%","-3.79%","-1%","-0.94%","0.98%",""],["-1.36%","6.56%","-3.42%","-4.53%","-3.56%",""],["10.79%","-3.77%","1.56%","5.88%","0.64%",""],["7.68%","0.76%","1.31%","8.93%","-3.11%",""],["2.74%","2.71%","-3.24%","-1.62%","-0.66%",""],["5.61%","-4.03%","-5.28%","13.97%","-0.37%",""],["-5.26%","-0.85%","1.61%","-7.34%","9.5%",""],["10.91%","0.44%","-0.25%","3.37%","2.14%",""],["-4.88%","0.22%","3.18%","5.1%","4.92%",""],["-4%","3.15%","3.73%","3.14%","-11.29%",""],["","","","","",""],["4.31%","-2.03%","-10.3%","34.94%","-6.52%","-0.11%"],["-16.1%","-30.19%","-4.45%","37.7%","18.96%","0.68%"]],"line":{"color":"white"},"fill":{"color":[["white","lightgrey","white","lightgrey","white","lightgrey","white","lightgrey"]]},"align":["center","center","center","center","center","center","center","center"],"font":{"color":"#04103b","size":6}},"type":"table","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 ```
 
 
@@ -120,19 +120,19 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 1511 days
+#> Time difference of 595 days
 df$longest_peak2trough
-#> Time difference of 1510 days
+#> Time difference of 320 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00           19
-#> 2  -0.05            4
-#> 3  -0.10            2
+#> 1   0.00           47
+#> 2  -0.05           11
+#> 3  -0.10            5
 #> 4  -0.20            1
 #> 5  -0.30            1
-#> 6  -0.40            1
-#> 7  -0.50            1
+#> 6  -0.40            0
+#> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
 ```
