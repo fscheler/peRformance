@@ -4,8 +4,8 @@ Title: Useful functions for financial market research
 Version: 2.0.0
 Author: Fabian Scheler
 Maintainer: The package maintainer <fscheler@proton.me>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: The package provides a range of functions dedicated to supporting the process of portfolio     
+    visualization, performance analysis, portfolio optimization and financial market research.
 License: AFL 3.0
 Encoding: UTF-8
 LazyData: true
