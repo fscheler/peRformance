@@ -1,6 +1,6 @@
 Package: peRformance
 Type: Package
-Title: Useful functions for financial market research
+Title: Functions for financial market research and portfolio management
 Version: 2.0.0
 Author: Fabian Scheler
 Maintainer: Fabian Scheler <fscheler@proton.me>
