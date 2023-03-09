@@ -202,7 +202,7 @@ The cost of a hedge can, therefore, be simulated easily using the interest rate 
 # Obtain the carry paid/earned by hedging USD exposure for a Singapore based investor
 # A negative figure means, the hedge costs money, a postive figure indicates that the investor is earning carry.
 df<-FXhedgeR(base_currency='SGD',exp_currency='USD')
-tail(df$forwards_perc,1)
+tail(df$hedge_cost_perc,1)
 
 # Obtain the carry paid/earned by hedging GBP exposure for a Swiss investor with user-given data
 df<-

@@ -54,18 +54,18 @@ df<-dRawdowns(da,ret_format='returns',graphics=F)
 
 # Some example output
 df$longest_drawdown
-#> Time difference of 1810 days
+#> Time difference of 1193 days
 df$longest_peak2trough
-#> Time difference of 1354 days
+#> Time difference of 967 days
 # Count number of drawdowns with a trough below threshold value
 df$n
 #>   ranges observations
-#> 1   0.00            3
-#> 2  -0.05            1
-#> 3  -0.10            1
-#> 4  -0.20            1
-#> 5  -0.30            1
-#> 6  -0.40            1
+#> 1   0.00            9
+#> 2  -0.05            3
+#> 3  -0.10            2
+#> 4  -0.20            2
+#> 5  -0.30            0
+#> 6  -0.40            0
 #> 7  -0.50            0
 #> 8   0.60            0
 #> 9  -0.70            0
@@ -139,8 +139,9 @@ default which, however, may not be up-to-date.
 # Obtain the carry paid/earned by hedging USD exposure for a Singapore based investor
 # A negative figure means, the hedge costs money, a postive figure indicates that the investor is earning carry.
 df<-FXhedgeR(base_currency='SGD',exp_currency='USD')
-tail(df$forwards_perc,1)
-#> NULL
+tail(df$hedge_cost_perc,1)
+#>         Dates     Hedge
+#> 1: 2023-03-07 -0.013948
 
 # Obtain the carry paid/earned by hedging GBP exposure for a Swiss investor with user-given data
 df<-
