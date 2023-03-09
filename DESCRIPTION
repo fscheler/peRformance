@@ -2,8 +2,8 @@ Package: peRformance
 Type: Package
 Title: Functions for financial research and portfolio management
 Version: 2.0.0
-Author: Who wrote it
-Maintainer: The package maintainer <fscheler@proton.me>
+Author: Fabian Scheler
+Maintainer: fscheler@proton.me
 Description: The package provides a range of functions to support the process of portfolio visualization/reporting,  
     performance analysis, portfolio optimization as well as financial market research.
 License: AFL-3.0
