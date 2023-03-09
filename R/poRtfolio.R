@@ -420,7 +420,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
     scale_y_continuous(labels = scales::percent_format(accuracy=.1))+
     theme(panel.grid.major.x = element_line(colour = "#D8D8D8"))
 
-  reslist<-list("eff_plotly"=p,"eff_ggplot"=rr_ggplot)
+  reslist<-list("dls"=dls,"eff"=eff,"eff_plotly"=p,"eff_ggplot"=rr_ggplot)
 
   return(reslist)
 }
