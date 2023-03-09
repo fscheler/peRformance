@@ -1,5 +1,6 @@
 ---
-output: github_document
+  html_document:
+    keep_md: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -13,6 +14,8 @@ knitr::opts_chunk$set(
   dpi=300
 )
 ```
+
+
 
 # peRformance
 
@@ -35,7 +38,7 @@ devtools::install_github("fscheler/peRformance")
 Create a monthly and annual performance overview table in plotly and a printable version that can be used in markdown documents with the kable package.
 Monthly tables are a popular tool in analysis and comparison of financial time series.
 
-```{r function_mperf_table,warning=FALSE,message=FALSE}
+```{r function_mperf_table,warning=FALSE,message=FALSE, fig.width=9,fig.height=0.5,dpi=300}
   library(peRformance)
 
   # Generate an integrated monthly and annual performance overview using plotly
@@ -64,8 +67,8 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
 
   # Display Plotly Graphic
   df$fig
-
 ```
+
 
 
 ##  Example application recession shading with ggplot2
@@ -73,7 +76,7 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
 Apply NBER recession shading to any ggplot2 time series graphic, directly loading the recession indicator from the St Louis Fed.
 Please note, that this function requires an API key that can be generated for free on the Fed's website (https://fred.stlouisfed.org/docs/api/api_key.html).
 
-```{r function_recession_shading,warning=FALSE,message=FALSE}
+```{r function_recession_shading,warning=FALSE,message=FALSE, include=FALSE,echo=T}
 
 # Generate a random return time series
 date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
@@ -81,18 +84,41 @@ asset_ret<-cumprod(1+rnorm(length(date))/100)
 da<-data.frame(date,asset_ret)
 
 # Initiate a ggplot2 chart
-
-  cols <- c("Time Series" = "#04103b")
+  library(ggplot2)
+  cols <- c("Time series with NBER recession shading" = "#04103b")
   p<-ggplot(data=da,aes(x=as.Date(date), y=asset_ret))
 # Add recession shading using the function and your API Key  
 # to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
   tryCatch({
-    p<-p + add_rec_shade(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
+    p<-p + ggRec(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="your_api_key")
   }, error = function(e) {})
 # add formatting  
   library(scales)
   p<-p +
-    geom_line(size=1,aes(y=asset_ret,color="Time Series"))+
+# add a theme from the peRformance package
+    theme_aq_black_default_font(base_size=16)+
+#Add other elements
+    geom_line(size=1,aes(y=asset_ret,color="Time series with NBER recession shading"))+
+    scale_colour_manual(values = cols)+
+    scale_x_date(labels = date_format("%m-%Y"))+
+    xlab("")+
+    ylab("")+
+    theme(legend.position = "bottom",legend.title = element_blank())+
+    theme(plot.margin=margin(l=5,r=10,b=5,t=5))
+  
+```
+
+```{r function_recession_shading_plot, fig.width=9,fig.height=6.5,echo=FALSE,warning=FALSE,message=FALSE,dpi=300}
+  cols <- c("Time series with NBER recession shading" = "#04103b")
+  p<-ggplot(data=da,aes(x=as.Date(date), y=asset_ret))
+# Add recession shading using the function and your API Key  
+# to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
+    p<-p + ggRec(as.Date(min(da$date)),as.Date(max(da$date)),fredr_key="267ec659142c1bbeb7637d657488acaa")
+# add formatting  
+  library(scales)
+  p<-p +
+    theme_aq_black_default_font(base_size=16)+
+    geom_line(size=1,aes(y=asset_ret,color="Time series with NBER recession shading"))+
     scale_colour_manual(values = cols)+
     scale_x_date(labels = date_format("%m-%Y"))+
     xlab("")+
@@ -100,7 +126,6 @@ da<-data.frame(date,asset_ret)
     theme(legend.position = "bottom",legend.title = element_blank())+
     theme(plot.margin=margin(l=5,r=10,b=5,t=5))
   p
-  
 ```
 
 
@@ -133,7 +158,7 @@ The rrScat functions provide visual insights into the risk/return profile of a g
 rrScat displays the annualized risk (standard deviation) of returns and the annualized return in a scatter plot.
 rrScatEff provides an interface to the ROI optimizer of the PortfolioAnalytics package and plots the efficient frontier alongisde the given assets.
 
-```{r function_risk_return_scatter,warning=FALSE,message=FALSE}
+```{r function_risk_return_scatter,warning=FALSE,message=FALSE, fig.width=9,fig.height=6.5,dpi=300}
 
 # Generate a dataframe of random asset returns
 date=seq(as.Date("2010-1-1"), as.Date("2015-1-1"), by = "days")
@@ -153,8 +178,11 @@ p<-rrScatEff(da,ret_format="returns",table_format='wide')
 # The function can also handle data in long format. 
 # For this, the data should be arranged as follows: date, id, values
 long <- melt(setDT(da), id.vars = "date")
-p<-rrScatEff(long,ret_format="returns",table_format='long')
+eff<-rrScatEff(long,ret_format="returns",table_format='long')
 
+
+
+eff$eff_ggplot
 ```
 
 ##  Foreign Exchange Hedging
@@ -179,7 +207,32 @@ FXhedgeR(base_currency='CHF',exp_currency='GBP',
 
 head(df$hedge_perf)
 tail(df$forwards_perc)
+tail(df$cumulative_hedge_cost)
 
+```
+
+```{r function_synthetic_fx_hedging_plot, fig.width=9,fig.height=6.5,echo=FALSE,warning=FALSE,message=FALSE,dpi=300}
+  library(ggplot2)
+  cols <- c("Cumulative cost of carry" = "#04103b")
+  p<-ggplot(data=df$cumulative_hedge_cost,aes(x=as.Date(Dates), y=Hedge))
+# Add recession shading using the function and your API Key  
+# to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
+    p<-p + ggRec(as.Date(min(df$cumulative_hedge_cost$Dates)),as.Date(max(df$cumulative_hedge_cost$Dates)),fredr_key="267ec659142c1bbeb7637d657488acaa")
+# add formatting  
+  library(scales)
+  p<-p +
+    theme_aq_black_default_font(base_size=16)+
+    labs(title="Cost of carry",subtitle="The cumulative cost of hedging a GBP position in CHF",x ="")+
+    geom_line(size=1,aes(y=Hedge-1,color="Cumulative cost of carry"))+
+    scale_colour_manual(values = cols)+
+    scale_x_date(labels = date_format("%m-%Y"))+
+    xlab("")+
+    ylab("")+
+    theme(legend.position = "none",legend.title = element_blank())+
+    theme(plot.margin=margin(l=5,r=10,b=5,t=5))+
+    scale_y_continuous(labels = percent)
+  p
+  
 ```
 
 ##  Dependencies
