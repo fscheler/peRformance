@@ -1,8 +1,5 @@
 ---
- date: "`r format(Sys.Date())`"
- output:
-   html_document:
-     keep_md: TRUE
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -30,9 +27,14 @@ The goal of peRformance is to provide a range of functions to study and visualiz
 
 You can install the development version of peRformance from [GitHub](https://github.com/) with:
 
-``` r
+``` {r,warning=FALSE,message=FALSE, include=FALSE,echo=T}
+# Install the package
+
 # install.packages("devtools")
 devtools::install_github("fscheler/peRformance")
+
+# Load the package
+library(peRformance)
 ```
 
 ## Example application monthly performance overview table
@@ -40,8 +42,7 @@ devtools::install_github("fscheler/peRformance")
 Create a monthly and annual performance overview table in plotly and a printable version that can be used in markdown documents with the kable package.
 Monthly tables are a popular tool in analysis and comparison of financial time series.
 
-```{r function_mperf_table,warning=FALSE,message=FALSE, fig.width=9,fig.height=0.5,dpi=300}
-  library(peRformance)
+```{r function_mperf_table,warning=FALSE,message=FALSE, fig.width=9,fig.height=0.5,dpi=300, include=FALSE,echo=T}
 
   # Generate an integrated monthly and annual performance overview using plotly
   date=seq(as.Date("2007-1-1"), as.Date("2015-1-1"), by = "days")
@@ -68,11 +69,15 @@ Monthly tables are a popular tool in analysis and comparison of financial time s
                   chart_export_width=600,chart_export_height=150,print_output=F)  
 
   # Display Plotly Graphic
-  
-  htmltools::tagList(list(df$fig))
+  df$fig
+
 ```
 
+```{r function_mperf_table_plot, fig.width=9,fig.height=6.5,echo=FALSE,warning=FALSE,message=FALSE,dpi=300}
+  
+  knitr::include_graphics("./mtable.svg")
 
+```
 
 ##  Example application recession shading with ggplot2
 
@@ -183,8 +188,6 @@ p<-rrScatEff(da,ret_format="returns",table_format='wide')
 long <- melt(setDT(da), id.vars = "date")
 eff<-rrScatEff(long,ret_format="returns",table_format='long')
 
-
-
 eff$eff_ggplot
 ```
 
@@ -209,7 +212,7 @@ FXhedgeR(base_currency='CHF',exp_currency='GBP',
 )
 
 head(df$hedge_perf)
-tail(df$forwards_perc)
+tail(df$hedge_cost_perc)
 tail(df$cumulative_hedge_cost)
 
 ```
@@ -225,7 +228,7 @@ tail(df$cumulative_hedge_cost)
   library(scales)
   p<-p +
     theme_aq_black_default_font(base_size=16)+
-    labs(title="Cost of carry",subtitle="The cumulative cost of hedging a GBP position in CHF",x ="")+
+    labs(title="Cost of carry",subtitle="Cumulative carry earned by hedging a GBP position in CHF",x ="")+
     geom_line(size=1,aes(y=Hedge-1,color="Cumulative cost of carry"))+
     scale_colour_manual(values = cols)+
     scale_x_date(labels = date_format("%m-%Y"))+
@@ -237,6 +240,8 @@ tail(df$cumulative_hedge_cost)
   p
   
 ```
+
+
 
 ##  Dependencies
 

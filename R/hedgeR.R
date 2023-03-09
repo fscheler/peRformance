@@ -137,7 +137,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 }
 
 
-#df<-FXhedgeR(base_currency='USD',exp_currency='JPY',just_convert=F)
+#df<-FXhedgeR(base_currency='EUR',exp_currency='CHF',just_convert=F)
 
 #tail(df$forwards_perc,1)
 #library(plotly)
