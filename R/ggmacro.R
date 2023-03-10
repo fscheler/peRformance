@@ -198,7 +198,7 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
 ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="Treasury Yield",chart_width=10,chart_height=6,base_size_font=22,
                  target_path="",cols="#04103b",source='Produced with the peRformance package',fredr_key=NULL,colorarea=T)
 {
-  
+
   
   
   #install.packages("fredr")
@@ -210,7 +210,7 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
   library(ecm) 
   
   names(dw)<-c('date','sums')
-  
+  dw$date<-as.Date(dw$date)
   dw<-na.locf(dw)
   # Initiate a ggplot2 chart
   library(ggplot2)
@@ -219,7 +219,10 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
   # Add recession shading using the function and your API Key  
   # to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
   tryCatch({
-    p<-p + ggRec(as.Date(min(dw$date)),as.Date(max(dw$date)),fredr_key=fredr_key)
+    if(!is.null(fredr_key))
+    {
+      p<-p + ggRec(as.Date(min(dw$date)),as.Date(max(dw$date)),fredr_key=fredr_key)      
+    }
   }, error = function(e) {})
   #> NULL
   # add formatting  
@@ -246,10 +249,7 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
     ylab("")+
     theme(legend.position = "none",legend.title = element_blank())+
     theme(plot.margin=margin(l=5,r=10,b=5,t=5))
-  p
-  
   
   return(p)
-  
   
 }
