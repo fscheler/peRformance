@@ -177,9 +177,12 @@ ggFRED<-function(mnemonic="T10YIE",chart_name,subline,save_name,observation_star
     theme(plot.margin=margin(5,5,5,5))
   p
   
-  ggsave(paste0(target_path,save_name,".png"),plot = p,width=chart_width,height=chart_height)
-  ggsave(paste0(target_path,save_name,".svg"),plot = p,width=chart_width,height=chart_height)
-  
+  if(target_path!="")
+  {
+    ggsave(paste0(target_path,save_name,".png"),plot = p,width=chart_width,height=chart_height)
+    ggsave(paste0(target_path,save_name,".svg"),plot = p,width=chart_width,height=chart_height)    
+  }
+
   }
   return(p)
 }
