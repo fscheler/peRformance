@@ -120,10 +120,10 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
 
 
 
-ggFRED<-function(mnemonic="T10YIE",chart_name,subline,save_name,observation_start_dt="1990-01-01",recession_shading="TRUE",chart_width=10,chart_height=6,base_size_font=22,
-                                 target_path="",api_key=NULL)
+ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield",save_name="Treasury Yield",observation_start_dt="1990-01-01",recession_shading="TRUE",chart_width=10,chart_height=6,base_size_font=22,
+                                 target_path="",cols="#04103b",source='Produced with the peRformance package',fredr_key=NULL)
 {
-  if(!is.null(api_key))
+  if(!is.null(fredr_key))
   {
     
 
@@ -137,7 +137,7 @@ ggFRED<-function(mnemonic="T10YIE",chart_name,subline,save_name,observation_star
     
   
   #Sys.getenv('FRED_API_KEY')
-  fredr_set_key(api_key)
+  fredr_set_key(fredr_key)
   
 
   de<-
@@ -147,19 +147,19 @@ ggFRED<-function(mnemonic="T10YIE",chart_name,subline,save_name,observation_star
     )
   
   
-   
+
   #p<-plot_ly(de,x=~as.Date(date),y=~value,type='scatter',mode='lines+markers')
   de<-na.locf(de)
   #source("C:/FS/Systems/ggplot_functions.R")
   #Create Chart
 
-  cols <- c("TS" = col_aq2[1])
+  cols <- c("TS" = cols[1])
   p<-
     ggplot(data=de,aes(x=as.Date(date), y=value))
   if(recession_shading=="TRUE")
   {
     p<-p+    
-      add_rec_shade(as.Date(min(de$date)),as.Date(Sys.Date()))
+      ggRec(as.Date(min(de$date)),as.Date(Sys.Date()),fredr_key=fredr_key)
   }
   p<-p+
     geom_line(size=1,aes(y=value,color="TS"))+
@@ -167,8 +167,8 @@ ggFRED<-function(mnemonic="T10YIE",chart_name,subline,save_name,observation_star
     theme_aq_black(base_size=base_size_font)+
     #size 22 for overleaf
     labs(color='')+
-    labs(title=chart_name,subtitle=subline,x ="")+
-    labs(caption = 'Source: FRED, Amadeus')+
+    labs(title=chart_name,subtitle=subtitle,x ="")+
+    labs(caption = source)+
     guides(colour = guide_legend(nrow = 5))+
     scale_x_date(labels = date_format("%m-%Y"))+
     theme(legend.position = "none")+
@@ -183,6 +183,9 @@ ggFRED<-function(mnemonic="T10YIE",chart_name,subline,save_name,observation_star
     ggsave(paste0(target_path,save_name,".svg"),plot = p,width=chart_width,height=chart_height)    
   }
 
-  }
   return(p)
+  
+  }else{
+    print("Missing API Key")
+  }
 }
