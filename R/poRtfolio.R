@@ -395,12 +395,24 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
                                max=box_constraint_list$max[1:length(funds)])
   
   
-  ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
+  #ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
+  #  define moment function
+  annualized.moments <- function(R, scale=ann_factor, portfolio=NULL){
+    out <- list()
+    out$mu <-   (1+dls$ret_ann)^(1/ann_factor)-1
+    out$sigma <- cov(R)
+    return(out)
+  }
+  ef <- create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-StdDev", n.portfolios = n.portfolios, match.col = "StdDev", search_size = 500, 
+                                      momentFUN="annualized.moments", scale=ann_factor)
+  
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
 
+  eff<-eff/rowSums(eff)
 
   eff$ret_ann<-rowSums(map2_dfc(eff, dls$ret_ann, `*`))
+
   eff$sd_ann<-ef$frontier[,2]*252^0.5
 
   col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
@@ -414,7 +426,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
            xaxis = list(title="Risk",tickformat =".1%",range = list(min(eff$sd_ann/1.1), max(dls$sd_ann*1.1))),
            yaxis = list(title="Return",tickformat =".1%"),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "efficient_frontier",width = chart_export_width,height = chart_export_height))
-
+  
 
   rr_ggplot<<-
     #GGplot scatter
