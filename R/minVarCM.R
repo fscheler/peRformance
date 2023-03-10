@@ -786,9 +786,9 @@ optimize.portfolio.h<-
 
 
 
-minVarCM<-function(da,ret_format="returns",table_format='wide',
+minVarCM<-function(da,ret_format="index",table_format='wide',
                           resampling_switch=T,resampling_switch_cov_lambda=0.5,
-                          ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30)
+                          ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
 {
 
       
@@ -819,7 +819,7 @@ minVarCM<-function(da,ret_format="returns",table_format='wide',
         return(x)
       }
       
-      dls<-rrScat(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
+      dls<-rrScata(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
       
       if(table_format!='wide')
       {
@@ -864,10 +864,17 @@ minVarCM<-function(da,ret_format="returns",table_format='wide',
       
       
       #Add Box Constraints      
-      #init.portf <- add.constraint(portfolio=init.portf,
-      #                             type="box",
-      #                             min=box_constraint_list$min[1:length(wgts)],
-      #                             max=box_constraint_list$max[1:length(wgts)])
+      if(is.null(box_constraint_list))
+      {
+        box_constraint_list<-list(
+          min=c(rep(0,length(wgts))),
+          max=c(rep(1,length(wgts)))
+        )        
+      }
+      init.portf <- add.constraint(portfolio=init.portf,
+                                   type="box",
+                                   min=box_constraint_list$min[1:length(wgts)],
+                                   max=box_constraint_list$max[1:length(wgts)])
 
       if(resampling_switch=="None")
       {

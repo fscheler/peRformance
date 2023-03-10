@@ -316,8 +316,10 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 }
 
 
-rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30)
+rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
 {
+  
+
   if (!require("purrr")) install.packages("data.table")
   if (!require("PortfolioAnalytics")) install.packages("dplyr")
   if (!require("ecm")) install.packages("ecm")
@@ -379,6 +381,20 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
   #                                  search_size=2000,
   #                                  trace=TRUE)
 
+  #Add Box Constraints      
+  if(is.null(box_constraint_list))
+  {
+    box_constraint_list<-list(
+      min=c(rep(0,length(funds))),
+      max=c(rep(1,length(funds)))
+    )        
+  }
+  init.portf <- add.constraint(portfolio=init.portf,
+                               type="box",
+                               min=box_constraint_list$min[1:length(funds)],
+                               max=box_constraint_list$max[1:length(funds)])
+  
+  
   ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
