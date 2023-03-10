@@ -189,3 +189,67 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
     print("Missing API Key")
   }
 }
+
+
+
+
+
+
+ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="Treasury Yield",chart_width=10,chart_height=6,base_size_font=22,
+                 target_path="",cols="#04103b",source='Produced with the peRformance package',fredr_key=NULL,colorarea=T)
+{
+  
+  
+  
+  #install.packages("fredr")
+  #library(fredr)
+  library(dplyr)
+  library(xts)
+  library(plotly)
+  library(ggplot2)
+  library(ecm) 
+  
+  names(dw)<-c('date','sums')
+  
+  dw<-na.locf(dw)
+  # Initiate a ggplot2 chart
+  library(ggplot2)
+  cols <- c("TS" = "#04103b")
+  p<-ggplot(data=dw,aes(x=as.Date(date), y=sums))
+  # Add recession shading using the function and your API Key  
+  # to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
+  tryCatch({
+    p<-p + ggRec(as.Date(min(dw$date)),as.Date(max(dw$date)),fredr_key=fredr_key)
+  }, error = function(e) {})
+  #> NULL
+  # add formatting  
+  library(scales)
+  p<-p +
+    # add a theme from the peRformance package
+    theme_aq_black(base_size=20)+
+    #Add other elements
+    geom_line(size=1,aes(y=sums,color="TS"))
+  
+  if(colorarea==T)
+  {
+    p<-p+
+      geom_area( fill="#3b5171", alpha=1)       
+  }
+  p<-p+
+    scale_colour_manual(values = cols)+
+    scale_x_date(labels = date_format("%Y"),limits = c(min(dw$date), max(dw$date)), expand = c(0, 0))+
+    #scale_x_continuous(limits = c(1986,2014), expand = c(0, 0)) +
+    scale_y_continuous( expand = c(0, 0))+
+    labs(color='')+
+    labs(title="London Metal Exchange Opening Stock",subtitle="Total for Copper, Nickel, Aluminium, Lead, Tin & Zinc",x ="")+
+    xlab("")+
+    ylab("")+
+    theme(legend.position = "none",legend.title = element_blank())+
+    theme(plot.margin=margin(l=5,r=10,b=5,t=5))
+  p
+  
+  
+  return(p)
+  
+  
+}

@@ -787,7 +787,7 @@ optimize.portfolio.h<-
 
 
 minVarCM<-function(da,ret_format="index",table_format='wide',
-                          resampling_switch=T,resampling_switch_cov_lambda=0.5,
+                          covshrinkage=T,cov_lambda=0.5,
                           ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
 {
 
@@ -876,11 +876,11 @@ minVarCM<-function(da,ret_format="index",table_format='wide',
                                    min=box_constraint_list$min[1:length(wgts)],
                                    max=box_constraint_list$max[1:length(wgts)])
 
-      if(resampling_switch=="None")
+      if(covshrinkage=="None")
       {
         shrinkage_lambda<-0.000001
       }else{
-        if(is.na(resampling_switch_cov_lambda))
+        if(is.na(cov_lambda))
         {
           shrinkage_lambda<-as.numeric(estimate.lambda.var(R))
           shinyalert(
@@ -890,7 +890,7 @@ minVarCM<-function(da,ret_format="index",table_format='wide',
             type = "warning",closeOnEsc = TRUE,closeOnClickOutside = TRUE) 
           shrinkage_lambda<-max(shrinkage_lambda,0.000001)
         }else{
-          shrinkage_lambda<-resampling_switch_cov_lambda        
+          shrinkage_lambda<-cov_lambda        
           shrinkage_lambda<-max(shrinkage_lambda,0.000001)          
         }
       }

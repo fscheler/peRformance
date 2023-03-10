@@ -316,7 +316,9 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 }
 
 
-rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
+
+rrScatEff<-function(da,ret_format="returns",table_format='wide',
+                    ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
 {
   
 
@@ -397,15 +399,18 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',ann_factor=252,c
   
   #ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
-  #  define moment function
+  
   annualized.moments <- function(R, scale=ann_factor, portfolio=NULL){
     out <- list()
     out$mu <-   (1+dls$ret_ann)^(1/ann_factor)-1
     out$sigma <- cov(R)
+    #out$siga <- corpcor::cov.shrink(R, shrinkage_lambda, shrinkage_lambda)[1:ncol(R),1:ncol(R)]
     return(out)
-  }
+  }   
+  
+
   ef <- create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-StdDev", n.portfolios = n.portfolios, match.col = "StdDev", search_size = 500, 
-                                      momentFUN="annualized.moments", scale=ann_factor)
+                                   momentFUN="annualized.moments", scale=ann_factor)
   
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
 
