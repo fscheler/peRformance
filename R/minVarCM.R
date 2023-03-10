@@ -819,7 +819,7 @@ minVarCM<-function(da,ret_format="index",table_format='wide',
         return(x)
       }
       
-      dls<-rrScata(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
+      dls<-rrScat(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
       
       if(table_format!='wide')
       {
