@@ -122,7 +122,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 }
 
 
-allocPie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4))
+allocPie<-function(df,chart_title='Portfolio',chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4))
 {
 
   if (!require("scales")) install.packages("scales")
@@ -151,7 +151,7 @@ allocPie<-function(df,chart_export_width=600,chart_export_height=450,m = list(l 
                insidetextfont = list(color = '#FFFFFF'),
                sort = FALSE
                ,marker = list(colors = cols)) %>%
-    layout(title = list(text ='Portfolio', y = 1), margin = m,
+    layout(title = list(text =chart_title, y = 1), margin = m,
            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
            yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
