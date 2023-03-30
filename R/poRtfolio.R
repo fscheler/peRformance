@@ -583,6 +583,67 @@ styleBox<-function(
 }
 
 
+
+valueboxeR<-function(  values = c(avg_dvd_yield,
+                                          avg_fcf_yield,
+                                          avg_pe,
+                                          avg_rev_cagr,
+                                          avg_ebitda_margin,
+                                          avg_net_debt_ebitda),
+                               info = c("P/E Ratio",
+                                        "FCF Yield",
+                                        "P/E/ Ratio",
+                                        "5Yr Rev. Growth",
+                                        "EBITDA Margin",
+                                        "Net Debt/EBITDA"),
+                               symbols=c("fa-area-chart","fa-percent","fa-bar-chart-o","fa-line-chart","fa-pie-chart","fa-money"),
+                               col_aq2 = c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")
+)
+{
+  
+  
+  
+  col_aq2 = as.character(col_aq2)
+  cols = colorRampPalette(col_aq2)(6)
+  
+  library(ggplot2)
+  library(emojifont)
+  ds <- data.frame(
+    x = rep(seq(2, 15, 6.5), 2),
+    y = c(rep(6.5, 3), rep(2,3)),
+    h = rep(4.25, 6),
+    w = rep(6.25, 6),
+    value = values,
+    info = info,
+    icon = c(fontawesome(as.character(symbols))),
+    font_family = c(rep("fontawesome-webfont", 6)),
+    color = factor(1:6)
+  )
+  
+  p<-ggplot(ds, aes(x, y, height = h, width = w, label = info)) +
+    ## Create the tiles using the `color` column
+    geom_tile(aes(fill = color)) +
+    ## Add the numeric values as text in `value` column
+    geom_text(color = "white", fontface = "bold", size = 10,
+              aes(label = value, x = x - 2.9, y = y + 1), hjust = 0) +
+    ## Add the labels for each box stored in the `info` column
+    geom_text(color = "white", fontface = "bold",
+              aes(label = info, x = x - 2.9, y = y - 1), hjust = 0) +
+    coord_fixed() +
+    scale_fill_manual(values =cols)+
+    ## Use `geom_text()` to add the icons by specifying the unicode symbol.
+    geom_text(size = 20, aes(label = icon, family = font_family,
+                             x = x + 1.5, y = y + 0.5), alpha = 0.25) +
+    theme_void() +
+    guides(fill = FALSE)
+  
+  return(p)
+  
+  
+}
+
+
+
 #p<-style_box_flex(number_categories_horizontal=6,number_categories_vertical=6,highlight_category=1,chart_font_size=25,chart_caption_1="Risk",chart_caption_2="Return",opacity_scale_factor=0.2)
 #p
 #orca(p,"style_box_plot.svg",width = 700,height = 250)
