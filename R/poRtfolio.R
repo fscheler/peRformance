@@ -86,7 +86,7 @@ allocBar<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_
 
 
 
-allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4),barcol="#f9f9f9",barborder="#3b5171")
 {
   if (!require("dplyr")) install.packages("dplyr")
   if (!require("plotly")) install.packages("plotly")
@@ -109,7 +109,7 @@ allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart
   
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
   
-  p <- plot_ly(da, x = as.numeric(da$weight), y =da$assets ,height=chart_height, type = 'bar', name = 'Portfolio',marker = list(color = "#3b5171"))
+  p <- plot_ly(da, x = as.numeric(da$weight), y =da$assets ,height=chart_height, type = 'bar', name = 'Portfolio',marker = list(color = barcol,line = list(width = 0.5,color = barborder)))
   p<-p%>%
     layout(yaxis= list(showticklabels = FALSE)) %>% 
     style(text = paste0(" ",da$assets), textposition = "left", insidetextanchor="start")
