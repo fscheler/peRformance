@@ -85,6 +85,41 @@ allocBar<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_
 }
 
 
+
+allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+{
+  if (!require("dplyr")) install.packages("dplyr")
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("lubridate")) install.packages("lubridate")
+  
+  library(dplyr)
+  library(plotly)
+  library(lubridate)
+  
+  da<-as.data.frame(da)
+  da<-da[,1:2]
+  
+  names(da)<-c("assets","weight")
+  da$weight<-as.numeric(da$weight)
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
+  y_axis_caption<-""
+  #chart_font_size<-16
+  
+  da<-da%>%group_by(assets)%>%summarize(weight=sum(as.numeric(weight)))
+  
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
+  
+  p <- plot_ly(da, x = as.numeric(da$weight), y =da$assets ,height=chart_height, type = 'bar', name = 'Portfolio',marker = list(color = "#3b5171"))
+  p<-p%>%
+    layout(yaxis= list(showticklabels = FALSE)) %>% 
+    style(text = paste0(" ",da$assets), textposition = "left", insidetextanchor="start")
+  
+  p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
+  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
+  
+  return(p)
+}
+
 FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
 
