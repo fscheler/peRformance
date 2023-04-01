@@ -611,6 +611,7 @@ styleBox<-function(
            )
 
     )
+  p<-p%>%layout(plot_bgcolor='white') %>% layout(paper_bgcolor='#252a4f')
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "stylebox",width = chart_export_width,height = chart_export_height))
 
   return(p)
