@@ -679,6 +679,98 @@ valueboxeR<-function(  values = c(avg_dvd_yield,
 }
 
 
+boxeR<-function()
+{
+  
+  library(plotly)
+  
+  y <- c('Dividend Yield %')
+  MXWO <- c(2.2)
+  Portfolio <- c(3.9)
+  data <- data.frame(y, MXWO, Portfolio)
+  m <- list(l = 0,r = 50,b = 10,t = 10,pad = 4)
+  fig <- plot_ly(data, x = ~MXWO, y = ~y, type = 'bar', orientation = 'h', name = 'SF Zoo',height=200,
+                 text = paste0("Market<br>",MXWO), textposition = 'inside',
+                 marker = list(color = 'white',
+                               line = list(color = 'white',
+                                           width = 3)))
+  fig <- fig %>% add_trace(x = ~Portfolio, name = 'LA Zoo',
+                           text = paste0("Portfolio<br>",Portfolio), textposition = 'outside',
+                           marker = list(color = 'rgba(58, 71, 80, 0.6)',
+                                         line = list(color = 'rgba(58, 71, 80, 1.0)',
+                                                     width = 0.5)))
+  fig <- fig %>% layout(margin=m,barmode = 'stack',showlegend=F,
+                        xaxis = list(title = "",showgrid=FALSE,showticklabels = FALSE,range=c(0,(data$MXWO+data$Portfolio)*1.5)),
+                        yaxis = list(title ="",showgrid=FALSE))
+  
+  fig<-fig %>%layout(plot_bgcolor  = "rgba(0, 0, 0, 0)",paper_bgcolor = "rgba(0, 0, 0, 0)",yaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE),xaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE))
+  fig
+  orca(fig,"comparison_dividend_yield.svg", width = 580,height=70)
+  
+  
+}
+
+rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=paste0(2.2,"%"),caption_po=paste0(3.9,"%"),chart_height=200)
+{
+  library(plotly)
+  
+  #,range=c(0,(data$MXWO+data$Portfolio)*1.5)
+  #y <- c('Dividend Yield %')
+  #benchmark <- c(2.2)
+  #portfolio <- c(3.9)
+  s <- data.frame(y, benchmark, portfolio)
+  library(plotly)
+  fig <- plot_ly(s, color = I("#BDBDBD"),height=chart_height)
+  fig <- fig %>% add_segments(x = ~benchmark, xend = ~portfolio, y = ~y, yend = ~y, showlegend = FALSE)
+  fig <- fig %>% add_markers(x = ~benchmark, y = ~y, name = "Women", color = I("#dd0400"),text = paste0("Market<br>",MXWO))
+  fig <- fig %>% add_markers(x = ~portfolio, y = ~y, name = "Men", color = I("#5777a7"))
+  fig <- fig %>% layout(
+    title = "",
+    xaxis = list(title = ""),
+    margin = list(l = 65,t=65)
+  )
+  
+  #fig <- fig %>% add_text(x = ~benchmark, y = ~y,text = ~caption_bm, 
+  #                        textposition = "bottom right",color = I("#dd0400"), showlegend = FALSE)
+  
+  #fig <- fig %>% add_text(x = ~portfolio, y = ~y,text = ~caption_po, 
+  #                        textposition = "bottom left",color = I("#5777a7"), showlegend = FALSE)
+  
+  fig <- fig %>% add_annotations(x = s$benchmark,
+                                 y = s$y,
+                                 text = caption_bm,
+                                 xref = "x",
+                                 yref = "y",
+                                 showarrow = TRUE,
+                                 arrowhead = 0,
+                                 arrowsize = 0,
+                                 ax = 0,
+                                 ay = -10)
+  
+  fig
+  fig <- fig %>% add_annotations(x = s$portfolio,
+                                 y = s$y,
+                                 text = caption_po,
+                                 xref = "x",
+                                 yref = "y",
+                                 showarrow = TRUE,
+                                 arrowhead = 0,
+                                 arrowsize = 0,
+                                 ax = 0,
+                                 ay = -10)
+  
+  fig
+  
+  fig <- fig %>% layout(margin=m,barmode = 'stack',showlegend=F,
+                        xaxis = list(title = "",showgrid=FALSE,showticklabels = FALSE),
+                        yaxis = list(title ="",showgrid=FALSE))
+  fig<-fig %>%layout(plot_bgcolor  = "rgba(0, 0, 0, 0)",paper_bgcolor = "rgba(0, 0, 0, 0)",yaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE),xaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE))
+  
+  return(fig)
+  
+}
+
+
 
 #p<-style_box_flex(number_categories_horizontal=6,number_categories_vertical=6,highlight_category=1,chart_font_size=25,chart_caption_1="Risk",chart_caption_2="Return",opacity_scale_factor=0.2)
 #p
