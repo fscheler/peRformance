@@ -710,7 +710,7 @@ boxeR<-function()
   
 }
 
-rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=paste0(2.2,"%"),caption_po=paste0(3.9,"%"),chart_height=200)
+rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=paste0(2.2,"%"),caption_po=paste0(3.9,"%"),chart_height=200,m=list(r=0,l=0,b=0,t=0,par=4))
 {
   library(plotly)
   
@@ -722,8 +722,8 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
   library(plotly)
   fig <- plot_ly(s, color = I("#BDBDBD"),height=chart_height)
   fig <- fig %>% add_segments(x = ~benchmark, xend = ~portfolio, y = ~y, yend = ~y, showlegend = FALSE)
-  fig <- fig %>% add_markers(x = ~benchmark, y = ~y, name = "Women", color = I("#dd0400"),text = paste0("Market<br>",MXWO))
-  fig <- fig %>% add_markers(x = ~portfolio, y = ~y, name = "Men", color = I("#5777a7"))
+  fig <- fig %>% add_markers(x = ~benchmark, y = ~y, name = "Benchmark", color = I("#dd0400"),text = paste0("Market<br>",benchmark))
+  fig <- fig %>% add_markers(x = ~portfolio, y = ~y, name = "Portfolio", color = I("#5777a7"))
   fig <- fig %>% layout(
     title = "",
     xaxis = list(title = ""),
