@@ -259,7 +259,7 @@ allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_exp
 }
 
 
-rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4))
+rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),source_text='Source: Created with the peRformance package')
 {
 
   if (!require("data.table")) install.packages("data.table")
@@ -331,7 +331,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
     #size 22 for overleaf
     labs(color='')+
     labs(title="Risk & Return",subtitle="Annualized values in %",x ="")+
-    labs(caption = 'Source: Created with the peRformance package')+
+    labs(caption = source_text)+
     xlab("Risk")+
     ylab("Excess Return")+
     theme(legend.position = "bottom",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(15,0,30,0))+
@@ -770,6 +770,37 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
   
 }
 
+
+#Life Performance
+ggLiner<-function(df,title="title",subtitle="subtitle",xcap="",ycap="",perc=T)
+{
+  names(df)<-c("date","asset")
+  df$date<-as.Date(df$date)
+  cols <- c("Strategy" = col_aq2[1])
+  
+  p<-
+    ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))+
+    add_rec_shade(as.Date(min(df$date)),as.Date(max(df$date)))+
+    geom_line(size=0.8,aes(y=df$asset,color="Strategy"))+
+    scale_colour_manual(values = cols)+
+    theme_aq_black(base_size=24)+
+    #size 22 for overleaf
+    labs(color='')+
+    labs(title=title,subtitle=subtitle,x =xcap)+
+    labs(caption = '')+
+    theme(legend.position = "none",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(0,0,0,0))+
+    guides(colour = guide_legend(nrow = 1))+
+    scale_x_date(labels = date_format("%Y"))
+  if(perc==TRUE)
+  {
+    p<-p+scale_y_continuous(labels = scales::percent)  
+  }
+  p<-p+     
+    ylab(ycap)+
+    theme(plot.margin=margin(5,5,5,5))
+  
+  return(p)  
+}
 
 
 #p<-style_box_flex(number_categories_horizontal=6,number_categories_vertical=6,highlight_category=1,chart_font_size=25,chart_caption_1="Risk",chart_caption_2="Return",opacity_scale_factor=0.2)
