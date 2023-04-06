@@ -1,5 +1,5 @@
 
-
+library(ggplot2)
 
 #assets<-c("EUR","USD","CHF","GBP","JPY")
 #gross<-c(0.3,0.4,0.1,0.05,0.15)
@@ -772,15 +772,20 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
 
 
 #Life Performance
-ggLiner<-function(df,title="title",subtitle="subtitle",xcap="",ycap="",perc=T)
+gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",perc=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL)
 {
   names(df)<-c("date","asset")
   df$date<-as.Date(df$date)
-  cols <- c("Strategy" = col_aq2[1])
+  cols <- setNames(c(col_aq2[1]), c(name1))
   
   p<-
     ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))+
-    add_rec_shade(as.Date(min(df$date)),as.Date(max(df$date)))+
+    
+    if(!is.null(fredr_key))
+    {
+      p<-p+ggRec(as.Date(min(df$date)),as.Date(max(df$date)),fredr_key=fredr_key)
+    }
+  p<-p+    
     geom_line(size=0.8,aes(y=df$asset,color="Strategy"))+
     scale_colour_manual(values = cols)+
     theme_aq_black(base_size=24)+
@@ -803,9 +808,59 @@ ggLiner<-function(df,title="title",subtitle="subtitle",xcap="",ycap="",perc=T)
 }
 
 
+
+#Life Performance
+gglineR2<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1)
+{
+  names(df)<-c("date","asset","benchmark")
+  df$date<-as.Date(df$date)
+  cols <- setNames(c(col_aq2[1], col_aq2[2]), c(name1, name2))
+  secaxisfactor<-2
+  p<-
+    ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))
+  
+  if(!is.null(fredr_key))
+  {
+  p<-p+ggRec(as.Date(min(df$date)),as.Date(max(df$date)),fredr_key=fredr_key)
+  }
+  p<-p+
+    geom_line(size=0.8,aes(y=df$asset,color=name1))+
+    geom_line(size=0.8,aes(y=df$benchmark/secaxis,color=name2))+
+    scale_colour_manual(values = cols)+
+    theme_aq_black(base_size=24)+
+    #size 22 for overleaf
+    labs(color='')+
+    labs(title=title,subtitle=subtitle,x =xcap)+
+    labs(caption = '')+
+    theme(legend.position = "bottom",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(0,0,0,0))+
+    guides(colour = guide_legend(nrow = 1))+
+    scale_x_date(labels = date_format("%Y"))
+  if(perc==TRUE)
+  {
+    p<-p+scale_y_continuous(labels = scales::percent)  
+  }
+  p<-p+     
+    ylab(ycap)+
+    theme(plot.margin=margin(5,5,5,5))
+  
+  if(secaxis!=1)
+  {
+    # Custom the Y scales:
+    p<-p+scale_y_continuous(
+      # Features of the first axis
+      name = "",
+      # Add a second axis and specify its features
+      sec.axis = sec_axis( trans=~.*secaxis, name="")
+    )
+  }
+
+
+  return(p)  
+}
+
+
 #p<-style_box_flex(number_categories_horizontal=6,number_categories_vertical=6,highlight_category=1,chart_font_size=25,chart_caption_1="Risk",chart_caption_2="Return",opacity_scale_factor=0.2)
 #p
 #orca(p,"style_box_plot.svg",width = 700,height = 250)
-
 
 
