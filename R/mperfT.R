@@ -9,7 +9,7 @@
 
 
 mperfT<-function(da,ts_format="returns",header_color="#3b5171",font_color="#04103b",
-                      export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T)
+                      export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,bm_name="Benchmark")
 {
 
   if (!require("plotly")) install.packages("plotly")
@@ -251,7 +251,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",font_color="#0410
                    '<b>Dec</b>',
                    '<b></b>',
                    '<b>FY</b>',
-                   '<b>Benchmark</b>'
+                   paste0('<b>',bm_name,'</b>')
         ),
         line = list(color = 'white'),
         fill = list(color = headerColor),
