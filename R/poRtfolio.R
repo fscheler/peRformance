@@ -810,7 +810,7 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",perc=T,co
 
 
 #Life Performance
-gglineR2<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1)
+gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1)
 {
   names(df)<-c("date","asset","benchmark")
   df$date<-as.Date(df$date)
