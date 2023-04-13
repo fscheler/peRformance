@@ -772,8 +772,9 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
 
 
 #Life Performance
-gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",perc=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL)
+gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Portfolio",perc=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL)
 {
+  library(ggplot2)
   names(df)<-c("date","asset")
   df$date<-as.Date(df$date)
   cols <- setNames(c(col_aq2[1]), c(name1))
@@ -786,7 +787,7 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",perc=T,co
       p<-p+ggRec(as.Date(min(df$date)),as.Date(max(df$date)),fredr_key=fredr_key)
     }
   p<-p+    
-    geom_line(size=0.8,aes(y=df$asset,color="Strategy"))+
+    geom_line(size=0.8,aes(y=df$asset,color=name1))+
     scale_colour_manual(values = cols)+
     theme_aq_black(base_size=24)+
     #size 22 for overleaf
@@ -812,6 +813,7 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",perc=T,co
 #Life Performance
 gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1)
 {
+  library(ggplot2)
   names(df)<-c("date","asset","benchmark")
   df$date<-as.Date(df$date)
   cols <- setNames(c(col_aq2[1], col_aq2[2]), c(name1, name2))
