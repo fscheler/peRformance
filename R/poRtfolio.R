@@ -861,6 +861,38 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
 }
 
 
+
+ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")))
+{
+  #long <- melt(setDT(df), id.vars = "date")
+  #names need to be date, variable, value
+  cols = colorRampPalette(col_aq2)(length(unique(long$variable)))
+  
+  # Stacked + percent
+  p<-
+    ggplot(long, aes(fill=variable, y=value/100, x=date)) + 
+    geom_bar(position="fill", stat="identity")+
+    scale_fill_manual(values=cols)+
+    theme_aq_black_default_font(base_size = 20) + 
+    labs(color = "") + labs(title = title, 
+                            subtitle = subtitle, x = "") + 
+    labs(caption = "") + xlab("") + 
+    ylab("") + theme(legend.position = "bottom", 
+                     legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,  0, 30, 0)) + 
+    guides(colour = guide_legend(nrow = 3)) + 
+    theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) + 
+    theme(legend.title=element_blank())+
+    guides(fill=guide_legend(nrow=2,byrow=TRUE))+
+    scale_x_date(limits=c(min(long$date),max(long$date)), expand = c(0, 0)) + 
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) + 
+    theme(panel.grid.major.x = element_blank())+
+    theme(panel.grid.major.x = element_blank())+
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+    coord_cartesian(xlim = c(min(long$date),max(long$date)), ylim = c(0,1))
+  
+  return(p)
+}
+
 #p<-style_box_flex(number_categories_horizontal=6,number_categories_vertical=6,highlight_category=1,chart_font_size=25,chart_caption_1="Risk",chart_caption_2="Return",opacity_scale_factor=0.2)
 #p
 #orca(p,"style_box_plot.svg",width = 700,height = 250)
