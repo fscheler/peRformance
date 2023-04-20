@@ -902,7 +902,7 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.characte
 gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", 
                      ycap = "", name1 = "asset", name2 = "benchmark",name3="benchmark1", perc = F, 
                      col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), 
-                     fredr_key = NULL, secaxis = 1) 
+                     fredr_key = NULL, secaxis = 1,base_size=24) 
 {
   library(ggplot2)
   names(df) <- c("date", "asset", "benchmark","benchmark1")
@@ -918,7 +918,7 @@ gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
     geom_line(size = 0.8, aes(y = df$benchmark/secaxis, color = name2)) +
     geom_line(size = 0.8, aes(y = df$benchmark1/secaxis, color = name3)) +
     scale_colour_manual(values = cols) + 
-    theme_aq_black(base_size = 24) + labs(color = "") + 
+    theme_aq_black(base_size = base_size ) + labs(color = "") + 
     labs(title = title, subtitle = subtitle, x = xcap) + 
     labs(caption = "") + theme(legend.position = "bottom", 
                                legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0, 
