@@ -864,6 +864,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
 
 ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")))
 {
+  library(ggplot2)
   #long <- melt(setDT(df), id.vars = "date")
   #names need to be date, variable, value
   cols = colorRampPalette(col_aq2)(length(unique(long$variable)))
@@ -897,4 +898,41 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.characte
 #p
 #orca(p,"style_box_plot.svg",width = 700,height = 250)
 
+
+gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", 
+                     ycap = "", name1 = "asset", name2 = "benchmark",name3="benchmark1", perc = F, 
+                     col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), 
+                     fredr_key = NULL, secaxis = 1) 
+{
+  library(ggplot2)
+  names(df) <- c("date", "asset", "benchmark","benchmark1")
+  df$date <- as.Date(df$date)
+  cols <- setNames(c(col_aq2[1], col_aq2[2], col_aq2[3]), c(name1, name2,name3))
+  secaxisfactor <- 2
+  p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
+  if (!is.null(fredr_key)) {
+    p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)), 
+                   fredr_key = fredr_key)
+  }
+  p <- p + geom_line(size = 0.8, aes(y = df$asset, color = name1)) + 
+    geom_line(size = 0.8, aes(y = df$benchmark/secaxis, color = name2)) +
+    geom_line(size = 0.8, aes(y = df$benchmark1/secaxis, color = name3)) +
+    scale_colour_manual(values = cols) + 
+    theme_aq_black(base_size = 24) + labs(color = "") + 
+    labs(title = title, subtitle = subtitle, x = xcap) + 
+    labs(caption = "") + theme(legend.position = "bottom", 
+                               legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0, 
+                                                                                                      0, 0, 0)) + guides(colour = guide_legend(nrow = 1)) + 
+    scale_x_date(labels = date_format("%Y"))
+  if (perc == TRUE) {
+    p <- p + scale_y_continuous(labels = scales::percent)
+  }
+  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5, 
+                                                   5))
+  if (secaxis != 1) {
+    p <- p + scale_y_continuous(name = "", sec.axis = sec_axis(trans = ~. * 
+                                                                 secaxis, name = ""))
+  }
+  return(p)
+}
 
