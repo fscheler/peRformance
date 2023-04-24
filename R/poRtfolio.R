@@ -862,7 +862,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
 
 
 
-ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")))
+ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")))
 {
   library(ggplot2)
   #long <- melt(setDT(df), id.vars = "date")
@@ -871,8 +871,14 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.characte
   
   # Stacked + percent
   p<-
-    ggplot(long, aes(fill=variable, y=value/100, x=date)) + 
-    geom_bar(position="fill", stat="identity")+
+    ggplot(long, aes(fill=variable, y=value/100, x=date)) 
+  
+  if(rel==T)
+  {
+    p<-p+geom_bar(position="fill", stat="identity")
+  }
+    
+  p<-p+
     scale_fill_manual(values=cols)+
     theme_aq_black_default_font(base_size = 20) + 
     labs(color = "") + labs(title = title, 
@@ -884,8 +890,14 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",col_aq2 = as.characte
     theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) + 
     theme(legend.title=element_blank())+
     guides(fill=guide_legend(nrow=2,byrow=TRUE))+
-    scale_x_date(limits=c(min(long$date),max(long$date)), expand = c(0, 0)) + 
-    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) + 
+    scale_x_date(limits=c(min(long$date),max(long$date)), expand = c(0, 0))  
+    
+    if(perc==T)
+    {
+      p<-p  +  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) 
+    }
+    
+  p<-p+
     theme(panel.grid.major.x = element_blank())+
     theme(panel.grid.major.x = element_blank())+
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
