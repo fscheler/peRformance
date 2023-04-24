@@ -876,6 +876,8 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,c
   if(rel==T)
   {
     p<-p+geom_bar(position="fill", stat="identity")
+  }else{
+    p<-p+geom_bar(stat="identity") 
   }
     
   p<-p+
