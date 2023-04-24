@@ -871,7 +871,7 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,c
   
   # Stacked + percent
   p<-
-    ggplot(long, aes(fill=variable, y=value/100, x=date)) 
+    ggplot(long, aes(fill=variable, y=value, x=date)) 
   
   if(rel==T)
   {
