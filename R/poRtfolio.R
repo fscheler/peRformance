@@ -903,7 +903,7 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,c
     theme(panel.grid.major.x = element_blank())+
     theme(panel.grid.major.x = element_blank())+
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-    coord_cartesian(xlim = c(min(long$date),max(long$date)), ylim = c(0,1))
+    coord_cartesian(xlim = c(min(long$date),max(long$date)))
   
   return(p)
 }
