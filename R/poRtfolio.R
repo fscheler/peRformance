@@ -862,7 +862,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
 
 
 
-ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")))
+ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")))
 {
   library(ggplot2)
   #long <- melt(setDT(df), id.vars = "date")
@@ -889,7 +889,7 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,col_aq2 
     guides(colour = guide_legend(nrow = 3)) + 
     theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) + 
     theme(legend.title=element_blank())+
-    guides(fill=guide_legend(nrow=2,byrow=TRUE))+
+    guides(fill=guide_legend(nrow=lrow,byrow=TRUE))+
     scale_x_date(limits=c(min(long$date),max(long$date)), expand = c(0, 0))  
     
     if(perc==T)
