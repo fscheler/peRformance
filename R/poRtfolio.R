@@ -780,7 +780,7 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Po
   cols <- setNames(c(col_aq2[1]), c(name1))
   
   p<-
-    ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))+
+    ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))
     
     if(!is.null(fredr_key))
     {
