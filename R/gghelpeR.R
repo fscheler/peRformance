@@ -127,7 +127,7 @@ theme_w_black<-
   }
 
 theme_aq_black<-
-  function (base_size = 12, base_family = "",font_type="Calibri")
+  function (base_size = 12, base_family = "",font_type="Calibri",titlepos="adjusted")
   {
     library(ggplot2)
     library(ggthemes)
@@ -135,6 +135,9 @@ theme_aq_black<-
     #col_aq2<-as.character(c("#297EBF","#7D1206","#1e1e1e","#3b5171","#5777a7","#04103b","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
     col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
 
+    
+    if(titlepos!="left")
+    {
     theme_hc(base_size = base_size, base_family = base_family) %+replace%
       theme(
         axis.text.x = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
@@ -155,6 +158,31 @@ theme_aq_black<-
         legend.background = element_rect(fill = "transparent",color = 'white'), # get rid of legend bg
         legend.box.background = element_rect(fill = "transparent",color="transparent")
       )
+    
+    }else{
+      theme(
+        axis.text.x = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
+        axis.text.y.left = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
+        axis.text.y.right = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
+        axis.title.x = element_text(color = col_aq2[3], size = base_size,family=font_type),
+        axis.title.y.left = element_text(color = col_aq2[3],size = base_size-1,family=font_type),
+        axis.title.y.right = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
+        plot.title = element_text(hjust=0,color=col_aq2[1], size=base_size+1, face="bold",family=font_type),
+        legend.text = element_text(color = col_aq2[3], size = base_size,family=font_type),
+        
+        plot.caption = element_text(hjust = 0.2), #Default is hjust=1
+        plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
+        plot.caption.position =  "plot", #NEW parameter
+        panel.background = element_rect(fill = "transparent"), # bg of the panel
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        panel.grid.major = element_blank(), # get rid of major grid
+        panel.grid.minor = element_blank(), # get rid of minor grid
+        legend.background = element_rect(fill = "transparent",color = 'white'), # get rid of legend bg
+        legend.box.background = element_rect(fill = "transparent",color="transparent")
+      )
+    }
+
+    
   }
 
 theme_aq_black_default_font<-

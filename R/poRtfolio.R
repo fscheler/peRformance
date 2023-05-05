@@ -52,39 +52,75 @@ trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=
   return(p)
 }
 
-
-
-allocBar<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Optional",chart_height = 400, 
+                    chart_font_size = 11, chart_export_width = 600, chart_export_height = 450, 
+                    m = list(r = 0, l = 0, b = 0, t = 50, par = 4),plotly=T,title_pos="center") 
 {
-  if (!require("dplyr")) install.packages("dplyr")
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("lubridate")) install.packages("lubridate")
-
+  
+  da<-df
+  if (!require("dplyr")) 
+    install.packages("dplyr")
+  if (!require("plotly")) 
+    install.packages("plotly")
+  if (!require("lubridate")) 
+    install.packages("lubridate")
   library(dplyr)
   library(plotly)
   library(lubridate)
-
-  da<-as.data.frame(da)
-  da<-da[,1:2]
-
-  names(da)<-c("assets","weight")
-  da$weight<-as.numeric(da$weight)
-  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
-  y_axis_caption<-""
-  #chart_font_size<-16
-
-  da<-da%>%group_by(assets)%>%summarize(weight=sum(as.numeric(weight)))
-
-  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
-
-  p <- plot_ly(da, x = as.numeric(da$weight), y =da$assets ,height=chart_height, type = 'bar', name = 'Portfolio',marker = list(color = col_aq2[1]))
-  p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
-  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
-
+  da <- as.data.frame(da)
+  da <- da[, 1:2]
+  names(da) <- c("assets", "weight")
+  da$weight <- as.numeric(da$weight)
+  col_aq2 <- as.character(c("#04103b", "#dd0400", "#3b5171"))
+  y_axis_caption <- ""
+  da <- da %>% group_by(assets) %>% summarize(weight = sum(as.numeric(weight)))
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), 
+                                                                  decreasing = F)])
+  p <- plot_ly(da, x = as.numeric(da$weight), y = da$assets, 
+               height = chart_height, type = "bar", name = "Portfolio", 
+               marker = list(color = col_aq2[1]))
+  p <- p %>% layout(margin = m, font = list(size = chart_font_size), 
+                    title = chart_title, xaxis = list(title = y_axis_caption, 
+                                                      tickformat = ".0%"), yaxis = list(title = y_axis_caption), 
+                    barmode = "group")
+  p <- p %>% config(toImageButtonOptions = list(format = "svg", 
+                                                filename = "allocation_pie", width = chart_export_width, 
+                                                height = chart_export_height))
+  
+  if(plotly!=T)
+  {
+    p<-
+      ggplot(da, aes(x=as.numeric(weight), y=assets,fill="#04103b")) + 
+      geom_bar(stat='identity') +
+      #coord_flip()+
+      scale_fill_manual(values="#04103b") + 
+      theme_aq_black_default_font(base_size = 20) + 
+      # scale_x_discrete(limits =names(df)[2:length(names(df))])+
+      labs(title = chart_title, subtitle = chart_subtitle, 
+           x = "") + labs(caption = "") + xlab("") +
+      theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) + xlab("")+ylab("")+
+      #geom_text(size = 5, col="lightgrey",position = position_stack(vjust = 0.5))+
+      theme(legend.position = "none", 
+            legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,0, 30, 0)) + guides(colour = guide_legend(nrow = 3)) +
+      theme(panel.grid.major.x = element_blank()) + theme(panel.grid.major.x = element_blank()) + 
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+      theme(legend.title = element_blank()) + guides(fill = guide_legend(nrow = 1,  byrow = TRUE))
+    #theme(axis.text.x = element_text(angle = 45, hjust=1))+
+    #scale_y_continuous(labels = scales::percent_format(accuracy = 1))  +
+    #xlim(min(mm$year),max(mm$year))
+    if(title_pos=="left")
+    {
+      p<-p+
+        theme(plot.caption = element_text(hjust = 0.2), #Default is hjust=1
+              plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
+              plot.caption.position =  "plot") #NEW parameter
+    }
+    
+  }
+  
+  
   return(p)
 }
-
-
 
 allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4),barcol="#f9f9f9",barborder="#3b5171")
 {
