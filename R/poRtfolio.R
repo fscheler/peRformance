@@ -57,7 +57,7 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
                     m = list(r = 0, l = 0, b = 0, t = 50, par = 4),plotly=T,title_pos="center") 
 {
   
-  da<-df
+
   if (!require("dplyr")) 
     install.packages("dplyr")
   if (!require("plotly")) 
