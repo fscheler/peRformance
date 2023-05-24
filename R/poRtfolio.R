@@ -193,7 +193,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 }
 
 
-allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14)
+allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14,plotly=T)
 {
 
   if (!require("scales")) install.packages("scales")
@@ -214,7 +214,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
   cols = colorRampPalette(col_aq2)(nrow(df))
   #show_col(cols)
 
-  if(plotly=T)
+  if(plotly==T)
   {
     p <- plot_ly(df, labels = ~assets, values = ~weights, type = 'pie',showlegend = FALSE,
                  textposition = 'outside',textinfo = 'text',
