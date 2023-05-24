@@ -193,7 +193,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 }
 
 
-allocPie<-function(df,chart_title='Portfolio',chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4))
+allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14)
 {
 
   if (!require("scales")) install.packages("scales")
@@ -214,19 +214,48 @@ allocPie<-function(df,chart_title='Portfolio',chart_export_width=600,chart_expor
   cols = colorRampPalette(col_aq2)(nrow(df))
   #show_col(cols)
 
+  if(plotly=T)
+  {
+    p <- plot_ly(df, labels = ~assets, values = ~weights, type = 'pie',showlegend = FALSE,
+                 textposition = 'outside',textinfo = 'text',
+                 hoverinfo = 'text',source = "subset",
+                 text=~paste(sub(" ","<br>",df$assets),":","<br>",paste0(round(df$weights,2)*100,"%") ),
+                 insidetextfont = list(color = '#FFFFFF'),
+                 sort = FALSE
+                 ,marker = list(colors = cols)) %>%
+      layout(title = list(text =chart_title, y = 1), margin = m,
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    
+    p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))    
+  }else{
+    library(ggplot2)
+    p<-
+    ggplot(df, aes(x="", y=weights, fill=assets)) +
+      geom_bar(stat="identity", width=1, color="white") +
+      coord_polar("y", start=0) +
+      scale_fill_manual("",values=cols)+
+      theme_aq_black_pie(base_size = 14)+
+      theme(
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.border = element_blank(),
+        panel.grid=element_blank(),
+        axis.ticks = element_blank()
+      )+
+      labs(title=chart_title,subtitle=subtitle)
 
-  p <- plot_ly(df, labels = ~assets, values = ~weights, type = 'pie',showlegend = FALSE,
-               textposition = 'outside',textinfo = 'text',
-               hoverinfo = 'text',source = "subset",
-               text=~paste(sub(" ","<br>",df$assets),":","<br>",paste0(round(df$weights,2)*100,"%") ),
-               insidetextfont = list(color = '#FFFFFF'),
-               sort = FALSE
-               ,marker = list(colors = cols)) %>%
-    layout(title = list(text =chart_title, y = 1), margin = m,
-           xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-           yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+   
+    if(title_pos=="left")
+    {
+      p<-p+
+        theme(plot.caption = element_text(hjust = 0.2), #Default is hjust=1
+              plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
+              plot.caption.position =  "plot") #NEW parameter
+    }
+     
+  }
 
-  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
 
   return(p)
 
