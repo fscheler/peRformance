@@ -8,8 +8,11 @@
 
 
 
-mperfT<-function(da,ts_format="returns",header_color="#3b5171",font_color="#04103b",
-                      export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,bm_name="Benchmark")
+mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="white",font_color="#04103b",
+                      export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,bm_name="Benchmark",
+                 rowOddColor="white",
+                 rowEvenColor="lightgrey"
+                 )
 {
 
   if (!require("plotly")) install.packages("plotly")
@@ -133,8 +136,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",font_color="#0410
   }, error=function(e){})
 
   headerColor<-header_color
-  rowOddColor<-"white"
-  rowEvenColor<-"lightgrey"
+
 
 
 
@@ -165,7 +167,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",font_color="#0410
       line = list(color = 'white'),
       fill = list(color = headerColor),
       #align = c(rep('left',3),rep('center',7)),
-      font = list(color = "white", size = 7)
+      font = list(color = header_font, size = 7)
     ),
     cells = list(
       height = 16,
