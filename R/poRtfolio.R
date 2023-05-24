@@ -257,6 +257,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
   }
 
 
+  
   return(p)
 
 }
