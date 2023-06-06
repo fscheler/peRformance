@@ -1021,3 +1021,145 @@ gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
 }
 
 
+
+
+
+
+
+statleR<-function(returns_matrix_z,periodicity_adjustment=252,
+                  chart_height=220,
+                  custom_caption_asset="Asset",
+                  custom_caption_benchmark="Benchmark"
+                  #Portfolio_type="Defensive",
+                  #main_currency="EUR"
+)
+{
+  #returns_matrix_z<-dm
+  
+  custom_caption_asset<-""
+  custom_caption_benchmark<-""
+  library(PerformanceAnalytics)
+  library(PortfolioAnalytics)
+  library(zoo)
+  periodicity_adjustment<-252
+  #returns_matrix_z<-df[,c("date","ret")]
+  names(returns_matrix_z)<-c("date","asset_ret")
+  returns_matrix_z$benchmark_ret<-0
+  returns_matrix_z$asset_exc_ret<-returns_matrix_z$asset_ret
+  returns_matrix_z$benchmark_exc_ret<-returns_matrix_z$benchmark_ret  
+  returns_matrix_z$asset<-cumprod(1+returns_matrix_z$asset_ret)
+  returns_matrix_z$benchmark<-cumprod(1+returns_matrix_z$benchmark_ret)
+  #da<-returns_matrix_z
+  col<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+  
+  
+  #da<-returns_matrix_z
+  col<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+  
+  #Total Return
+  tot_ret_asset<-tail(cumprod(1+returns_matrix_z$asset_ret),1)-1
+  tot_ret_benchmark<-tail(cumprod(1+returns_matrix_z$benchmark_ret),1)-1
+  
+  #Annualized Return  
+  number_years<-as.numeric(tail(returns_matrix_z$date,1)-head(returns_matrix_z$date,1))/365.25
+  ann_ret_asset<-tail(cumprod(1+returns_matrix_z$asset_ret),1)^(1/number_years)-1
+  ann_ret_benchmark<-tail(cumprod(1+returns_matrix_z$benchmark_ret),1)^(1/number_years)-1
+  
+  #Annualized Volatility
+  risk_asset<-sd(returns_matrix_z$asset_ret)*periodicity_adjustment^0.5
+  risk_benchmark<-sd(returns_matrix_z$benchmark_ret)*periodicity_adjustment^0.5
+  
+  #Drawdowns
+  worst_drawdown_asset<-min(returns_matrix_z$asset/cummax(returns_matrix_z$asset),na.rm=T)-1
+  worst_drawdown_benchmark<-min(returns_matrix_z$benchmark/cummax(returns_matrix_z$benchmark),na.rm=T)-1
+  
+  #Sharpe Ratio  
+  number_years<-as.numeric(tail(returns_matrix_z$date,1)-head(returns_matrix_z$date,1))/365.25
+  excess_ret_asset<-tail(cumprod(1+returns_matrix_z$asset_exc_ret),1)^(1/number_years)-1
+  excess_ret_benchmark<-tail(cumprod(1+returns_matrix_z$benchmark_exc_ret),1)^(1/number_years)-1
+  risk_asset<-sd(returns_matrix_z$asset_ret)*periodicity_adjustment^0.5
+  risk_benchmark<-sd(returns_matrix_z$benchmark_ret)*periodicity_adjustment^0.5
+  sharpe_ratio_asset<-  excess_ret_asset/risk_asset
+  sharpe_ratio_benchmark<-  excess_ret_benchmark/risk_benchmark  
+  
+  #Calmar Ratio
+  calmar_ratio_asset<-excess_ret_asset/(-(min(returns_matrix_z$asset/cummax(returns_matrix_z$asset),na.rm=T)-1))
+  calmar_ratio_benchmark<-excess_ret_asset/(-(min(returns_matrix_z$benchmark/cummax(returns_matrix_z$benchmark),na.rm=T)-1))
+  
+  returns_matrix_zoo<-read.zoo(returns_matrix_z,index.column=1)
+  
+  #Information Ratio
+  information_ratio<-InformationRatio(returns_matrix_zoo$asset_ret, returns_matrix_zoo$benchmark_ret)
+  
+  #Treynor Ratio Portfolio
+  treynor_ratio<-TreynorRatio(returns_matrix_zoo$asset_exc_ret, returns_matrix_zoo$benchmark_exc_ret, Rf = 0, scale = NA, modified = FALSE)
+  
+  #Pooled correlation
+  pooled_correlation<-cor(returns_matrix_zoo$asset_exc_ret, returns_matrix_zoo$benchmark_exc_ret)
+  
+  #Longest Drawdown
+  returns_matrix_z$drawdown_asset<-returns_matrix_z$asset/cummax(returns_matrix_z$asset)-1
+  returns_matrix_z$drawdown_asset_binary<-ifelse(returns_matrix_z$drawdown_asset<0,1,0)
+  returns_matrix_z$seq_asset<-sequence(rle(as.character(returns_matrix_z$drawdown_asset_binary))$lengths)
+  rec_index<-index(returns_matrix_z$date)[returns_matrix_z$seq_asset==max(returns_matrix_z$seq_asset)]
+  longest_drawdown_asset<-as.numeric(returns_matrix_z$date[rec_index]-returns_matrix_z$date[rec_index-max(returns_matrix_z$seq_asset)])/365.26
+  
+  returns_matrix_z$drawdown_benchmark<-returns_matrix_z$benchmark/cummax(returns_matrix_z$benchmark)-1
+  returns_matrix_z$drawdown_benchmark_binary<-ifelse(returns_matrix_z$drawdown_benchmark<0,1,0)
+  returns_matrix_z$seq_benchmark<-sequence(rle(as.character(returns_matrix_z$drawdown_benchmark_binary))$lengths)
+  rec_index<-index(returns_matrix_z$date)[returns_matrix_z$seq_benchmark==max(returns_matrix_z$seq_benchmark)]
+  longest_drawdown_benchmark<-as.numeric(returns_matrix_z$date[rec_index]-returns_matrix_z$date[rec_index-max(returns_matrix_z$seq_benchmark)])/365.26
+  
+  headerColor<-"darkgrey"
+  rowOddColor<-"white"
+  rowEvenColor<-"lightgrey"
+  
+  chart_height<-500
+  
+  fig <- plot_ly(
+    height=chart_height,
+    type = 'table',
+    columnwidth  = c(80,60),
+    header = list(
+      values = c('<b>Performance</b>',paste0('<b>',custom_caption_asset,'</b> ')
+      ),
+      line = list(color = 'white'),
+      fill = list(color = headerColor),
+      align = c(rep('left',1),rep('center',1)),
+      font = list(color = "white", size = 12)
+      #align="left"
+    ),
+    cells = list(
+      values = rbind(
+        c(
+          "Total Return",
+          "Annualized Return",
+          "Annualized Volatility",
+          "Sharpe Ratio",
+          "Calmar Ratio",
+          "Longest Drawdown (Yrs)"
+        ),
+        c(
+          paste0(round(tot_ret_asset*100,2),"%"),   
+          paste0(round(ann_ret_asset*100,2),"%"),   
+          paste0(round(risk_asset*100,2),"%"),   
+          paste0(round(sharpe_ratio_asset,4),""),
+          paste0(round(calmar_ratio_asset,4),""),
+          paste0(round(longest_drawdown_asset,4),"")
+        )
+      ),
+      line = list(color = 'white'),
+      fill = list(color = list(rep(c(rowOddColor,rowEvenColor),10/2+1))),
+      align = c('left', 'center','center'),
+      font = list(color = c("#04103b"), size = 10),
+      height = 20
+    ))
+  
+  m<-list(r=0,b=0,t=0,l=0,par=4)
+  fig<-fig%>%layout(margin=m)
+  
+  fig_list<-list("fig"=fig)
+  
+  return(fig_list)
+  
+}
