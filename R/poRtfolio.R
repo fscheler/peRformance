@@ -156,7 +156,7 @@ allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart
   return(p)
 }
 
-FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",legends=c("Gross","Net"),chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
 
   if (!require("plotly")) install.packages("plotly")
@@ -181,11 +181,11 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
   p <- p %>% add_trace(x = ~net, y = ~assets, type = 'bar',
                        text = paste0(round(da$net*100),"%"), textposition = 'auto',
                        marker = list(color = '#3b5171',
-                                     line = list(color = 'white', width = 1.5)),name="Net")
+                                     line = list(color = 'white', width = 1.5)),name=legends[2])
   p <- p %>% add_trace(x = ~gross, y = ~assets, type = 'bar',
                        text = paste0(round(da$gross*100),"%"), textposition = 'auto',
                        marker = list(color = '#04103b',
-                                     line = list(color = 'white', width = 1.5)),name="Gross")
+                                     line = list(color = 'white', width = 1.5)),name=legends[1])
   p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
 

@@ -343,3 +343,95 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
 }
 
 
+
+#
+# Some useful keyboard shortcuts for package authoring:
+#
+#   Install Package:           'Ctrl + Shift + B'
+#   Check Package:             'Ctrl + Shift + E'
+#   Test Package:              'Ctrl + Shift + T'
+
+
+
+mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",header_font="white",font_color="#04103b",
+                 export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,
+                 rowOddColor="white",
+                 rowEvenColor="lightgrey",
+                 orders=c("Year","Amadeus Very Defensive USD","Amadeus Defensive USD","Amadeus Balanced USD","Amadeus Dynamic USD","Amadeus Very Dynamic USD")
+)
+{
+  
+  if (!require("plotly")) install.packages("plotly")
+  if (!require("ecm")) install.packages("ecm")
+  if (!require("caTools")) install.packages("caTools")
+  if (!require("dplyr")) install.packages("dplyr")
+  if (!require("lubridate")) install.packages("lubridate")
+  library(plotly)
+  library(ecm)
+  library(caTools)
+  library(dplyr)
+  library(lubridate)
+  options(warn = -1)
+
+
+  
+  if(ts_format=="index")
+  {
+    names(df)<-c("id","date","nav")
+    df<-df%>%group_by(id)%>%mutate(ret=nav/lagpad(nav,k=1)-1)    
+  }else{
+    names(df)<-c("id","date","ret")
+  }
+
+  df$ret<-ifelse(is.na(df$ret),0,df$ret)
+  df$Year<-year(as.Date(df$date))
+  df<-df%>%group_by(id,Year)%>%mutate(aret=cumprod(1+ret))
+  df<-df%>%group_by(id,Year)%>%summarise(aret=tail(aret,1)-1)
+  dw<-dcast(df,Year~id,value.var="aret")
+  
+  formating<-function(x)
+  {
+    x<-paste0(round(as.numeric(x)*100,rounding),"%")
+  }
+  
+  
+  #orders<-c("Year","Amadeus Very Defensive USD","Amadeus Defensive USD","Amadeus Balanced USD","Amadeus Dynamic USD","Amadeus Very Dynamic USD")
+  dw<-dw[,c(orders)]
+  
+  dv<-cbind(dw$Year,apply(dw[,2:ncol(dw)],2,formating))
+  names(dv)<-orders
+  headerColor<-header_color
+
+    
+    fig <- plot_ly(
+      #height=chart_height,
+      type = 'table',
+      columnwidth  = c(60,rep(80,12)),
+      header = list(
+        values = paste0("<b>",names(dw),"</b>"),
+        line = list(color = 'white'),
+        fill = list(color = headerColor),
+        #align = c(rep('left',3),rep('center',7)),
+        font = list(color = header_font, size = 7)
+      ),
+      cells = list(
+        height = 16,
+        values = t(dv),
+        line = list(color = 'white'),
+        fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(dw$Year)/2+1))),
+        align = c('center', 'center','center','center','center', 'center','center', 'center'),
+        font = list(color = c(font_color), size = 6)
+        #font = list(color = list(list(c("red","green")),), size = 6.5),
+        
+      ))
+
+  
+  m<-list(r=0,b=0,t=0,l=0,par=4)
+  fig<-fig%>%layout(margin=m)
+  fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "annual_returns_table",width = chart_export_width,height = chart_export_height))
+  
+
+  fig_list<-list("fig"=fig)
+  
+}
+
