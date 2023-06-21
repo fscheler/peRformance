@@ -438,7 +438,7 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
 
 
 
-createValueBoxes <- function(df, h = 4, w = 6, padding=0.5, rows = 2,cols){
+createValueBoxes <- function(df, h = 4, w = 6, padding=0.5, rows = 2,colsel){
   # required packages
   library(ggplot2)
   library(emojifont)
@@ -468,9 +468,10 @@ createValueBoxes <- function(df, h = 4, w = 6, padding=0.5, rows = 2,cols){
     color = factor(1:boxes)
   )
   print(plotdf)
+  p<-
   ggplot(plotdf, aes(x, y, height = h, width = w, label = info)) +
     ## Create the tiles using the `color` column
-    geom_tile(aes(fill = color)) +
+    geom_tile(fill =colsel) +
     ## Add the numeric values as text in `value` column
     geom_text(color = "white", fontface = "bold", size = 10,
               aes(label = value, x = x - w/2.2, y = y + h/4), hjust = 0) +
@@ -478,12 +479,12 @@ createValueBoxes <- function(df, h = 4, w = 6, padding=0.5, rows = 2,cols){
     geom_text(color = "white", fontface = "bold",
               aes(label = info, x = x - w/2.2, y = y-h/4), hjust = 0) +
     coord_fixed() +
-    scale_colour_manual(values = cols)+
+    #scale_colour_manual(values = colsel)+
     #scale_fill_brewer(type = "qual",palette = "Dark2") +
     ## Use `geom_text()` to add the icons by specifying the unicode symbol.
     geom_text(size = 20, aes(label = icon, family = font_family,
-                             x = x + w/4, y = y + h/8), alpha = 0.25) +
+                             x = x + w/4, y = y + h/8), alpha = 0.2) +
     theme_void() +
     guides(fill = FALSE)
-  
+  return(p)
 } 
