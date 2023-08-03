@@ -145,7 +145,7 @@ allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart
   
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
   
-  p <- plot_ly(df, type='bar', x = ~as.numeric(da$weight), y = ~da$assets, text = ~paste0(" ",da$assets), name = 'Portfolio',height=chart_height,marker = list(color = barcol,line = list(width = 0.5,color = barborder)),
+  p <- plot_ly(da, type='bar', x = ~as.numeric(da$weight), y = ~da$assets, text = ~paste0(" ",da$assets), name = 'Portfolio',height=chart_height,marker = list(color = barcol,line = list(width = 0.5,color = barborder)),
                  texttemplate = paste0("<b>",da$assets,"</b>"), textfont=20,textposition = 'inside',insidetextanchor = "start") 
     
   #p <- p %>% layout(uniformtext=list(minsize=50))
