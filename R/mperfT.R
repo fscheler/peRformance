@@ -8,7 +8,6 @@
 
 
 
-
 mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="white",font_color="#04103b",
                       export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,bm_name="Benchmark",
                  rowOddColor="white",
