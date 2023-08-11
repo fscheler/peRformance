@@ -370,13 +370,23 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
 )
 {
   
+  
+  lagpad <- function(x, k) {
+    if (k>0) {
+      return (c(rep(NA, k), x)[1 : length(x)] );
+    }
+    else {
+      return (c(x[(-k+1) : length(x)], rep(NA, -k)));
+    }
+  }
+  
   if (!require("plotly")) install.packages("plotly")
-  if (!require("ecm")) install.packages("ecm")
+  #if (!require("ecm")) install.packages("ecm")
   if (!require("caTools")) install.packages("caTools")
   if (!require("dplyr")) install.packages("dplyr")
   if (!require("lubridate")) install.packages("lubridate")
   library(plotly)
-  library(ecm)
+  #library(ecm)
   library(caTools)
   library(dplyr)
   library(lubridate)
