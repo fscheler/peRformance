@@ -1,15 +1,25 @@
-
+lagpad <- function(x, k=1) {
+  i<-is.vector(x)
+  if(is.vector(x)) x<-matrix(x) else x<-matrix(x,nrow(x))
+  if(k>0) {
+    x <- rbind(matrix(rep(NA, k*ncol(x)),ncol=ncol(x)), matrix(x[1:(nrow(x)-k),], ncol=ncol(x)))
+  }
+  else {
+    x <- rbind(matrix(x[(-k+1):(nrow(x)),], ncol=ncol(x)),matrix(rep(NA, -k*ncol(x)),ncol=ncol(x)))
+  }
+  if(i) x[1:length(x)] else x
+}
 
 ggRec<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color="darkgray")
 {
   if (!require("fredr")) install.packages("fredr")
-  if (!require("ecm")) install.packages("ecm")
+  #if (!require("ecm")) install.packages("ecm")
   if (!require("ggplot2")) install.packages("ggplot2")
   if (!require("dplyr")) install.packages("dplyr")
   if (!require("scales")) install.packages("scales")
 
   library(fredr)
-  library(ecm)
+  #library(ecm)
   library(ggplot2)
   library(dplyr)
   library(scales)
@@ -51,7 +61,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
   #st_date<-"2000-01-01"
   #ed_date<-Sys.Date()
   library(fredr)
-  library(ecm)
+  #library(ecm)
   library(ggplot2)
   library(dplyr)
   library(tidyverse)
@@ -133,7 +143,7 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
   library(xts)
   library(plotly)
   library(ggplot2)
-  library(ecm) 
+  #library(ecm) 
     
   
   #Sys.getenv('FRED_API_KEY')
@@ -207,7 +217,7 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
   library(xts)
   library(plotly)
   library(ggplot2)
-  library(ecm) 
+  #library(ecm) 
   
   names(dw)<-c('date','sums')
   dw$date<-as.Date(dw$date)
