@@ -244,7 +244,7 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
     p<-p%>%
       add_trace(x=~mb$date,y=~mb$dd10_bear,type="scatter",alpha = 1,mode="none", opacity=1, stackgroup = 'one',showlegend = FALSE, yaxis = "y2",line=list(width = 0.1,color=shade_color),marker = list(size = 0.1,color = shade_color))%>%
       layout(yaxis2 = Noax)
-    return(p)
+    return(list("p"=p,"bear_markets"=recs,"mb"=mb))
   }
 }
 
