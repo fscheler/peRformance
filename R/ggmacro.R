@@ -164,6 +164,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
 }
 
 
+
 plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color="lightgrey",threshold=0.1,mode="cummax",days=252)
 {
   #st_date<-"2000-01-01"
@@ -245,7 +246,6 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
     return(p)
   }
 }
-
 
 
 ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield",save_name="Treasury Yield",observation_start_dt="1990-01-01",recession_shading="TRUE",chart_width=10,chart_height=6,base_size_font=22,
