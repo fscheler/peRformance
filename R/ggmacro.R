@@ -140,8 +140,8 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
   mb$bear_end<-ifelse(mb$dd10_bear==0 & lagpad(mb$dd10_bear,k=1)==1,1,NA)
   mb<-as.data.table(mb)
 
-  bear_starts<-(mb[bear_start==1,]$date)
-  bear_ends<-(mb[bear_end==1,]$date)
+  bear_starts<-(mb[mb$bear_start==1,]$date)
+  bear_ends<-(mb[mb$bear_end==1,]$date)
   if(length(bear_starts)>length(bear_starts))
   {
     bear_ends<-c(bear_ends,Sys.Date())
