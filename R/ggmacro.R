@@ -219,12 +219,13 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   mb<-mb%>%group_by(dds)%>%mutate(regime=na.locf(regime,na.rm=F))
   mb$dd10_bear<-ifelse(mb$through<(-threshold) & mb$regime=="bear",1,0)
   
+
   mb$bear_start<-ifelse(mb$dd10_bear==1 & lagpad(mb$dd10_bear,k=1)==0,1,NA)
   mb$bear_end<-ifelse(mb$dd10_bear==0 & lagpad(mb$dd10_bear,k=1)==1,1,NA)
   mb<-as.data.table(mb)
   
-  bear_starts<-(mb[bear_start==1,]$date)
-  bear_ends<-(mb[bear_end==1,]$date)
+  bear_starts<-(mb[mb$bear_start==1,]$date)
+  bear_ends<-(mb[mb$bear_end==1,]$date)
   if(length(bear_starts)>length(bear_starts))
   {
     bear_ends<-c(bear_ends,Sys.Date())
