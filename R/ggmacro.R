@@ -55,6 +55,43 @@ ggRec<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color=
 }
 
 
+plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color="lightgrey")
+{
+  #if (!require("fredr")) install.packages("fredr")
+  #if (!require("plotly")) install.packages("plotly")
+  
+  library(fredr)
+  library(ggplot2)
+  
+  fredr_set_key(fredr_key)
+  
+  #st_date<-as.Date("2000-12-31")
+  #ed_date<-as.Date(Sys.Date())
+  #shade_color<-"darkgray"
+  
+  recession<-fredr(series_id = "USRECD",observation_start = as.Date(st_date),observation_end = as.Date(ed_date))
+  Noax <- list(
+    title = "",
+    zeroline = FALSE,
+    showline = FALSE,
+    showticklabels = FALSE,
+    showgrid = FALSE,
+    overlaying = "y",
+    side = "right",
+    range=c(0,1)
+  )
+  if(nrow(recession)>0)
+  {
+    p<-p%>%
+      add_trace(x=~recession$date,y=~recession$value,type="scatter",alpha = 1,mode="none", opacity=1, stackgroup = 'one',showlegend = FALSE, yaxis = "y2",line=list(width = 0.1,color=shade_color),marker = list(size = 0.1,color = shade_color))%>%
+      layout(yaxis2 = Noax)
+    
+    return(p)
+  }
+}
+
+
+
 #----------------------------------------------------------------------------------------------------------------------------
 ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkgray",threshold=0.1,mode="cummax",days=252)
 {
