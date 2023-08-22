@@ -64,11 +64,7 @@ plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_
   library(ggplot2)
   
   fredr_set_key(fredr_key)
-  
-  #st_date<-as.Date("2000-12-31")
-  #ed_date<-as.Date(Sys.Date())
-  #shade_color<-"darkgray"
-  
+
   recession<-fredr(series_id = "USRECD",observation_start = as.Date(st_date),observation_end = as.Date(ed_date))
   Noax <- list(
     title = "",
@@ -95,10 +91,7 @@ plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_
 #----------------------------------------------------------------------------------------------------------------------------
 ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkgray",threshold=0.1,mode="cummax",days=252)
 {
-  #st_date<-"2000-01-01"
-  #ed_date<-Sys.Date()
   library(fredr)
-  #library(ecm)
   library(ggplot2)
   library(dplyr)
   library(tidyverse)
@@ -106,8 +99,6 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
   library(zoo)
   library(data.table)
 
-
-  #mb <- read_csv(paste0("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/","market_breadth.csv"))
   mb<-mb[,1:2]
   names(mb)<-c("date","PX_LAST")
 
@@ -119,8 +110,6 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
   }else{
     mb$max_drawdown<-mb$PX_LAST/cummax(mb$PX_LAST)-1
   }
-  #plot(mb$PX_LAST/runmax(mb$PX_LAST,250)-1)
-  #plot(mb$PX_LAST/cummax(mb$PX_LAST)-1)
 
   mb$dddummy<-ifelse(mb$max_drawdown<0,1,0)
   mb$ddcount<-ifelse(mb$dddummy==1 & lagpad(mb$dddummy,k=1)==0,1,0)
@@ -167,10 +156,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="darkg
 
 plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color="lightgrey",threshold=0.1,mode="cummax",days=252)
 {
-  #st_date<-"2000-01-01"
-  #ed_date<-Sys.Date()
   library(fredr)
-  #library(ecm)
   library(ggplot2)
   library(dplyr)
   library(tidyverse)
@@ -178,8 +164,6 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   library(zoo)
   library(data.table)
   
-  
-  #mb <- read_csv(paste0("P:/NEWTREE/Amadeus/CSE_PDE_DHO_FSL/3_FSL/RStudio/","market_breadth.csv"))
   mb<-mb[,1:2]
   names(mb)<-c("date","PX_LAST")
   
@@ -191,7 +175,8 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
     showgrid = FALSE,
     overlaying = "y",
     side = "right",
-    range=c(0,1)
+    range=c(0,1),
+    layer="below"
   )
   
   mb<-mb[mb$date>st_date & mb$date<ed_date,]
@@ -202,8 +187,6 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   }else{
     mb$max_drawdown<-mb$PX_LAST/cummax(mb$PX_LAST)-1
   }
-  #plot(mb$PX_LAST/runmax(mb$PX_LAST,250)-1)
-  #plot(mb$PX_LAST/cummax(mb$PX_LAST)-1)
   
   mb$dddummy<-ifelse(mb$max_drawdown<0,1,0)
   mb$ddcount<-ifelse(mb$dddummy==1 & lagpad(mb$dddummy,k=1)==0,1,0)
