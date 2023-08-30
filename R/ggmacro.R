@@ -144,9 +144,6 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="grey"
   recs$recession.start <- as.Date(recs$recession.start)
   recs$recession.end <- as.Date(recs$recession.end)
   
-  
-  if(nrow(recs)>0)
-  {
     
     rec_shade <- geom_rect(data = recs, inherit.aes = F, 
                            aes(xmin = recession.start, xmax = recession.end, 
@@ -154,7 +151,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="grey"
                            alpha = 0.5)
     rec_shade <- list("bear_shade" = rec_shade, "mb" = mb)
     return(rec_shade)
-  }
+  
   
 }
 
