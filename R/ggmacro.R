@@ -37,7 +37,7 @@ ggRec<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color=
   recession.end<-recession[recession$diff==(-1),]$date
 
   if(length(recession.start)>length(recession.end))
-  {recession.end<-c(recession.end,Sys.Date())}
+  {recession.end<-c(recession.end,ed_date)}
   if(length(recession.end)>length(recession.start))
   {recession.start<-c(min(recession$date),recession.start)}
 
@@ -133,7 +133,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey"
   bear_starts <- (mb[mb$bear_start == 1, ]$date)
   bear_ends <- (mb[mb$bear_end == 1, ]$date)
   if (length(bear_starts) > length(bear_ends)) {
-    bear_ends <- c(bear_ends, Sys.Date())
+    bear_ends <- c(bear_ends, ed_date)
   }
   if (length(bear_ends) > length(bear_starts)) {
     bear_ends <- tail(bear_ends, length(bear_ends) - 1)
@@ -220,7 +220,7 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   bear_starts <- (mb[mb$bear_start == 1, ]$date)
   bear_ends <- (mb[mb$bear_end == 1, ]$date)
   if (length(bear_starts) > length(bear_ends)) {
-    bear_ends <- c(bear_ends, Sys.Date())
+    bear_ends <- c(bear_ends, ed_date)
   }
   if (length(bear_ends) > length(bear_starts)) {
     bear_ends <- tail(bear_ends, length(bear_ends) - 1)
