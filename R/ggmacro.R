@@ -88,7 +88,7 @@ plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_
 
 
 #----------------------------------------------------------------------------------------------------------------------------
-ggBeara<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey",threshold=0.1,mode="cummax",days=252)
+ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey",threshold=0.1,mode="cummax",days=252)
 {
   
   library(fredr)
@@ -139,14 +139,12 @@ ggBeara<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey
     bear_ends <- tail(bear_ends, length(bear_ends) - 1)
   }
 
-  
-  recs <- data.frame(bear_starts, bear_ends, stringsAsFactors = F)
+
+  recs <- as.data.frame(cbind(bear_starts, bear_ends), stringsAsFactors = F)
   names(recs) <- c("recession.start", "recession.end")
-  recs$recession.start <- as.Date(recs$recession.start)
-  recs$recession.end <- as.Date(recs$recession.end)
+  recs$recession.start <- as.Date(recs$recession.start,origin="1970-01-01")
+  recs$recession.end <- as.Date(recs$recession.end,origin="1970-01-01")
 
-
-  print(recs)
   
     rec_shade <- geom_rect(data = recs, inherit.aes = F, 
                            aes(xmin = recession.start, xmax = recession.end, 
@@ -221,11 +219,12 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   if (length(bear_ends) > length(bear_starts)) {
     bear_ends <- tail(bear_ends, length(bear_ends) - 1)
   }
-  browser()
-  recs<-data.frame(bear_starts,bear_ends,stringsAsFactors=F)
-  names(recs)<-c("recession.start","recession.end")
-  recs$recession.start<-as.Date(recs$recession.start)
-  recs$recession.end<-as.Date(recs$recession.end)
+
+  recs <- as.data.frame(cbind(bear_starts, bear_ends), stringsAsFactors = F)
+  names(recs) <- c("recession.start", "recession.end")
+  recs$recession.start <- as.Date(recs$recession.start,origin="1970-01-01")
+  recs$recession.end <- as.Date(recs$recession.end,origin="1970-01-01")
+  
   
   if(nrow(recs)>0)
   {
