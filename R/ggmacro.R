@@ -139,12 +139,14 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey"
     bear_ends <- tail(bear_ends, length(bear_ends) - 1)
   }
 
-
+  print(bear_starts)
+  print(bear_ends)
+  
   recs <- as.data.frame(cbind(bear_starts, bear_ends), stringsAsFactors = F)
   names(recs) <- c("recession.start", "recession.end")
   recs$recession.start <- as.Date(recs$recession.start,origin="1970-01-01")
   recs$recession.end <- as.Date(recs$recession.end,origin="1970-01-01")
-
+  print(recs)
   
     rec_shade <- geom_rect(data = recs, inherit.aes = F, 
                            aes(xmin = recession.start, xmax = recession.end, 
