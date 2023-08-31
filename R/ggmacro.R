@@ -145,7 +145,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="grey"
   recs$recession.start <- as.Date(recs$recession.start)
   recs$recession.end <- as.Date(recs$recession.end)
 
-    
+  recs<-na.omit(recs)
   print(recs)
   
     rec_shade <- geom_rect(data = recs, inherit.aes = F, 
