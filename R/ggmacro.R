@@ -101,6 +101,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="grey"
   
   mb <- mb[, 1:2]
   names(mb) <- c("date", "PX_LAST")
+  mb$date<-as.Date(mb$date)
   mb <- mb[mb$date > st_date & mb$date < ed_date, ]
   if(mode == "runmax") {
     mb$max_drawdown <- mb$PX_LAST/runmax(mb$PX_LAST, days, 
