@@ -143,6 +143,8 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey"
   print(bear_ends)
   bear_starts<-bear_starts[!is.na(bear_starts)]
   bear_ends<-bear_ends[!is.na(bear_ends)]
+  print(bear_starts)
+  print(bear_ends)
   
   recs <- as.data.frame(cbind(bear_starts, bear_ends), stringsAsFactors = F)
   names(recs) <- c("recession.start", "recession.end")
