@@ -221,6 +221,7 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   if (length(bear_ends) > length(bear_starts)) {
     bear_ends <- tail(bear_ends, length(bear_ends) - 1)
   }
+  browser()
   recs<-data.frame(bear_starts,bear_ends,stringsAsFactors=F)
   names(recs)<-c("recession.start","recession.end")
   recs$recession.start<-as.Date(recs$recession.start)
