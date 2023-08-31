@@ -139,7 +139,7 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="grey"
     bear_starts <- tail(bear_starts, length(bear_starts) - 
                           1)
   }
-  recs <- as.data.frame(cbind(bear_starts, bear_ends), stringsAsFactors = F)
+  recs <- data.frame(bear_starts, bear_ends, stringsAsFactors = F)
   names(recs) <- c("recession.start", "recession.end")
   recs$recession.start <- as.Date(recs$recession.start)
   recs$recession.end <- as.Date(recs$recession.end)
@@ -219,7 +219,7 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   {
     bear_starts<-tail(bear_starts,length(bear_starts)-1)
   }
-  recs<-as.data.frame(cbind(bear_starts,bear_ends),stringsAsFactors=F)
+  recs<-data.frame(bear_starts,bear_ends,stringsAsFactors=F)
   names(recs)<-c("recession.start","recession.end")
   recs$recession.start<-as.Date(recs$recession.start)
   recs$recession.end<-as.Date(recs$recession.end)
