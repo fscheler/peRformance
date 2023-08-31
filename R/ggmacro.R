@@ -3,8 +3,7 @@ lagpad <- function(x, k=1) {
   if(is.vector(x)) x<-matrix(x) else x<-matrix(x,nrow(x))
   if(k>0) {
     x <- rbind(matrix(rep(NA, k*ncol(x)),ncol=ncol(x)), matrix(x[1:(nrow(x)-k),], ncol=ncol(x)))
-  }
-  else {
+  }else {
     x <- rbind(matrix(x[(-k+1):(nrow(x)),], ncol=ncol(x)),matrix(rep(NA, -k*ncol(x)),ncol=ncol(x)))
   }
   if(i) x[1:length(x)] else x
@@ -145,12 +144,15 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-01-01",shade_color="grey"
   recs$recession.end <- as.Date(recs$recession.end)
   
     
+  print(recs)
+  
     rec_shade <- geom_rect(data = recs, inherit.aes = F, 
                            aes(xmin = recession.start, xmax = recession.end, 
                                ymin = -Inf, ymax = +Inf), fill = shade_color, 
                            alpha = 0.5)
     rec_shade <- list("bear_shade" = rec_shade, "mb" = mb)
-    return(rec_shade)
+  
+  return(rec_shade)
   
   
 }
