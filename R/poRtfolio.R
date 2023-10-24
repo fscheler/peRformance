@@ -1257,10 +1257,10 @@ allocSun2<-function(sb,sb_title="")
   p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>%
     layout(colorway  = ~colors,title =sb_title)%>%
     layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))%>%
-    layout(title = list(text = chart_title, y = 1)
+    layout(title = list(text = chart_title, y = 1))
 
 
-  plist<-list("p"=p,"sel"=sb)
+  plist=list("p"=p,"sel"=sb)
 
   return(plist)
 
