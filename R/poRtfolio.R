@@ -1168,6 +1168,7 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
 
 
 
+
 #Life Performance
 ggReg<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",markersize=1,percx=T,percy=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL)
 {
