@@ -53,17 +53,17 @@ trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=
   return(p)
 }
 
-allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Optional",chart_height = 400, 
-                    chart_font_size = 11, chart_export_width = 600, chart_export_height = 450, 
-                    m = list(r = 0, l = 0, b = 0, t = 50, par = 4),plotly=T,title_pos="center") 
+allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Optional",chart_height = 400,
+                    chart_font_size = 11, chart_export_width = 600, chart_export_height = 450,
+                    m = list(r = 0, l = 0, b = 0, t = 50, par = 4),plotly=T,title_pos="center")
 {
-  
 
-  if (!require("dplyr")) 
+
+  if (!require("dplyr"))
     install.packages("dplyr")
-  if (!require("plotly")) 
+  if (!require("plotly"))
     install.packages("plotly")
-  if (!require("lubridate")) 
+  if (!require("lubridate"))
     install.packages("lubridate")
   library(dplyr)
   library(plotly)
@@ -75,35 +75,35 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
   col_aq2 <- as.character(c("#04103b", "#dd0400", "#3b5171"))
   y_axis_caption <- ""
   da <- da %>% group_by(assets) %>% summarize(weight = sum(as.numeric(weight)))
-  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), 
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight),
                                                                   decreasing = F)])
-  p <- plot_ly(da, x = as.numeric(da$weight), y = da$assets, 
-               height = chart_height, type = "bar", name = "Portfolio", 
+  p <- plot_ly(da, x = as.numeric(da$weight), y = da$assets,
+               height = chart_height, type = "bar", name = "Portfolio",
                marker = list(color = col_aq2[1]))
-  p <- p %>% layout(margin = m, font = list(size = chart_font_size), 
-                    title = chart_title, xaxis = list(title = y_axis_caption, 
-                                                      tickformat = ".0%"), yaxis = list(title = y_axis_caption), 
+  p <- p %>% layout(margin = m, font = list(size = chart_font_size),
+                    title = chart_title, xaxis = list(title = y_axis_caption,
+                                                      tickformat = ".0%"), yaxis = list(title = y_axis_caption),
                     barmode = "group")
-  p <- p %>% config(toImageButtonOptions = list(format = "svg", 
-                                                filename = "allocation_pie", width = chart_export_width, 
+  p <- p %>% config(toImageButtonOptions = list(format = "svg",
+                                                filename = "allocation_pie", width = chart_export_width,
                                                 height = chart_export_height))
-  
+
   if(plotly!=T)
   {
     p<-
-      ggplot(da, aes(x=as.numeric(weight), y=assets,fill="#04103b")) + 
+      ggplot(da, aes(x=as.numeric(weight), y=assets,fill="#04103b")) +
       geom_bar(stat='identity') +
       #coord_flip()+
-      scale_fill_manual(values="#04103b") + 
-      theme_aq_black_default_font(base_size = 20) + 
+      scale_fill_manual(values="#04103b") +
+      theme_aq_black_default_font(base_size = 20) +
       # scale_x_discrete(limits =names(df)[2:length(names(df))])+
-      labs(title = chart_title, subtitle = chart_subtitle, 
+      labs(title = chart_title, subtitle = chart_subtitle,
            x = "") + labs(caption = "") + xlab("") +
       theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) + xlab("")+ylab("")+
       #geom_text(size = 5, col="lightgrey",position = position_stack(vjust = 0.5))+
-      theme(legend.position = "none", 
+      theme(legend.position = "none",
             legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,0, 30, 0)) + guides(colour = guide_legend(nrow = 3)) +
-      theme(panel.grid.major.x = element_blank()) + theme(panel.grid.major.x = element_blank()) + 
+      theme(panel.grid.major.x = element_blank()) + theme(panel.grid.major.x = element_blank()) +
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
       theme(legend.title = element_blank()) + guides(fill = guide_legend(nrow = 1,  byrow = TRUE))
     #theme(axis.text.x = element_text(angle = 45, hjust=1))+
@@ -116,10 +116,10 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
               plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
               plot.caption.position =  "plot") #NEW parameter
     }
-    
+
   }
-  
-  
+
+
   return(p)
 }
 
@@ -128,29 +128,29 @@ allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart
   if (!require("dplyr")) install.packages("dplyr")
   if (!require("plotly")) install.packages("plotly")
   if (!require("lubridate")) install.packages("lubridate")
-  
+
   library(dplyr)
   library(plotly)
   library(lubridate)
-  
+
   da<-as.data.frame(da)
   da<-da[,1:2]
-  
+
   names(da)<-c("assets","weight")
   da$weight<-as.numeric(da$weight)
   col_aq2<-as.character(c("#04103b","#dd0400","#3b5171"))
   y_axis_caption<-""
   #chart_font_size<-16
-  
+
   da<-da%>%group_by(assets)%>%summarize(weight=sum(as.numeric(weight)))
-  
+
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
-  
+
   p <- plot_ly(da, type='bar', x = ~as.numeric(da$weight), y = ~da$assets, text = ~paste0(" ",da$assets), name = 'Portfolio',height=chart_height,marker = list(color = barcol,line = list(width = 0.5,color = barborder)),
-                 texttemplate = paste0("<b>",da$assets,"</b>"), textfont=20,textposition = 'inside',insidetextanchor = "start") 
-    
+                 texttemplate = paste0("<b>",da$assets,"</b>"), textfont=20,textposition = 'inside',insidetextanchor = "start")
+
   #p <- p %>% layout(uniformtext=list(minsize=50))
-  p<-p%>%layout(yaxis= list(showticklabels = FALSE)) 
+  p<-p%>%layout(yaxis= list(showticklabels = FALSE))
   p <- p %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title, xaxis = list(title=y_axis_caption,tickformat =".0%"), yaxis = list(title=y_axis_caption), barmode = 'group')
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
 
@@ -227,8 +227,8 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
       layout(title = list(text =chart_title, y = 1), margin = m,
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-    
-    p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))    
+
+    p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "allocation_pie",width = chart_export_width,height = chart_export_height))
   }else{
     library(ggplot2)
     p<-
@@ -246,7 +246,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
       )+
       labs(title=chart_title,subtitle=subtitle)
 
-   
+
     if(title_pos=="left")
     {
       p<-p+
@@ -254,11 +254,11 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
               plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
               plot.caption.position =  "plot") #NEW parameter
     }
-     
+
   }
 
 
-  
+
   return(p)
 
 }
@@ -422,7 +422,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 rrScatEff<-function(da,ret_format="returns",table_format='wide',
                     ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
 {
-  
+
 
   if (!require("purrr")) install.packages("data.table")
   if (!require("PortfolioAnalytics")) install.packages("dplyr")
@@ -485,35 +485,35 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',
   #                                  search_size=2000,
   #                                  trace=TRUE)
 
-  #Add Box Constraints      
+  #Add Box Constraints
   if(is.null(box_constraint_list))
   {
     box_constraint_list<-list(
       min=c(rep(0,length(funds))),
       max=c(rep(1,length(funds)))
-    )        
+    )
   }
   init.portf <- add.constraint(portfolio=init.portf,
                                type="box",
                                min=box_constraint_list$min[1:length(funds)],
                                max=box_constraint_list$max[1:length(funds)])
-  
-  
+
+
   #ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
 
-  
+
   annualized.moments <- function(R, scale=ann_factor, portfolio=NULL){
     out <- list()
     out$mu <-   (1+dls$ret_ann)^(1/ann_factor)-1
     out$sigma <- cov(R)
     #out$siga <- corpcor::cov.shrink(R, shrinkage_lambda, shrinkage_lambda)[1:ncol(R),1:ncol(R)]
     return(out)
-  }   
-  
+  }
 
-  ef <- create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-StdDev", n.portfolios = n.portfolios, match.col = "StdDev", search_size = 500, 
+
+  ef <- create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-StdDev", n.portfolios = n.portfolios, match.col = "StdDev", search_size = 500,
                                    momentFUN="annualized.moments", scale=ann_factor)
-  
+
   eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
 
   eff<-eff/rowSums(eff)
@@ -533,7 +533,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',
            xaxis = list(title="Risk",tickformat =".1%",range = list(min(eff$sd_ann/1.1), max(dls$sd_ann*1.1))),
            yaxis = list(title="Return",tickformat =".1%"),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "efficient_frontier",width = chart_export_width,height = chart_export_height))
-  
+
 
   rr_ggplot<<-
     #GGplot scatter
@@ -703,12 +703,12 @@ valueboxeR<-function(  values = c(avg_dvd_yield,
                                col_aq2 = c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")
 )
 {
-  
-  
-  
+
+
+
   col_aq2 = as.character(col_aq2)
   cols = colorRampPalette(col_aq2)(6)
-  
+
   library(ggplot2)
   library(emojifont)
   ds <- data.frame(
@@ -722,7 +722,7 @@ valueboxeR<-function(  values = c(avg_dvd_yield,
     font_family = c(rep("fontawesome-webfont", 6)),
     color = factor(1:6)
   )
-  
+
   p<-ggplot(ds, aes(x, y, height = h, width = w, label = info)) +
     ## Create the tiles using the `color` column
     geom_tile(aes(fill = color)) +
@@ -739,18 +739,18 @@ valueboxeR<-function(  values = c(avg_dvd_yield,
                              x = x + 1.5, y = y + 0.5), alpha = 0.25) +
     theme_void() +
     guides(fill = FALSE)
-  
+
   return(p)
-  
-  
+
+
 }
 
 
 boxeR<-function()
 {
-  
+
   library(plotly)
-  
+
   y <- c('Dividend Yield %')
   MXWO <- c(2.2)
   Portfolio <- c(3.9)
@@ -769,18 +769,18 @@ boxeR<-function()
   fig <- fig %>% layout(margin=m,barmode = 'stack',showlegend=F,
                         xaxis = list(title = "",showgrid=FALSE,showticklabels = FALSE,range=c(0,(data$MXWO+data$Portfolio)*1.5)),
                         yaxis = list(title ="",showgrid=FALSE))
-  
+
   fig<-fig %>%layout(plot_bgcolor  = "rgba(0, 0, 0, 0)",paper_bgcolor = "rgba(0, 0, 0, 0)",yaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE),xaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE))
   fig
   orca(fig,"comparison_dividend_yield.svg", width = 580,height=70)
-  
-  
+
+
 }
 
 rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=paste0(2.2,"%"),caption_po=paste0(3.9,"%"),chart_height=200,m=list(r=0,l=0,b=0,t=0,par=4))
 {
   library(plotly)
-  
+
   #,range=c(0,(data$MXWO+data$Portfolio)*1.5)
   #y <- c('Dividend Yield %')
   #benchmark <- c(2.2)
@@ -796,13 +796,13 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
     xaxis = list(title = ""),
     margin = list(l = 65,t=65)
   )
-  
-  #fig <- fig %>% add_text(x = ~benchmark, y = ~y,text = ~caption_bm, 
+
+  #fig <- fig %>% add_text(x = ~benchmark, y = ~y,text = ~caption_bm,
   #                        textposition = "bottom right",color = I("#dd0400"), showlegend = FALSE)
-  
-  #fig <- fig %>% add_text(x = ~portfolio, y = ~y,text = ~caption_po, 
+
+  #fig <- fig %>% add_text(x = ~portfolio, y = ~y,text = ~caption_po,
   #                        textposition = "bottom left",color = I("#5777a7"), showlegend = FALSE)
-  
+
   fig <- fig %>% add_annotations(x = s$benchmark,
                                  y = s$y,
                                  text = caption_bm,
@@ -813,7 +813,7 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
                                  arrowsize = 0,
                                  ax = 0,
                                  ay = -10)
-  
+
   fig
   fig <- fig %>% add_annotations(x = s$portfolio,
                                  y = s$y,
@@ -825,16 +825,16 @@ rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=
                                  arrowsize = 0,
                                  ax = 0,
                                  ay = -10)
-  
+
   fig
-  
+
   fig <- fig %>% layout(margin=m,barmode = 'stack',showlegend=F,
                         xaxis = list(title = "",showgrid=FALSE,showticklabels = FALSE),
                         yaxis = list(title ="",showgrid=FALSE))
   fig<-fig %>%layout(plot_bgcolor  = "rgba(0, 0, 0, 0)",paper_bgcolor = "rgba(0, 0, 0, 0)",yaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE),xaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE))
-  
+
   return(fig)
-  
+
 }
 
 
@@ -845,15 +845,15 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Po
   names(df)<-c("date","asset")
   df$date<-as.Date(df$date)
   cols <- setNames(c(col_aq2[1]), c(name1))
-  
+
   p<-
     ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))
-    
+
     if(!is.null(fredr_key))
     {
       p<-p+ggRec(as.Date(min(df$date)),as.Date(max(df$date)),fredr_key=fredr_key)
     }
-  p<-p+    
+  p<-p+
     geom_line(size=0.8,aes(y=df$asset,color=name1))+
     scale_colour_manual(values = cols)+
     theme_aq_black(base_size=24)+
@@ -866,13 +866,13 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Po
     scale_x_date(labels = date_format("%Y"))
   if(perc==TRUE)
   {
-    p<-p+scale_y_continuous(labels = scales::percent)  
+    p<-p+scale_y_continuous(labels = scales::percent)
   }
-  p<-p+     
+  p<-p+
     ylab(ycap)+
     theme(plot.margin=margin(5,5,5,5))
-  
-  return(p)  
+
+  return(p)
 }
 
 
@@ -887,7 +887,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
   secaxisfactor<-2
   p<-
     ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))
-  
+
   if(!is.null(fredr_key))
   {
   p<-p+ggRec(as.Date(min(df$date)),as.Date(max(df$date)),fredr_key=fredr_key)
@@ -906,12 +906,12 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
     scale_x_date(labels = date_format("%Y"))
   if(perc==TRUE)
   {
-    p<-p+scale_y_continuous(labels = scales::percent)  
+    p<-p+scale_y_continuous(labels = scales::percent)
   }
-  p<-p+     
+  p<-p+
     ylab(ycap)+
     theme(plot.margin=margin(5,5,5,5))
-  
+
   if(secaxis!=1)
   {
     # Custom the Y scales:
@@ -924,7 +924,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
   }
 
 
-  return(p)  
+  return(p)
 }
 
 
@@ -935,47 +935,47 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,c
   #long <- melt(setDT(df), id.vars = "date")
   #names need to be date, variable, value
   cols = colorRampPalette(col_aq2)(length(unique(long$variable)))
-  
+
   # Stacked + percent
   p<-
-    ggplot(long, aes(fill=variable, y=value, x=date)) 
-  
+    ggplot(long, aes(fill=variable, y=value, x=date))
+
   if(rel==T)
   {
     p<-p+geom_bar(position="fill", stat="identity")
   }else{
-    p<-p+geom_bar(stat="identity") 
+    p<-p+geom_bar(stat="identity")
   }
-    
+
   p<-p+
     scale_fill_manual(values=cols)+
-    theme_aq_black_default_font(base_size = 20) + 
-    labs(color = "") + labs(title = title, 
-                            subtitle = subtitle, x = "") + 
-    labs(caption = "") + xlab("") + 
-    ylab("") + theme(legend.position = "bottom", 
-                     legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,  0, 30, 0)) + 
-    guides(colour = guide_legend(nrow = 3)) + 
-    theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) + 
+    theme_aq_black_default_font(base_size = 20) +
+    labs(color = "") + labs(title = title,
+                            subtitle = subtitle, x = "") +
+    labs(caption = "") + xlab("") +
+    ylab("") + theme(legend.position = "bottom",
+                     legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,  0, 30, 0)) +
+    guides(colour = guide_legend(nrow = 3)) +
+    theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) +
     theme(legend.title=element_blank())+
     guides(fill=guide_legend(nrow=lrow,byrow=TRUE))
-  
+
   if(minmaxx==T)
   {
-    p<-p+scale_x_date(limits=c(min(long$date),max(long$date)), expand = c(0, 0))      
+    p<-p+scale_x_date(limits=c(min(long$date),max(long$date)), expand = c(0, 0))
   }
-  
+
     if(perc==T)
     {
-      p<-p  +  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) 
+      p<-p  +  scale_y_continuous(labels = scales::percent_format(accuracy = 1))
     }
-    
+
   p<-p+
     theme(panel.grid.major.x = element_blank())+
     theme(panel.grid.major.x = element_blank())+
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
     coord_cartesian(xlim = c(min(long$date),max(long$date)))
-  
+
   return(p)
 }
 
@@ -984,10 +984,10 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,c
 #orca(p,"style_box_plot.svg",width = 700,height = 250)
 
 
-gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", 
-                     ycap = "", name1 = "asset", name2 = "benchmark",name3="benchmark1", perc = F, 
-                     col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), 
-                     fredr_key = NULL, secaxis = 1,base_size=24) 
+gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
+                     ycap = "", name1 = "asset", name2 = "benchmark",name3="benchmark1", perc = F,
+                     col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"),
+                     fredr_key = NULL, secaxis = 1,base_size=24)
 {
   library(ggplot2)
   names(df) <- c("date", "asset", "benchmark","benchmark1")
@@ -996,26 +996,26 @@ gglineRtr<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
   secaxisfactor <- 2
   p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
   if (!is.null(fredr_key)) {
-    p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)), 
+    p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)),
                    fredr_key = fredr_key)
   }
-  p <- p + geom_line(size = 0.8, aes(y = df$asset, color = name1)) + 
+  p <- p + geom_line(size = 0.8, aes(y = df$asset, color = name1)) +
     geom_line(size = 0.8, aes(y = df$benchmark/secaxis, color = name2)) +
     geom_line(size = 0.8, aes(y = df$benchmark1/secaxis, color = name3)) +
-    scale_colour_manual(values = cols) + 
-    theme_aq_black(base_size = base_size ) + labs(color = "") + 
-    labs(title = title, subtitle = subtitle, x = xcap) + 
-    labs(caption = "") + theme(legend.position = "bottom", 
-                               legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0, 
-                                                                                                      0, 0, 0)) + guides(colour = guide_legend(nrow = 1)) + 
+    scale_colour_manual(values = cols) +
+    theme_aq_black(base_size = base_size ) + labs(color = "") +
+    labs(title = title, subtitle = subtitle, x = xcap) +
+    labs(caption = "") + theme(legend.position = "bottom",
+                               legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
+                                                                                                      0, 0, 0)) + guides(colour = guide_legend(nrow = 1)) +
     scale_x_date(labels = date_format("%Y"))
   if (perc == TRUE) {
     p <- p + scale_y_continuous(labels = scales::percent)
   }
-  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5, 
+  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
                                                    5))
   if (secaxis != 1) {
-    p <- p + scale_y_continuous(name = "", sec.axis = sec_axis(trans = ~. * 
+    p <- p + scale_y_continuous(name = "", sec.axis = sec_axis(trans = ~. *
                                                                  secaxis, name = ""))
   }
   return(p)
@@ -1036,7 +1036,7 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
 )
 {
   #returns_matrix_z<-dm
-  
+
   custom_caption_asset<-""
   custom_caption_benchmark<-""
   library(PerformanceAnalytics)
@@ -1047,76 +1047,76 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
   names(returns_matrix_z)<-c("date","asset_ret")
   returns_matrix_z$benchmark_ret<-0
   returns_matrix_z$asset_exc_ret<-returns_matrix_z$asset_ret
-  returns_matrix_z$benchmark_exc_ret<-returns_matrix_z$benchmark_ret  
+  returns_matrix_z$benchmark_exc_ret<-returns_matrix_z$benchmark_ret
   returns_matrix_z$asset<-cumprod(1+returns_matrix_z$asset_ret)
   returns_matrix_z$benchmark<-cumprod(1+returns_matrix_z$benchmark_ret)
   #da<-returns_matrix_z
   col<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
-  
-  
+
+
   #da<-returns_matrix_z
   col<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
-  
+
   #Total Return
   tot_ret_asset<-tail(cumprod(1+returns_matrix_z$asset_ret),1)-1
   tot_ret_benchmark<-tail(cumprod(1+returns_matrix_z$benchmark_ret),1)-1
-  
-  #Annualized Return  
+
+  #Annualized Return
   number_years<-as.numeric(tail(returns_matrix_z$date,1)-head(returns_matrix_z$date,1))/365.25
   ann_ret_asset<-tail(cumprod(1+returns_matrix_z$asset_ret),1)^(1/number_years)-1
   ann_ret_benchmark<-tail(cumprod(1+returns_matrix_z$benchmark_ret),1)^(1/number_years)-1
-  
+
   #Annualized Volatility
   risk_asset<-sd(returns_matrix_z$asset_ret)*periodicity_adjustment^0.5
   risk_benchmark<-sd(returns_matrix_z$benchmark_ret)*periodicity_adjustment^0.5
-  
+
   #Drawdowns
   worst_drawdown_asset<-min(returns_matrix_z$asset/cummax(returns_matrix_z$asset),na.rm=T)-1
   worst_drawdown_benchmark<-min(returns_matrix_z$benchmark/cummax(returns_matrix_z$benchmark),na.rm=T)-1
-  
-  #Sharpe Ratio  
+
+  #Sharpe Ratio
   number_years<-as.numeric(tail(returns_matrix_z$date,1)-head(returns_matrix_z$date,1))/365.25
   excess_ret_asset<-tail(cumprod(1+returns_matrix_z$asset_exc_ret),1)^(1/number_years)-1
   excess_ret_benchmark<-tail(cumprod(1+returns_matrix_z$benchmark_exc_ret),1)^(1/number_years)-1
   risk_asset<-sd(returns_matrix_z$asset_ret)*periodicity_adjustment^0.5
   risk_benchmark<-sd(returns_matrix_z$benchmark_ret)*periodicity_adjustment^0.5
   sharpe_ratio_asset<-  excess_ret_asset/risk_asset
-  sharpe_ratio_benchmark<-  excess_ret_benchmark/risk_benchmark  
-  
+  sharpe_ratio_benchmark<-  excess_ret_benchmark/risk_benchmark
+
   #Calmar Ratio
   calmar_ratio_asset<-excess_ret_asset/(-(min(returns_matrix_z$asset/cummax(returns_matrix_z$asset),na.rm=T)-1))
   calmar_ratio_benchmark<-excess_ret_asset/(-(min(returns_matrix_z$benchmark/cummax(returns_matrix_z$benchmark),na.rm=T)-1))
-  
+
   returns_matrix_zoo<-read.zoo(returns_matrix_z,index.column=1)
-  
+
   #Information Ratio
   information_ratio<-InformationRatio(returns_matrix_zoo$asset_ret, returns_matrix_zoo$benchmark_ret)
-  
+
   #Treynor Ratio Portfolio
   treynor_ratio<-TreynorRatio(returns_matrix_zoo$asset_exc_ret, returns_matrix_zoo$benchmark_exc_ret, Rf = 0, scale = NA, modified = FALSE)
-  
+
   #Pooled correlation
   pooled_correlation<-cor(returns_matrix_zoo$asset_exc_ret, returns_matrix_zoo$benchmark_exc_ret)
-  
+
   #Longest Drawdown
   returns_matrix_z$drawdown_asset<-returns_matrix_z$asset/cummax(returns_matrix_z$asset)-1
   returns_matrix_z$drawdown_asset_binary<-ifelse(returns_matrix_z$drawdown_asset<0,1,0)
   returns_matrix_z$seq_asset<-sequence(rle(as.character(returns_matrix_z$drawdown_asset_binary))$lengths)
   rec_index<-index(returns_matrix_z$date)[returns_matrix_z$seq_asset==max(returns_matrix_z$seq_asset)]
   longest_drawdown_asset<-as.numeric(returns_matrix_z$date[rec_index]-returns_matrix_z$date[rec_index-max(returns_matrix_z$seq_asset)])/365.26
-  
+
   returns_matrix_z$drawdown_benchmark<-returns_matrix_z$benchmark/cummax(returns_matrix_z$benchmark)-1
   returns_matrix_z$drawdown_benchmark_binary<-ifelse(returns_matrix_z$drawdown_benchmark<0,1,0)
   returns_matrix_z$seq_benchmark<-sequence(rle(as.character(returns_matrix_z$drawdown_benchmark_binary))$lengths)
   rec_index<-index(returns_matrix_z$date)[returns_matrix_z$seq_benchmark==max(returns_matrix_z$seq_benchmark)]
   longest_drawdown_benchmark<-as.numeric(returns_matrix_z$date[rec_index]-returns_matrix_z$date[rec_index-max(returns_matrix_z$seq_benchmark)])/365.26
-  
+
   headerColor<-"darkgrey"
   rowOddColor<-"white"
   rowEvenColor<-"lightgrey"
-  
+
   chart_height<-500
-  
+
   fig <- plot_ly(
     height=chart_height,
     type = 'table',
@@ -1141,9 +1141,9 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
           "Longest Drawdown (Yrs)"
         ),
         c(
-          paste0(round(tot_ret_asset*100,2),"%"),   
-          paste0(round(ann_ret_asset*100,2),"%"),   
-          paste0(round(risk_asset*100,2),"%"),   
+          paste0(round(tot_ret_asset*100,2),"%"),
+          paste0(round(ann_ret_asset*100,2),"%"),
+          paste0(round(risk_asset*100,2),"%"),
           paste0(round(sharpe_ratio_asset,4),""),
           paste0(round(calmar_ratio_asset,4),""),
           paste0(round(longest_drawdown_asset,4),"")
@@ -1155,14 +1155,14 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
       font = list(color = c("#04103b"), size = 10),
       height = 20
     ))
-  
+
   m<-list(r=0,b=0,t=0,l=0,par=4)
   fig<-fig%>%layout(margin=m)
-  
+
   fig_list<-list("fig"=fig)
-  
+
   return(fig_list)
-  
+
 }
 
 
@@ -1173,12 +1173,12 @@ ggReg<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",markersize=
 {
   library(ggplot2)
   names(df)<-c("assetx","assety")
-  
-  cols <- setNames(c(col_aq2[1]), c("Regression"))
-  
+
+  #cols <- setNames(c(col_aq2[1]), c("assetx","assety"))
+
   p<-
     ggplot(df, aes(x=df$assetx, y=df$assety))
-  p<-p+    
+  p<-p+
     geom_point(size=markersize,col=col_aq2[1])+
     geom_smooth(method=lm, se=FALSE,col=col_aq2[2])+
     theme_aq_black(base_size=24)+
@@ -1191,20 +1191,20 @@ ggReg<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",markersize=
     #scale_x_date(labels = date_format("%Y"))
   if(percx==TRUE)
   {
-    p<-p+scale_x_continuous(labels = scales::percent)  
+    p<-p+scale_x_continuous(labels = scales::percent)
   }
   if(percy==TRUE)
   {
-    p<-p+scale_y_continuous(labels = scales::percent)  
+    p<-p+scale_y_continuous(labels = scales::percent)
   }
-  p<-p+     
+  p<-p+
     ylab(ycap)+
     theme(plot.margin=margin(5,5,5,5))
-  
+
   reg<-lm(assety~assetx,data=df)
   plist=list("p"=p,"reg"=reg)
   print(summary(reg))
-  return(plist)  
+  return(plist)
 }
 
 
@@ -1223,46 +1223,46 @@ allocSun2<-function(sb,sb_title="")
   sb_center$values<-sb_center$sum
   sb_center<-sb_center[,c("parents","ids","labels","values")]
   sb_center<-as.data.frame(sb_center)
-  
+
   sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
   sb_center1$labels<-sb_center1$ids
   sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
   sb_center1$values<-sb_center1$sum
   sb_center1<-sb_center1[,c("parents","ids","labels","values")]
   sb_center1<-as.data.frame(sb_center1)
-  
+
   sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
-  
+
   sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
-  
+
   #Customized Color Scheme
   library(colorspace)
   sb_center$colors<-1
   sb_center1$colors<-1
   sb$colors<-1
   sb_center<-sb_center[order(sb_center$values),]
-  
+
   for(color_i in 1:nrow(sb_center))
   {
     sel_id<-substr(sb_center$ids[color_i],1,4)
-    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)
     sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
     sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
   }
   sb_tmp<-rbind(sb_center,sb_center1,sb)
-  
-  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>% 
+
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>%
     layout(colorway  = ~colors,title =sb_title)%>%
     layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))%>%
     layout(title = list(text = chart_title, y = 1)
-  
-  
+
+
   plist<-list("p"=p,"sel"=sb)
-  
+
   return(plist)
-  
+
 }
 
 allocTree2<-function(sb,sb_title="Allocation Tree")
@@ -1278,45 +1278,45 @@ allocTree2<-function(sb,sb_title="Allocation Tree")
   sb_center$values<-sb_center$sum
   sb_center<-sb_center[,c("parents","ids","labels","values")]
   sb_center<-as.data.frame(sb_center)
-  
+
   sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
   sb_center1$labels<-sb_center1$ids
   sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
   sb_center1$values<-sb_center1$sum
   sb_center1<-sb_center1[,c("parents","ids","labels","values")]
   sb_center1<-as.data.frame(sb_center1)
-  
+
   sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
-  
+
   sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
-  
+
   #Customized Color Scheme
   library(colorspace)
   sb_center$colors<-1
   sb_center1$colors<-1
   sb$colors<-1
   sb_center<-sb_center[order(sb_center$values),]
-  
+
   for(color_i in 1:nrow(sb_center))
   {
     sel_id<-substr(sb_center$ids[color_i],1,4)
-    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)
     sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
     sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
   }
   sb_tmp<-rbind(sb_center,sb_center1,sb)
-  
-  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2),branchvalues="total", type = 'treemap')%>% 
+
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2),branchvalues="total", type = 'treemap')%>%
     layout(colorway  = ~colors,title =sb_title)%>%
     layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-  
-  
+
+
   plist<-list("p"=p,"sel"=sb)
-  
+
   return(plist)
-  
+
 }
 
 
@@ -1333,45 +1333,45 @@ allocSun2<-function(sb,sb_title="")
   sb_center$values<-sb_center$sum
   sb_center<-sb_center[,c("parents","ids","labels","values")]
   sb_center<-as.data.frame(sb_center)
-  
+
   sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
   sb_center1$labels<-sb_center1$ids
   sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
   sb_center1$values<-sb_center1$sum
   sb_center1<-sb_center1[,c("parents","ids","labels","values")]
   sb_center1<-as.data.frame(sb_center1)
-  
+
   sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
-  
+
   sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
-  
+
   #Customized Color Scheme
   library(colorspace)
   sb_center$colors<-1
   sb_center1$colors<-1
   sb$colors<-1
   sb_center<-sb_center[order(sb_center$values),]
-  
+
   for(color_i in 1:nrow(sb_center))
   {
     sel_id<-substr(sb_center$ids[color_i],1,4)
-    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)
     sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
     sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
   }
   sb_tmp<-rbind(sb_center,sb_center1,sb)
-  
-  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>% 
+
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>%
     layout(colorway  = ~colors,title =sb_title)%>%
     layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-  
-  
+
+
   plist<-list("p"=p,"sel"=sb)
-  
+
   return(plist)
-  
+
 }
 
 allocTree2<-function(sb,sb_title="")
@@ -1387,45 +1387,45 @@ allocTree2<-function(sb,sb_title="")
   sb_center$values<-sb_center$sum
   sb_center<-sb_center[,c("parents","ids","labels","values")]
   sb_center<-as.data.frame(sb_center)
-  
+
   sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
   sb_center1$labels<-sb_center1$ids
   sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
   sb_center1$values<-sb_center1$sum
   sb_center1<-sb_center1[,c("parents","ids","labels","values")]
   sb_center1<-as.data.frame(sb_center1)
-  
+
   sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
-  
+
   sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
   sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
-  
+
   #Customized Color Scheme
   library(colorspace)
   sb_center$colors<-1
   sb_center1$colors<-1
   sb$colors<-1
   sb_center<-sb_center[order(sb_center$values),]
-  
+
   for(color_i in 1:nrow(sb_center))
   {
     sel_id<-substr(sb_center$ids[color_i],1,4)
-    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)
     sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
     sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
   }
   sb_tmp<-rbind(sb_center,sb_center1,sb)
-  
-  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2),branchvalues="total", type = 'treemap')%>% 
+
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2),branchvalues="total", type = 'treemap')%>%
     layout(colorway  = ~colors,title =sb_title)%>%
     layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-  
-  
+
+
   plist<-list("p"=p,"sel"=sb)
-  
+
   return(plist)
-  
+
 }
 
 
