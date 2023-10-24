@@ -8,6 +8,7 @@ library(ggplot2)
 #FXallocBar(da)
 #allocBar(da)
 
+
 #Export table without quotes
 noQuoteCSV<-function(pf,path)
 {
