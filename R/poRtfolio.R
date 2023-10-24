@@ -1173,7 +1173,7 @@ ggReg<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",markersize=
   library(ggplot2)
   names(df)<-c("assetx","assety")
   
-  cols <- setNames(c(col_aq2[1]), c(name1))
+  cols <- setNames(c(col_aq2[1]), c("Regression"))
   
   p<-
     ggplot(df, aes(x=df$assetx, y=df$assety))
@@ -1205,4 +1205,227 @@ ggReg<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",markersize=
   print(summary(reg))
   return(plist)  
 }
+
+
+
+
+allocSun2<-function(sb,sb_title="")
+{
+  library(scales)
+  library(colorspace)
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+  names(sb)<-c("parents","ids","labels","values")
+  sb_center<-sb %>%group_by(parents) %>%summarise(sum = sum(values))
+  sb_center$ids<-sb_center$parents
+  sb_center$labels<-sb_center$parents
+  sb_center$parents<-""
+  sb_center$values<-sb_center$sum
+  sb_center<-sb_center[,c("parents","ids","labels","values")]
+  sb_center<-as.data.frame(sb_center)
+  
+  sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
+  sb_center1$labels<-sb_center1$ids
+  sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
+  sb_center1$values<-sb_center1$sum
+  sb_center1<-sb_center1[,c("parents","ids","labels","values")]
+  sb_center1<-as.data.frame(sb_center1)
+  
+  sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
+  
+  sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
+  
+  #Customized Color Scheme
+  library(colorspace)
+  sb_center$colors<-1
+  sb_center1$colors<-1
+  sb$colors<-1
+  sb_center<-sb_center[order(sb_center$values),]
+  
+  for(color_i in 1:nrow(sb_center))
+  {
+    sel_id<-substr(sb_center$ids[color_i],1,4)
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
+    sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
+  }
+  sb_tmp<-rbind(sb_center,sb_center1,sb)
+  
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>% 
+    layout(colorway  = ~colors,title =sb_title)%>%
+    layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))%>%
+    layout(title = list(text = chart_title, y = 1)
+  
+  
+  plist<-list("p"=p,"sel"=sb)
+  
+  return(plist)
+  
+}
+
+allocTree2<-function(sb,sb_title="Allocation Tree")
+{
+  library(scales)
+  library(colorspace)
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+  names(sb)<-c("parents","ids","labels","values")
+  sb_center<-sb %>%group_by(parents) %>%summarise(sum = sum(values))
+  sb_center$ids<-sb_center$parents
+  sb_center$labels<-sb_center$parents
+  sb_center$parents<-""
+  sb_center$values<-sb_center$sum
+  sb_center<-sb_center[,c("parents","ids","labels","values")]
+  sb_center<-as.data.frame(sb_center)
+  
+  sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
+  sb_center1$labels<-sb_center1$ids
+  sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
+  sb_center1$values<-sb_center1$sum
+  sb_center1<-sb_center1[,c("parents","ids","labels","values")]
+  sb_center1<-as.data.frame(sb_center1)
+  
+  sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
+  
+  sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
+  
+  #Customized Color Scheme
+  library(colorspace)
+  sb_center$colors<-1
+  sb_center1$colors<-1
+  sb$colors<-1
+  sb_center<-sb_center[order(sb_center$values),]
+  
+  for(color_i in 1:nrow(sb_center))
+  {
+    sel_id<-substr(sb_center$ids[color_i],1,4)
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
+    sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
+  }
+  sb_tmp<-rbind(sb_center,sb_center1,sb)
+  
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2),branchvalues="total", type = 'treemap')%>% 
+    layout(colorway  = ~colors,title =sb_title)%>%
+    layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  
+  
+  plist<-list("p"=p,"sel"=sb)
+  
+  return(plist)
+  
+}
+
+
+allocSun2<-function(sb,sb_title="")
+{
+  library(scales)
+  library(colorspace)
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+  names(sb)<-c("parents","ids","labels","values")
+  sb_center<-sb %>%group_by(parents) %>%summarise(sum = sum(values))
+  sb_center$ids<-sb_center$parents
+  sb_center$labels<-sb_center$parents
+  sb_center$parents<-""
+  sb_center$values<-sb_center$sum
+  sb_center<-sb_center[,c("parents","ids","labels","values")]
+  sb_center<-as.data.frame(sb_center)
+  
+  sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
+  sb_center1$labels<-sb_center1$ids
+  sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
+  sb_center1$values<-sb_center1$sum
+  sb_center1<-sb_center1[,c("parents","ids","labels","values")]
+  sb_center1<-as.data.frame(sb_center1)
+  
+  sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
+  
+  sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
+  
+  #Customized Color Scheme
+  library(colorspace)
+  sb_center$colors<-1
+  sb_center1$colors<-1
+  sb$colors<-1
+  sb_center<-sb_center[order(sb_center$values),]
+  
+  for(color_i in 1:nrow(sb_center))
+  {
+    sel_id<-substr(sb_center$ids[color_i],1,4)
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
+    sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
+  }
+  sb_tmp<-rbind(sb_center,sb_center1,sb)
+  
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2), type = 'sunburst')%>% 
+    layout(colorway  = ~colors,title =sb_title)%>%
+    layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  
+  
+  plist<-list("p"=p,"sel"=sb)
+  
+  return(plist)
+  
+}
+
+allocTree2<-function(sb,sb_title="")
+{
+  library(scales)
+  library(colorspace)
+  col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+  names(sb)<-c("parents","ids","labels","values")
+  sb_center<-sb %>%group_by(parents) %>%summarise(sum = sum(values))
+  sb_center$ids<-sb_center$parents
+  sb_center$labels<-sb_center$parents
+  sb_center$parents<-""
+  sb_center$values<-sb_center$sum
+  sb_center<-sb_center[,c("parents","ids","labels","values")]
+  sb_center<-as.data.frame(sb_center)
+  
+  sb_center1<-sb %>%group_by(parents,ids) %>%summarise(sum = sum(values))
+  sb_center1$labels<-sb_center1$ids
+  sb_center1$ids<-paste(sb_center1$parents,sb_center1$ids,sep=" - ")
+  sb_center1$values<-sb_center1$sum
+  sb_center1<-sb_center1[,c("parents","ids","labels","values")]
+  sb_center1<-as.data.frame(sb_center1)
+  
+  sb$labels<-ifelse(is.na(sb$labels),"All Sectors",sb$labels)
+  
+  sb$parents<-paste(sb$parents,sb$ids,sep=" - ")
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",sb$ids,sb$labels)
+  sb$ids<-ifelse(sb$parents==sb$ids& sb$parents!="",paste(sb$parents,sb$labels,sep=" - "),sb$ids)
+  
+  #Customized Color Scheme
+  library(colorspace)
+  sb_center$colors<-1
+  sb_center1$colors<-1
+  sb$colors<-1
+  sb_center<-sb_center[order(sb_center$values),]
+  
+  for(color_i in 1:nrow(sb_center))
+  {
+    sel_id<-substr(sb_center$ids[color_i],1,4)
+    sb_center$colors<-ifelse(substr(sb_center$ids,1,4)==sel_id,col_aq2[color_i],sb_center$colors)  
+    sb_center1$colors<-ifelse(substr(sb_center1$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.1,method="relative"),sb_center1$colors)
+    sb$colors<-ifelse(substr(sb$parents,1,4)==sel_id,lighten(col_aq2[color_i],amount=0.2,method="relative"),sb$colors)
+  }
+  sb_tmp<-rbind(sb_center,sb_center1,sb)
+  
+  p <- plot_ly(sb_tmp, ids = ~ids, labels = ~factor(labels), parents = ~parents,values=~round(100*values,2),branchvalues="total", type = 'treemap')%>% 
+    layout(colorway  = ~colors,title =sb_title)%>%
+    layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  
+  
+  plist<-list("p"=p,"sel"=sb)
+  
+  return(plist)
+  
+}
+
+
 

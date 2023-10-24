@@ -25,6 +25,7 @@ ggRec<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color=
 
   fredr_set_key(fredr_key)
 
+  
   #st_date<-as.Date("2000-12-31")
   #ed_date<-as.Date(Sys.Date())
   #shade_color<-"darkgray"
