@@ -194,7 +194,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 }
 
 
-allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14,plotly=T)
+allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14,plotly=T,rotation_angle=90)
 {
 
   if (!require("scales")) install.packages("scales")
@@ -217,7 +217,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
 
   if(plotly==T)
   {
-    p <- plot_ly(df, labels = ~assets, values = ~weights, type = 'pie',showlegend = FALSE,
+    p <- plot_ly(df, labels = ~assets, values = ~weights, type = 'pie',showlegend = FALSE, rotation = rotation_angle,
                  textposition = 'outside',textinfo = 'text',
                  hoverinfo = 'text',source = "subset",
                  text=~paste(sub(" ","<br>",df$assets),":","<br>",paste0(round(df$weights,2)*100,"%") ),
@@ -1506,4 +1506,40 @@ allocTree2<-function(sb,sb_title="")
 }
 
 
-
+gaugeR<-function(value=6,min=0,max=10,text="Score",chart_export_width_uploader,chart_export_height_uploader)
+{
+  col_aq_esg<-as.character(c("#dd0400","#D1E2EC","#5777a7","#04103b"))
+  stepsize<-10
+  cols_esg = colorRampPalette(col_aq_esg)(stepsize)
+  #show_col(cols_esg)
+  fig <-
+    plot_ly(
+      domain = list(x = c(0, 1), y = c(0, 1)),
+      value = value,
+      title = list(text = text),
+      type = "indicator",
+      mode = "gauge+number",
+      gauge = list(
+        bar = list(color = "#04103b"),
+        axis =list(range = list(min, max)),
+        steps = list(
+          list(range = c(min, (max/stepsize)), color = cols_esg[1]),
+          list(range = c((max/stepsize)*1, (max/stepsize)*2), color = cols_esg[2]),
+          list(range = c((max/stepsize)*2, (max/stepsize)*3), color = cols_esg[3]),
+          list(range = c((max/stepsize)*3, (max/stepsize)*4), color = cols_esg[4]),
+          list(range = c((max/stepsize)*4, (max/stepsize)*5), color = cols_esg[5]),
+          list(range = c((max/stepsize)*5, (max/stepsize)*6), color = cols_esg[6]),
+          list(range = c((max/stepsize)*6, (max/stepsize)*7), color = cols_esg[7]),
+          list(range = c((max/stepsize)*7, (max/stepsize)*8), color = cols_esg[8]),
+          list(range = c((max/stepsize)*8, (max/stepsize)*9), color = cols_esg[9]),
+          list(range = c((max/stepsize)*9, (max/stepsize)*10), color = cols_esg[10])
+        ),
+        threshold = list(
+          line = list(color = "#f4f4f4", width = 3),thickness = 1,value = value)
+      )
+    )
+  fig <- fig %>%
+    layout(margin = list(l=20,r=30))
+  fig <- fig %>% config(toImageButtonOptions = list( format = "svg",filename = "gauge",width = chart_export_width_uploader,height = chart_export_height_uploader))
+  return(fig)
+}
