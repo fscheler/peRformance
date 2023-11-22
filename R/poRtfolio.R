@@ -1543,3 +1543,46 @@ gaugeR<-function(value=6,min=0,max=10,text="Score",chart_export_width_uploader,c
   fig <- fig %>% config(toImageButtonOptions = list( format = "svg",filename = "gauge",width = chart_export_width_uploader,height = chart_export_height_uploader))
   return(fig)
 }
+
+
+
+allocBarh<-function (da, chart_title = "Portfolio Allocation", chart_height = 400,
+                     chart_font_size = 11, chart_export_width = 600, chart_export_height = 450,
+                     m = list(r = 0, l = 0, b = 0, t = 50, par = 4), barcol = "#f9f9f9",
+                     barborder = "#3b5171")
+{
+
+
+  if (!require("dplyr"))
+    install.packages("dplyr")
+  if (!require("plotly"))
+    install.packages("plotly")
+  if (!require("lubridate"))
+    install.packages("lubridate")
+  library(dplyr)
+  library(plotly)
+  library(lubridate)
+  da <- as.data.frame(da)
+  da <- da[, 1:2]
+  names(da) <- c("assets", "weight")
+  da$weight <- as.numeric(da$weight)
+  col_aq2 <- as.character(c("#04103b", "#dd0400",
+                            "#3b5171"))
+  y_axis_caption <- ""
+  da <- da %>% group_by(assets) %>% summarize(weight = sum(as.numeric(weight)))
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight),  decreasing = T)])
+  p <- plot_ly(da, type = "bar", y = ~as.numeric(da$weight), textangle=0,
+               x = ~da$assets, text = ~paste0(" ", da$assets),
+               name = "Portfolio", height = chart_height, marker = list(color = barcol,
+                                                                        line = list(width = 0.5, color = barborder)), texttemplate = paste0("<b>",
+                                                                                                                                            round(as.numeric(da$weight),3)*100,"%", "</b>"), textfont = 20, textposition = "outside",
+               insidetextanchor = "start")
+  p <- p %>% layout(yaxis = list(showticklabels = FALSE))
+  p <- p %>% layout(margin = m, font = list(size = chart_font_size),
+                    title = chart_title, xaxis = list(title = y_axis_caption,tickangle=-45), yaxis = list(title = y_axis_caption),
+                    barmode = "group")
+  p <- p %>% config(toImageButtonOptions = list(format = "svg",
+                                                filename = "allocation_pie", width = chart_export_width,
+                                                height = chart_export_height))
+  return(p)
+}
