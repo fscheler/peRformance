@@ -160,11 +160,11 @@ allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart
 FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",legends=c("Gross","Net"),chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
 
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("reshape2")) install.packages("reshape2")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("reshape2")) install.packages("reshape2")
 
-  library(plotly)
-  library(reshape2)
+  #library(plotly)
+  #library(reshape2)
 
   da<-da[,1:3]
   names(da)<-c("assets","gross","net")
