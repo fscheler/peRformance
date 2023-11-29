@@ -18,9 +18,9 @@ noQuoteCSV<-function(pf,path)
 #NAV
 trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=400,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
-  if (!require("dplyr")) install.packages("dplyr")
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("lubridate")) install.packages("lubridate")
+  #if (!require("dplyr")) install.packages("dplyr")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("lubridate")) install.packages("lubridate")
 
   library(dplyr)
   library(plotly)
@@ -59,12 +59,12 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
 {
 
 
-  if (!require("dplyr"))
-    install.packages("dplyr")
-  if (!require("plotly"))
-    install.packages("plotly")
-  if (!require("lubridate"))
-    install.packages("lubridate")
+  #if (!require("dplyr"))
+  #  install.packages("dplyr")
+  #if (!require("plotly"))
+  #  install.packages("plotly")
+  #if (!require("lubridate"))
+  #  install.packages("lubridate")
   library(dplyr)
   library(plotly)
   library(lubridate)
@@ -125,9 +125,9 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
 
 allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart_font_size=11,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4),barcol="#f9f9f9",barborder="#3b5171")
 {
-  if (!require("dplyr")) install.packages("dplyr")
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("lubridate")) install.packages("lubridate")
+  #if (!require("dplyr")) install.packages("dplyr")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("lubridate")) install.packages("lubridate")
 
   library(dplyr)
   library(plotly)
@@ -163,8 +163,8 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
   #if (!require("plotly")) install.packages("plotly")
   #if (!require("reshape2")) install.packages("reshape2")
 
-  #library(plotly)
-  #library(reshape2)
+  library(plotly)
+  library(reshape2)
 
   da<-da[,1:3]
   names(da)<-c("assets","gross","net")
@@ -197,9 +197,9 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14,plotly=T,rotation_angle=90)
 {
 
-  if (!require("scales")) install.packages("scales")
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("dplyr")) install.packages("dplyr")
+  #if (!require("scales")) install.packages("scales")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("dplyr")) install.packages("dplyr")
 
   library(scales)
   library(plotly)
@@ -266,9 +266,9 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
 
 allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
 {
-  if (!require("scales")) install.packages("scales")
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("dplyr")) install.packages("dplyr")
+  #if (!require("scales")) install.packages("scales")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("dplyr")) install.packages("dplyr")
 
   library(scales)
   library(plotly)
@@ -329,13 +329,13 @@ allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_exp
 rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),source_text='Source: Created with the peRformance package')
 {
 
-  if (!require("data.table")) install.packages("data.table")
-  if (!require("dplyr")) install.packages("dplyr")
-  if (!require("ecm")) install.packages("ecm")
-  if (!require("lubridate")) install.packages("lubridate")
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("scales")) install.packages("scales")
-  if (!require("reshape2")) install.packages("reshape2")
+  #if (!require("data.table")) install.packages("data.table")
+  #if (!require("dplyr")) install.packages("dplyr")
+  #if (!require("ecm")) install.packages("ecm")
+  #if (!require("lubridate")) install.packages("lubridate")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("scales")) install.packages("scales")
+  #if (!require("reshape2")) install.packages("reshape2")
 
   library(data.table)
   library(dplyr)
@@ -424,11 +424,11 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',
 {
 
 
-  if (!require("purrr")) install.packages("data.table")
-  if (!require("PortfolioAnalytics")) install.packages("dplyr")
-  if (!require("ecm")) install.packages("ecm")
-  if (!require("plotly")) install.packages("lubridate")
-  if (!require("scales")) install.packages("scales")
+  #if (!require("purrr")) install.packages("data.table")
+  #if (!require("PortfolioAnalytics")) install.packages("dplyr")
+  #if (!require("ecm")) install.packages("ecm")
+  #if (!require("plotly")) install.packages("lubridate")
+  #if (!require("scales")) install.packages("scales")
 
   library(purrr)
   library(PortfolioAnalytics)
@@ -581,8 +581,8 @@ styleBox<-function(
     chart_export_height=150
 )
 {
-  if (!require("plotly")) install.packages("plotly")
-  if (!require("dplyr")) install.packages("dplyr")
+  #if (!require("plotly")) install.packages("plotly")
+  #if (!require("dplyr")) install.packages("dplyr")
 
   library(plotly)
   library(dplyr)
@@ -1553,12 +1553,12 @@ allocBarh<-function (da, chart_title = "Portfolio Allocation", chart_height = 40
 {
 
 
-  if (!require("dplyr"))
-    install.packages("dplyr")
-  if (!require("plotly"))
-    install.packages("plotly")
-  if (!require("lubridate"))
-    install.packages("lubridate")
+  #if (!require("dplyr"))
+  #  install.packages("dplyr")
+  #if (!require("plotly"))
+  #  install.packages("plotly")
+  #if (!require("lubridate"))
+  #  install.packages("lubridate")
   library(dplyr)
   library(plotly)
   library(lubridate)
