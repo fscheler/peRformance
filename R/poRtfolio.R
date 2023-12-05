@@ -1,6 +1,7 @@
 
 library(ggplot2)
 
+
 #assets<-c("EUR","USD","CHF","GBP","JPY")
 #gross<-c(0.3,0.4,0.1,0.05,0.15)
 #net<-c(0.45,0.4,0.1,0.05,0.00)
@@ -339,7 +340,7 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 
   library(data.table)
   library(dplyr)
-  library(ecm)
+  #library(ecm)
   library(lubridate)
   library(plotly)
   library(scales)
@@ -432,7 +433,7 @@ rrScatEff<-function(da,ret_format="returns",table_format='wide',
 
   library(purrr)
   library(PortfolioAnalytics)
-  library(ecm)
+  #library(ecm)
   library(plotly)
   library(scales)
 
