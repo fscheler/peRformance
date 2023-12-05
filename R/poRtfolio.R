@@ -340,7 +340,6 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 
   library(data.table)
   library(dplyr)
-  #library(ecm)
   library(lubridate)
   library(plotly)
   library(scales)
@@ -357,15 +356,15 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
   if(ret_format=="returns")
   {
     names(dl)<-c("date","variable","ret")
-    dl<-dl%>%group_by(variable)%>%mutate(idx=cumprod(1+ret))
+    dl<-dl%>%dplyr::group_by(variable)%>%dplyr::mutate(idx=cumprod(1+ret))
   }else{
     names(dl)<-c("date","variable","idx")
-    dl<-dl%>%group_by(variable)%>%mutate(ret=idx/lagpad(idx,k=1)-1)
+    dl<-dl%>%dplyr::group_by(variable)%>%dplyr::mutate(ret=idx/lagpad(idx,k=1)-1)
     dl$ret<-ifelse(is.na(dl$ret),0,dl$ret)
   }
 
   #dls <- dl %>% group_by(variable) %>%  do(tail(., n=1))
-  dls<-dl%>%group_by(variable)%>%summarise(sd=head(date,1),ld=tail(date,1),std=sd(ret),first=head(idx,1),last=tail(idx,1))
+  dls<-dl%>%dplyr::group_by(variable)%>%dplyr::summarise(sd=head(date,1),ld=tail(date,1),std=sd(ret),first=head(idx,1),last=tail(idx,1))
 
   dls$sd_ann<-dls$std*ann_factor^0.5
   dls$ret_ann<-(dls$last/dls$first)^(1/time_length(difftime(as.Date(dls$ld), as.Date(dls$sd)), "years"))-1
