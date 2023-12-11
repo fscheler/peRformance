@@ -69,13 +69,14 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
   library(dplyr)
   library(plotly)
   library(lubridate)
+  library(dplyr)
   da <- as.data.frame(da)
   da <- da[, 1:2]
   names(da) <- c("assets", "weight")
   da$weight <- as.numeric(da$weight)
   col_aq2 <- as.character(c("#04103b", "#dd0400", "#3b5171"))
   y_axis_caption <- ""
-  da <- da %>% group_by(assets) %>% summarize(weight = sum(as.numeric(weight)))
+  da <- da %>% dplyr::group_by(assets) %>% dplyr::summarize(weight = sum(as.numeric(weight)))
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight),
                                                                   decreasing = F)])
   p <- plot_ly(da, x = as.numeric(da$weight), y = da$assets,
