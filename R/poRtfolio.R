@@ -144,7 +144,7 @@ allocBar2<-function(da,chart_title="Portfolio Allocation",chart_height=400,chart
   y_axis_caption<-""
   #chart_font_size<-16
 
-  da<-da%>%group_by(assets)%>%summarize(weight=sum(as.numeric(weight)))
+  da<-da%>%dplyr::group_by(assets)%>%dplyr::summarize(weight=sum(as.numeric(weight)))
 
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight), decreasing = F)])
 
@@ -167,6 +167,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 
   library(plotly)
   library(reshape2)
+  library(dplyr)
 
   da<-da[,1:3]
   names(da)<-c("assets","gross","net")
@@ -176,7 +177,7 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
   y_axis_caption<-""
   #chart_font_size<-16
 
-  da<-da%>%group_by(assets)%>%summarize(gross=sum(as.numeric(gross)),net=sum(as.numeric(net)))
+  da<-da%>%dplyr::group_by(assets)%>%dplyr::summarize(gross=sum(as.numeric(gross)),net=sum(as.numeric(net)))
 
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$gross), decreasing = F)])
 
@@ -209,7 +210,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
   #library(grDevices)
 
   names(df)<-c("assets","weights")
-  df<-df%>%group_by(assets)%>%summarize(weights=sum(weights))
+  df<-df%>%dplyr::group_by(assets)%>%dplyr::summarize(weights=sum(weights))
   df$weights<-df$weights/sum(df$weights)
 
   col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
@@ -278,13 +279,13 @@ allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_exp
   #library(grDevices)
 
   names(df)<-c("assets","weights")
-  df<-df%>%group_by(assets)%>%summarize(weights=sum(weights))
+  df<-df%>%dplyr::group_by(assets)%>%dplyr::summarize(weights=sum(weights))
   df$weights<-df$weights/sum(df$weights)
 
   wmp<-df
   wmp$Parent_Label<-parent_label
 
-  regions<-wmp%>%group_by(assets)%>%summarize(sum= sum(weights,na.rm=T))
+  regions<-wmp%>%dplyr::group_by(assets)%>%dplyr::summarize(sum= sum(weights,na.rm=T))
 
     library(plotly)
 
@@ -1570,7 +1571,7 @@ allocBarh<-function (da, chart_title = "Portfolio Allocation", chart_height = 40
   col_aq2 <- as.character(c("#04103b", "#dd0400",
                             "#3b5171"))
   y_axis_caption <- ""
-  da <- da %>% group_by(assets) %>% summarize(weight = sum(as.numeric(weight)))
+  da <- da %>% dplyr::group_by(assets) %>% dplyr::summarize(weight = sum(as.numeric(weight)))
   da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight),  decreasing = T)])
   p <- plot_ly(da, type = "bar", y = ~as.numeric(da$weight), textangle=0,
                x = ~da$assets, text = ~paste0(" ", da$assets),
