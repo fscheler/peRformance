@@ -531,5 +531,6 @@ indexR<-function(df,normalization="index",first_value_adj=0)
   dates<-df[,1]
   values<-dfs
   dfr<-data.frame(dates,values,stringsAsFactors = F)
+  names(dfr)<-names(df)
   return(dfr)
 }
