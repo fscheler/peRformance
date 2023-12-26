@@ -580,7 +580,8 @@ styleBox<-function(
     chart_caption_2="Return",
     opacity_scale_factor=0.5,
     chart_export_width=500,
-    chart_export_height=150
+    chart_export_height=150,
+    bgcolors="#04103b"
 )
 {
   #if (!require("plotly")) install.packages("plotly")
@@ -680,7 +681,7 @@ styleBox<-function(
            )
 
     )
-  p<-p%>%layout(plot_bgcolor='white') %>% layout(paper_bgcolor='#252a4f')
+  p<-p%>%layout(plot_bgcolor='white') %>% layout(paper_bgcolor=bgcolors)
   p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "stylebox",width = chart_export_width,height = chart_export_height))
 
   return(p)
@@ -880,7 +881,7 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Po
 
 
 #Life Performance
-gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1,legend_rows=1)
+gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1,secaxisadd=0,legend_rows=1)
 {
   library(ggplot2)
   names(df)<-c("date","asset","benchmark")
@@ -896,7 +897,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
   }
   p<-p+
     geom_line(size=0.8,aes(y=df$asset,color=name1))+
-    geom_line(size=0.8,aes(y=df$benchmark/secaxis,color=name2))+
+    geom_line(size=0.8,aes(y=df$benchmark/secaxis-secaxisadd,color=name2))+
     scale_colour_manual(values = cols)+
     theme_aq_black(base_size=24)+
     #size 22 for overleaf
@@ -921,7 +922,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
       # Features of the first axis
       name = "",
       # Add a second axis and specify its features
-      sec.axis = sec_axis( trans=~.*secaxis, name="")
+      sec.axis = sec_axis( trans=~.*secaxis+secaxisadd*secaxis, name="")
     )
   }
 

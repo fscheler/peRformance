@@ -135,7 +135,7 @@ theme_aq_black<-
     #col_aq2<-as.character(c("#297EBF","#7D1206","#1e1e1e","#3b5171","#5777a7","#04103b","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
     col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
 
-    
+
     if(titlepos!="left")
     {
     theme_hc(base_size = base_size, base_family = base_family) %+replace%
@@ -158,7 +158,7 @@ theme_aq_black<-
         legend.background = element_rect(fill = "transparent",color = 'white'), # get rid of legend bg
         legend.box.background = element_rect(fill = "transparent",color="transparent")
       )
-    
+
     }else{
       theme(
         axis.text.x = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
@@ -169,7 +169,7 @@ theme_aq_black<-
         axis.title.y.right = element_text(color = col_aq2[3], size = base_size-1,family=font_type),
         plot.title = element_text(hjust=0,color=col_aq2[1], size=base_size+1, face="bold",family=font_type),
         legend.text = element_text(color = col_aq2[3], size = base_size,family=font_type),
-        
+
         plot.caption = element_text(hjust = 0.2), #Default is hjust=1
         plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
         plot.caption.position =  "plot", #NEW parameter
@@ -182,7 +182,7 @@ theme_aq_black<-
       )
     }
 
-    
+
   }
 
 theme_aq_black_default_font<-
@@ -461,4 +461,75 @@ scoreGauge<-function(score_value=30,min_value=0,max_value=100,chart_title="Econo
 
   return(fig)
 
+}
+
+
+indexR<-function(df,normalization="index",first_value_adj=0)
+{
+  lagpad<-function (x, k)
+  {
+    if (k > 0) {
+      return(c(rep(NA, k), x)[1:length(x)])
+    }
+    else {
+      return(c(x[(-k + 1):length(x)], rep(NA, -k)))
+    }
+  }
+
+  if(normalization=="index")
+  {
+    indexfunction<-function(x)
+    {
+      x<-x/head(x,1)
+    }
+  }
+  if(normalization=="1+cumprod")
+  {
+    indexfunction<-function(x)
+    {
+      x<-cumprod(1+x)
+    }
+  }
+  if(normalization=="cumprod")
+  {
+    indexfunction<-function(x)
+    {
+      x<-cumprod(x)
+    }
+  }
+
+  if(normalization=="returns")
+  {
+    indexfunction<-function(x)
+    {
+      x<-x/lagpad(x,k=1)-1
+    }
+  }
+  if(normalization=="1+returns")
+  {
+    indexfunction<-function(x)
+    {
+      x<-x/lagpad(x,k=1)
+    }
+  }
+  if(normalization=="ln")
+  {
+    indexfunction<-function(x)
+    {
+      x<-log(x/lagpad(x,k=1))
+    }
+  }
+
+
+  dfs<-df[,2:ncol(df)]
+  dfs<-as.data.frame(dfs)
+  dfs<-apply(dfs,2,indexfunction)
+  if(first_value_adj==0 & normalization %in% c("ln","returns"))
+  {
+    dfs[1,]<-0
+  }
+  dates<-df[,1]
+  values<-dfs
+  dfr<-data.frame(dates,values,stringsAsFactors = F)
+  return(dfr)
 }
