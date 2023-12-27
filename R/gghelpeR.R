@@ -504,14 +504,14 @@ indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualiza
       x<-(x/cummax(x))-1
     }
   }
-  if(normalization=="rundrawdown")
+  if(normalization=="rundrawdown" & !is.null(rolln))
   {
     indexfunction<-function(x)
     {
       x<-(x/runmax(x,k=rolln,align="right",endrule="NA"))
     }
   }
-  if(normalization=="rundrawdown-1")
+  if(normalization=="rundrawdown-1" & !is.null(rolln))
   {
     indexfunction<-function(x)
     {
@@ -567,7 +567,7 @@ indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualiza
       x<-log(x/lagpad(x,k=1))
     }
   }
-  if(normalization=="runsd")
+  if(normalization=="runsd" & !is.null(rolln)  & !is.null(annualization))
   {
     indexfunction<-function(x)
     {
