@@ -490,6 +490,20 @@ indexR<-function(df,normalization="index",first_value_adj=0)
       x<-(x/head(x,1))*100
     }
   }
+  if(normalization=="drawdown")
+  {
+    indexfunction<-function(x)
+    {
+      x<-(x/cummax(x))
+    }
+  }
+  if(normalization=="drawdown-1")
+  {
+    indexfunction<-function(x)
+    {
+      x<-(x/cummax(x))-1
+    }
+  }
   if(normalization=="index-1")
   {
     indexfunction<-function(x)
