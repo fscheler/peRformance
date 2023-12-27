@@ -483,6 +483,20 @@ indexR<-function(df,normalization="index",first_value_adj=0)
       x<-x/head(x,1)
     }
   }
+  if(normalization=="index*100")
+  {
+    indexfunction<-function(x)
+    {
+      x<-(x/head(x,1))*100
+    }
+  }
+  if(normalization=="index-1")
+  {
+    indexfunction<-function(x)
+    {
+      x<-x/head(x,1)-1
+    }
+  }
   if(normalization=="1+cumprod")
   {
     indexfunction<-function(x)
