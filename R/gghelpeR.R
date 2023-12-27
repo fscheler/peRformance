@@ -464,7 +464,7 @@ scoreGauge<-function(score_value=30,min_value=0,max_value=100,chart_title="Econo
 }
 
 
-indexR<-function(df,normalization="index",first_value_adj=0)
+indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualization=NULL)
 {
   lagpad<-function (x, k)
   {
@@ -504,6 +504,20 @@ indexR<-function(df,normalization="index",first_value_adj=0)
       x<-(x/cummax(x))-1
     }
   }
+  if(normalization=="rundrawdown")
+  {
+    indexfunction<-function(x)
+    {
+      x<-(x/runmax(x,k=rolln,align="right",endrule="NA"))
+    }
+  }
+  if(normalization=="rundrawdown-1")
+  {
+    indexfunction<-function(x)
+    {
+      x<-(x/runmax(x,k=rolln,align="right",endrule="NA"))-1
+    }
+  }
   if(normalization=="index-1")
   {
     indexfunction<-function(x)
@@ -525,7 +539,6 @@ indexR<-function(df,normalization="index",first_value_adj=0)
       x<-cumprod(x)
     }
   }
-
   if(normalization=="returns")
   {
     indexfunction<-function(x)
@@ -540,6 +553,13 @@ indexR<-function(df,normalization="index",first_value_adj=0)
       x<-x/lagpad(x,k=1)
     }
   }
+  if(normalization=="runreturns")
+  {
+    indexfunction<-function(x)
+    {
+      x<-x/lagpad(x,k=rolln)-1
+    }
+  }
   if(normalization=="ln")
   {
     indexfunction<-function(x)
@@ -547,11 +567,19 @@ indexR<-function(df,normalization="index",first_value_adj=0)
       x<-log(x/lagpad(x,k=1))
     }
   }
-
+  if(normalization=="runsd")
+  {
+    indexfunction<-function(x)
+    {
+      x<-x/lagpad(x,k=1)-1
+      x<-runsd(x,k=rolln,endrule = "NA",align="right")*annualization^0.5
+    }
+  }
 
   dfs<-df[,2:ncol(df)]
   dfs<-as.data.frame(dfs)
   dfs<-apply(dfs,2,indexfunction)
+
   if(first_value_adj==0 & normalization %in% c("ln","returns"))
   {
     dfs[1,]<-0
