@@ -56,7 +56,7 @@ trLine<-function(da,ret_format="returns",chart_title="Performance",chart_height=
 
 allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Optional",chart_height = 400,
                     chart_font_size = 11, chart_export_width = 600, chart_export_height = 450,
-                    m = list(r = 0, l = 0, b = 0, t = 50, par = 4),plotly=T,title_pos="center")
+                    m = list(r = 0, l = 0, b = 0, t = 50, par = 4),plotly=T,title_pos="center",perc=".0%")
 {
 
 
@@ -82,9 +82,10 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
   p <- plot_ly(da, x = as.numeric(da$weight), y = da$assets,
                height = chart_height, type = "bar", name = "Portfolio",
                marker = list(color = col_aq2[1]))
+
   p <- p %>% layout(margin = m, font = list(size = chart_font_size),
                     title = chart_title, xaxis = list(title = y_axis_caption,
-                                                      tickformat = ".0%"), yaxis = list(title = y_axis_caption),
+                                                      tickformat = perc), yaxis = list(title = y_axis_caption),
                     barmode = "group")
   p <- p %>% config(toImageButtonOptions = list(format = "svg",
                                                 filename = "allocation_pie", width = chart_export_width,
@@ -117,6 +118,10 @@ allocBar<-function (da, chart_title = "Portfolio Allocation", chart_subtitle="Op
         theme(plot.caption = element_text(hjust = 0.2), #Default is hjust=1
               plot.title.position = "plot", #NEW parameter. Apply for subtitle too.
               plot.caption.position =  "plot") #NEW parameter
+    }
+    if(perc==".0%")
+    {
+      p<-p+scale_x_continuous(labels = scales::percent_format(accuracy = 1))
     }
 
   }
