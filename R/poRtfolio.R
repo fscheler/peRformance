@@ -244,7 +244,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
       geom_bar(stat="identity", width=1, color="white") +
       coord_polar("y", start=0) +
       scale_fill_manual("",values=cols)+
-      theme_aq_black_pie(base_size = 14)+
+      theme_aq_black_pie(base_size = base_size)+
       theme(
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
