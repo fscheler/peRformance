@@ -590,3 +590,7 @@ indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualiza
   names(dfr)<-names(df)
   return(dfr)
 }
+
+
+
+'%ni%' <- function(x,y)!('%in%'(x,y))
