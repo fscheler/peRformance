@@ -598,7 +598,6 @@ indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualiza
 
 umbRuch<-function(x,l)
 {
-  x<-cons$InstrumentTypea
   repl<-paste0('(.{1,',l,'})(\\s|$)')
   x<-gsub(repl, '\\1\n', x)
   x<-ifelse(substr(x,nchar(x)-0,nchar(x))=="\n",substr(x,0,nchar(x)-1),x)
