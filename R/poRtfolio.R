@@ -1513,11 +1513,11 @@ allocTree2<-function(sb,sb_title="")
 
 }
 
-
-gaugeR<-function(value=6,min=0,max=10,text="Score",chart_export_width_uploader,chart_export_height_uploader)
+gaugeR<-function(value=6,min=0,max=10,text="Score",chart_export_width_uploader=200,chart_export_height_uploader=100,
+                 stepsize = 10,col_aq_esg = as.character(c("#dd0400", "#D1E2EC", "#5777a7", "#04103b")))
 {
-  col_aq_esg<-as.character(c("#dd0400","#D1E2EC","#5777a7","#04103b"))
-  stepsize<-10
+  #col_aq_esg<-as.character(c("#dd0400","#D1E2EC","#5777a7","#04103b"))
+  #stepsize<-10
   cols_esg = colorRampPalette(col_aq_esg)(stepsize)
   #show_col(cols_esg)
   fig <-
