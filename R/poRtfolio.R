@@ -1594,3 +1594,49 @@ allocBarh<-function (da, chart_title = "Portfolio Allocation", chart_height = 40
                                                 height = chart_export_height))
   return(p)
 }
+
+
+gggaugeR <- function(pos=10,caption="",title="",breaks=c(0,10,20,30,40,50,60,70,80,90,100)) {
+  require(ggplot2)
+
+  col_aq_esg = as.character(c("#04103b","#D1E2EC","#dd0400"))
+  cols<-colorRampPalette(col_aq_esg)(10)
+
+  get.poly <- function(a,b,r1=0.5,r2=1.0) {
+    th.start <- pi*(1-a/100)
+    th.end   <- pi*(1-b/100)
+    th       <- seq(th.start,th.end,length=100)
+    x        <- c(r1*cos(th),rev(r2*cos(th)))
+    y        <- c(r1*sin(th),rev(r2*sin(th)))
+    return(data.frame(x,y))
+  }
+  ggplot()+
+    geom_polygon(data=get.poly(breaks[1],breaks[2]),aes(x,y),fill=cols[1])+
+    geom_polygon(data=get.poly(breaks[2],breaks[3]),aes(x,y),fill=cols[2])+
+    geom_polygon(data=get.poly(breaks[3],breaks[4]),aes(x,y),fill=cols[3])+
+    geom_polygon(data=get.poly(breaks[4],breaks[5]),aes(x,y),fill=cols[4])+
+    geom_polygon(data=get.poly(breaks[5],breaks[6]),aes(x,y),fill=cols[5])+
+    geom_polygon(data=get.poly(breaks[6],breaks[7]),aes(x,y),fill=cols[6])+
+    geom_polygon(data=get.poly(breaks[7],breaks[8]),aes(x,y),fill=cols[7])+
+    geom_polygon(data=get.poly(breaks[8],breaks[9]),aes(x,y),fill=cols[8])+
+    geom_polygon(data=get.poly(breaks[9],breaks[10]),aes(x,y),fill=cols[9])+
+    geom_polygon(data=get.poly(breaks[10],breaks[11]),aes(x,y),fill=cols[10])+
+    geom_polygon(data=get.poly(pos-1,pos+1,0.2),aes(x,y))+
+    #geom_text(data=as.data.frame(breaks), size=5, fontface="bold", vjust=0,
+    #          aes(x=1.1*cos(pi*(1-breaks/100)),y=1.1*sin(pi*(1-breaks/100)),label=paste0(breaks,"%")))+
+    annotate("text",x=0,y=0.98,label=caption,vjust=0,size=5,fontface="bold")+
+    coord_fixed()+
+    theme_bw()+
+    theme(
+          axis.text=element_blank(),
+          axis.title=element_blank(),
+          axis.ticks=element_blank(),
+          panel.grid=element_blank(),
+          panel.border=element_blank())+
+    ggtitle(title)+
+    theme(plot.title = element_text(hjust = 0.5))
+
+}
+
+
+
