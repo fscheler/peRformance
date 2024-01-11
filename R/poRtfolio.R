@@ -1596,6 +1596,7 @@ allocBarh<-function (da, chart_title = "Portfolio Allocation", chart_height = 40
 }
 
 
+
 gggaugeR <- function(pos=10,caption="",title="",breaks=c(0,10,20,30,40,50,60,70,80,90,100)) {
   require(ggplot2)
 
