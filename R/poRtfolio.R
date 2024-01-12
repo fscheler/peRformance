@@ -272,7 +272,7 @@ allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_e
 }
 
 
-allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4))
+allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_export_height=450,m = list(l = 0,r = 0,b = 0,t = 0,pad = 4),col_aq2=as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400")))
 {
   #if (!require("scales")) install.packages("scales")
   #if (!require("plotly")) install.packages("plotly")
@@ -302,7 +302,7 @@ allocTree<-function(df,parent_label="Portfolio",chart_export_width=600,chart_exp
 
     #m<-list(r=0,l=0,b=0,t=0,par=4)
 
-    col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
+
     #col_aq2<-as.character(c("#04103b","#D1E2EC","#dd0400"))
     cols = colorRampPalette(col_aq2)(length(unique(regions$assets))-1)
     #show_col(cols)
