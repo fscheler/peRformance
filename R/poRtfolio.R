@@ -204,7 +204,28 @@ FXallocBar<-function(da,ret_format="returns",chart_title="Portfolio Allocation",
 
 allocPie<-function(df,chart_title='Portfolio',subtitle="Allocation in %",chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 50,t = 50,pad = 4),title_pos="center",legend_row=2,base_size = 14,plotly=T,rotation_angle=90)
 {
+  theme_aq_black_pie<-
+    function (base_size = 12, base_family = "",font_type="Calibri")
+    {
+      library(ggplot2)
+      library(ggthemes)
+      library(scales)
+      #col_aq2<-as.character(c("#297EBF","#7D1206","#1e1e1e","#3b5171","#5777a7","#04103b","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
+      col_aq2<-as.character(c("#04103b","#dd0400","#3b5171","#5777a7","#969696","#BDBDBD","#D9D9D9","#F0F0F0"))
 
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.title = element_text(hjust=0,color=col_aq2[1], size=base_size+1, face="bold"),
+        plot.caption = element_text(color = col_aq2[1], face = 'bold',hjust=1),
+        plot.subtitle = element_text(hjust=0,color=col_aq2[2], size=base_size-2),
+        legend.text = element_text(color = col_aq2[3], size = base_size)
+      )
+
+    }
   #if (!require("scales")) install.packages("scales")
   #if (!require("plotly")) install.packages("plotly")
   #if (!require("dplyr")) install.packages("dplyr")
