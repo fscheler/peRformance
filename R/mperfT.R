@@ -11,7 +11,9 @@
 mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="white",font_color="#04103b",
                       export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,bm_name="Benchmark",
                  rowOddColor="white",
-                 rowEvenColor="lightgrey"
+                 rowEvenColor="lightgrey",
+                 fontsize=10,
+                 cellsheight=18
                  )
 {
 
@@ -23,7 +25,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
       return (c(x[(-k+1) : length(x)], rep(NA, -k)));
     }
   }
-  
+
   if (!require("plotly")) install.packages("plotly")
   #if (!require("ecm")) install.packages("ecm")
   if (!require("caTools")) install.packages("caTools")
@@ -176,10 +178,10 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
       line = list(color = 'white'),
       fill = list(color = headerColor),
       #align = c(rep('left',3),rep('center',7)),
-      font = list(color = header_font, size = 7)
+      font = list(color = header_font, size = fontsize+1)
     ),
     cells = list(
-      height = 16,
+      height = cellsheight,
       values = rbind(
         ds$Year,
         ds$Jan,
@@ -200,7 +202,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
       line = list(color = 'white'),
       fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(ds$Year)/2+1))),
       align = c('center', 'center','center','center','center', 'center','center', 'center'),
-      font = list(color = c(font_color), size = 6)
+      font = list(color = c(font_color), size = fontsize)
       #font = list(color = list(list(c("red","green")),), size = 6.5),
 
     ))
@@ -267,10 +269,10 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
         line = list(color = 'white'),
         fill = list(color = headerColor),
         #align = c(rep('left',3),rep('center',7)),
-        font = list(color = "white", size = 7)
+        font = list(color = "white", size = fontsize+1)
       ),
       cells = list(
-        height = 16,
+        height = cellsheight,
         values = rbind(
           ds$Year,
           ds$Jan,
@@ -292,7 +294,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
         line = list(color = 'white'),
         fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(ds$Year)/2+1))),
         align = c('center', 'center','center','center','center', 'center','center', 'center'),
-        font = list(color = c(font_color), size = 6)
+        font = list(color = c(font_color), size = fontsize)
         #font = list(color = list(list(c("red","green")),), size = 6.5),
 
       ))
@@ -366,11 +368,13 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
                  export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,
                  rowOddColor="white",
                  rowEvenColor="lightgrey",
+                 fontsize=10,
+                 cellsheight=18,
                  orders=c("Year","Amadeus Very Defensive USD","Amadeus Defensive USD","Amadeus Balanced USD","Amadeus Dynamic USD","Amadeus Very Dynamic USD")
 )
 {
-  
-  
+
+
   lagpad <- function(x, k) {
     if (k>0) {
       return (c(rep(NA, k), x)[1 : length(x)] );
@@ -379,7 +383,7 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
       return (c(x[(-k+1) : length(x)], rep(NA, -k)));
     }
   }
-  
+
   if (!require("plotly")) install.packages("plotly")
   #if (!require("ecm")) install.packages("ecm")
   if (!require("caTools")) install.packages("caTools")
@@ -393,11 +397,11 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
   options(warn = -1)
 
 
-  
+
   if(ts_format=="index")
   {
     names(df)<-c("id","date","nav")
-    df<-df%>%group_by(id)%>%mutate(ret=nav/lagpad(nav,k=1)-1)    
+    df<-df%>%group_by(id)%>%mutate(ret=nav/lagpad(nav,k=1)-1)
   }else{
     names(df)<-c("id","date","ret")
   }
@@ -407,21 +411,21 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
   df<-df%>%group_by(id,Year)%>%mutate(aret=cumprod(1+ret))
   df<-df%>%group_by(id,Year)%>%summarise(aret=tail(aret,1)-1)
   dw<-dcast(df,Year~id,value.var="aret")
-  
+
   formating<-function(x)
   {
     x<-paste0(round(as.numeric(x)*100,rounding),"%")
   }
-  
-  
+
+
   #orders<-c("Year","Amadeus Very Defensive USD","Amadeus Defensive USD","Amadeus Balanced USD","Amadeus Dynamic USD","Amadeus Very Dynamic USD")
   dw<-dw[,c(orders)]
-  
+
   dv<-cbind(dw$Year,apply(dw[,2:ncol(dw)],2,formating))
   names(dv)<-orders
   headerColor<-header_color
 
-    
+
     fig <- plot_ly(
       #height=chart_height,
       type = 'table',
@@ -431,27 +435,27 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
         line = list(color = 'white'),
         fill = list(color = headerColor),
         #align = c(rep('left',3),rep('center',7)),
-        font = list(color = header_font, size = 7)
+        font = list(color = header_font, size = fontsize+1)
       ),
       cells = list(
-        height = 16,
+        height = cellsheight,
         values = t(dv),
         line = list(color = 'white'),
         fill = list(color = list(rep(c(rowOddColor,rowEvenColor),length(dw$Year)/2+1))),
         align = c('center', 'center','center','center','center', 'center','center', 'center'),
-        font = list(color = c(font_color), size = 6)
+        font = list(color = c(font_color), size = fontsize)
         #font = list(color = list(list(c("red","green")),), size = 6.5),
-        
+
       ))
 
-  
+
   m<-list(r=0,b=0,t=0,l=0,par=4)
   fig<-fig%>%layout(margin=m)
   fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "annual_returns_table",width = chart_export_width,height = chart_export_height))
-  
+
 
   fig_list<-list("fig"=fig)
-  
+
 }
 
 
@@ -471,7 +475,7 @@ createValueBoxes <- function(df, h = 4, w = 6, padding=0.5, rows = 2,colsel){
       deparse(substitute(df)),
       paste(columns[!i], collapse=", ")))
   }
-  
+
   boxes = nrow(df) # number of items passed
   # calculate the grid
   cols = boxes/rows
@@ -506,4 +510,4 @@ createValueBoxes <- function(df, h = 4, w = 6, padding=0.5, rows = 2,colsel){
     theme_void() +
     guides(fill = FALSE)
   return(p)
-} 
+}
