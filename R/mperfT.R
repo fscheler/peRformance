@@ -12,7 +12,7 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
                       export_format="svg",chart_export_width=800,chart_export_height=400,print_output=T,bm_name="Benchmark",
                  rowOddColor="white",
                  rowEvenColor="lightgrey",
-                 fontsize=10,
+                 fontsize=6,
                  cellsheight=18
                  )
 {

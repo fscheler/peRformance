@@ -1663,3 +1663,136 @@ gggaugeR <- function(pos=10,caption="",title="",breaks=c(0,10,20,30,40,50,60,70,
 
 
 
+#Stylebox
+#------------------------------------------------------------------------------------------------------------------------------------------------------------
+styleBox2<-function(
+    number_categories_horizontal=5,
+    number_categories_vertical=5,
+    highlight_category=4,
+    main_color="#5777a7",
+    highlight_color="#dd0400",
+    font_color="#04103b",
+    chart_font_size=14,
+    chart_caption_1="Risk Category",
+    chart_caption_2="Return Category",
+    chart_caption_center="Not Available/Not Applicable",
+    opacity_scale_factor=0.5,
+    custom_width=300,
+    custom_height=180,
+    dups=""
+)
+{
+
+  library(plotly)
+  library(dplyr)
+
+  number_categories<-number_categories_horizontal*number_categories_vertical
+  if(highlight_category>number_categories)
+  { highlight_category<-number_categories }
+
+  cols<-rep(main_color,number_categories)
+  cols[highlight_category]<-highlight_color
+
+
+
+  st_list<-list(
+    "fillcolor" = cols[1],
+    "line" = list("color"="rgb(0,0,0)", "width"=2),
+    "opacity" = (1/number_categories*1),
+    "type" = "rect",
+    "x0" = 0,
+    "x1" = (1/number_categories*1),
+    "xref" = "paper",
+    "y0" = 0,
+    "y1" = (1/number_categories*1),
+    "yref" = "paper"
+  )
+
+if(dups=="")
+{
+  dups<-""
+}else{
+  dups <- list(st_list)[rep(1,number_categories)]
+  for(i in 1:number_categories_horizontal)
+  {
+    for(j in 1:number_categories_vertical)
+    {
+      dups[[i+(j-1)*number_categories_horizontal]]$fillcolor<-cols[i+(j-1)*number_categories_horizontal]
+      dups[[i+(j-1)*number_categories_horizontal]]$x0<-(1/number_categories_horizontal)*(i-1)
+      dups[[i+(j-1)*number_categories_horizontal]]$x1<-(1/number_categories_horizontal)*(i)
+      dups[[i+(j-1)*number_categories_horizontal]]$y0<-(1/number_categories_vertical)*(j-1)
+      dups[[i+(j-1)*number_categories_horizontal]]$y1<-(1/number_categories_vertical)*(j)
+      dups[[i+(j-1)*number_categories_horizontal]]$opacity<-1/(number_categories_horizontal-i+number_categories_vertical-j)^opacity_scale_factor
+    }
+  }
+}
+
+
+
+  stock_style_graph <- plot_ly(x = list("1"), y = list("1"), hoverinfo = "none",
+                               marker = list("opacity" = 0), mode = "markers", name = "B", type = "scatter",
+                               width = custom_width,
+                               height = custom_height) %>%
+    layout(title = "",
+           annotations = list(
+             list(
+               "x" = 0.990130093458,
+               "y" = 1.00181709504,
+               "align" = "left",
+               "font" = list("size" = chart_font_size,color=font_color),
+               "showarrow" = FALSE,
+               "text" = paste0("<b>",chart_caption_1,"</b>"),
+               "xref" = "x",
+               "yref" = "y"
+             ),
+             list(
+               "x" = 0.989694747864+(1.00064057995-0.989694747864)/2,
+               "y" = 0.5,
+               "align" = "left",
+               "font" = list("size" = chart_font_size,color=font_color),
+               "showarrow" = FALSE,
+               "text" = paste0(chart_caption_center),
+               "xref" = "x",
+               "yref" = "y"
+             ),
+             list(
+               "x"= 1.00001816013,
+               "y"= 1.35907755794e-16,
+               "font" = list("size" = chart_font_size,color=font_color),
+               "showarrow" = FALSE,
+               "text" = paste0("<b>",chart_caption_2,"</b>"),
+               "xref" = "x",
+               "yref" = "y"
+             )
+           ),
+
+           hovermode = "closest",
+           margin = list("r" = 30, "t" = 20, "b" = 0, "l" = 30),
+
+
+           shapes = dups,
+           xaxis = list(
+             "autorange" = TRUE,
+             "range" = list(0.989694747864, 1.00064057995),
+             "showgrid" = FALSE,
+             "showline" = FALSE,
+             "showticklabels" = FALSE,
+             "title"  = "<br>",
+             "type" = "linear",
+             "zeroline" = FALSE
+           ),
+           yaxis = list(
+             "autorange" = TRUE,
+             "range" = list(-0.0358637178721, 1.06395696354),
+             "showgrid" = FALSE,
+             "showline" = FALSE,
+             "showticklabels" = FALSE,
+             "title"  = "<br>",
+             "type" = "linear",
+             "zeroline" = FALSE
+           )
+
+    )
+  return(stock_style_graph)
+
+}
