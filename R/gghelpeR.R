@@ -466,6 +466,7 @@ scoreGauge<-function(score_value=30,min_value=0,max_value=100,chart_title="Econo
 
 indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualization=NULL)
 {
+  library(caTools)
   lagpad<-function (x, k)
   {
     if (k > 0) {
