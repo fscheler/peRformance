@@ -25,7 +25,7 @@ ggRec<-function(st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_color=
 
   fredr_set_key(fredr_key)
 
-  
+
   #st_date<-as.Date("2000-12-31")
   #ed_date<-as.Date(Sys.Date())
   #shade_color<-"darkgray"
@@ -59,10 +59,10 @@ plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_
 {
   #if (!require("fredr")) install.packages("fredr")
   #if (!require("plotly")) install.packages("plotly")
-  
+
   library(fredr)
   library(ggplot2)
-  
+
   fredr_set_key(fredr_key)
 
   recession<-fredr(series_id = "USRECD",observation_start = as.Date(st_date),observation_end = as.Date(ed_date))
@@ -81,7 +81,7 @@ plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_
     p<-p%>%
       add_trace(x=~recession$date,y=~recession$value,type="scatter",alpha = 1,mode="none", opacity=1, stackgroup = 'one',showlegend = FALSE, yaxis = "y2",line=list(width = 0.1,color=shade_color),marker = list(size = 0.1,color = shade_color))%>%
       layout(yaxis2 = Noax)
-    
+
     return(p)
   }
 }
@@ -91,7 +91,7 @@ plotlyRec<-function(p,st_date="2007-01-01",ed_date="2015-01-01",fredr_key,shade_
 #----------------------------------------------------------------------------------------------------------------------------
 ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey",threshold=0.1,mode="cummax",days=252)
 {
-  
+
   library(fredr)
   library(ggplot2)
   library(dplyr)
@@ -99,36 +99,36 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey"
   library(caTools)
   library(zoo)
   library(data.table)
-  
+
   mb <- mb[, 1:2]
   names(mb) <- c("date", "PX_LAST")
   mb$date<-as.Date(mb$date)
   mb <- mb[mb$date > st_date & mb$date < ed_date, ]
   if(mode == "runmax") {
-    mb$max_drawdown <- mb$PX_LAST/runmax(mb$PX_LAST, days, 
+    mb$max_drawdown <- mb$PX_LAST/runmax(mb$PX_LAST, days,
                                          align = "right") - 1
   }else {
     mb$max_drawdown <- mb$PX_LAST/cummax(mb$PX_LAST) - 1
   }
   mb$dddummy <- ifelse(mb$max_drawdown < 0, 1, 0)
-  mb$ddcount <- ifelse(mb$dddummy == 1 & lagpad(mb$dddummy, 
+  mb$ddcount <- ifelse(mb$dddummy == 1 & lagpad(mb$dddummy,
                                                 k = 1) == 0, 1, 0)
   mb$ddcount[1] <- 0
   mb$dds <- cumsum(mb$ddcount)
   mb$dds <- ifelse(mb$dddummy == 0, 0, mb$dds)
   mb <- mb %>% group_by(dds) %>% mutate(through = min(max_drawdown))
   mb$dd10 <- ifelse(mb$through < (-threshold), 1, 0)
-  mb$regime <- ifelse(mb$dddummy == 1 & mb$max_drawdown == 
+  mb$regime <- ifelse(mb$dddummy == 1 & mb$max_drawdown ==
                         mb$through, "recovery", NA)
-  mb$regime <- ifelse(mb$dddummy == 1 & lagpad(mb$dddummy, 
+  mb$regime <- ifelse(mb$dddummy == 1 & lagpad(mb$dddummy,
                                                k = 1) == 0, "bear", mb$regime)
-  mb <- mb %>% group_by(dds) %>% mutate(regime = na.locf(regime, 
+  mb <- mb %>% group_by(dds) %>% mutate(regime = na.locf(regime,
                                                          na.rm = F))
-  mb$dd10_bear <- ifelse(mb$through < (-threshold) & mb$regime == 
+  mb$dd10_bear <- ifelse(mb$through < (-threshold) & mb$regime ==
                            "bear", 1, 0)
-  mb$bear_start <- ifelse(mb$dd10_bear == 1 & lagpad(mb$dd10_bear, 
+  mb$bear_start <- ifelse(mb$dd10_bear == 1 & lagpad(mb$dd10_bear,
                                                      k = 1) == 0, 1, NA)
-  mb$bear_end <- ifelse(mb$dd10_bear == 0 & lagpad(mb$dd10_bear, 
+  mb$bear_end <- ifelse(mb$dd10_bear == 0 & lagpad(mb$dd10_bear,
                                                    k = 1) == 1, 1, NA)
   mb <- as.data.table(mb)
   bear_starts <- (mb[mb$bear_start == 1, ]$date)
@@ -149,16 +149,16 @@ ggBear<-function(mb,st_date="2001-01-01",ed_date="2020-05-01",shade_color="grey"
   recs$recession.end <- as.Date(recs$recession.end,origin="1970-01-01")
 
   print(recs)
-  
-    rec_shade <- geom_rect(data = recs, inherit.aes = F, 
-                           aes(xmin = recession.start, xmax = recession.end, 
-                               ymin = -Inf, ymax = +Inf), fill = shade_color, 
+
+    rec_shade <- geom_rect(data = recs, inherit.aes = F,
+                           aes(xmin = recession.start, xmax = recession.end,
+                               ymin = -Inf, ymax = +Inf), fill = shade_color,
                            alpha = 0.5)
     rec_shade <- list("bear_shade" = rec_shade, "mb" = mb)
-  
+
   return(rec_shade)
-  
-  
+
+
 }
 
 
@@ -171,10 +171,10 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   library(caTools)
   library(zoo)
   library(data.table)
-  
+
   mb<-mb[,1:2]
   names(mb)<-c("date","PX_LAST")
-  
+
   Noax <- list(
     title = "",
     zeroline = FALSE,
@@ -186,35 +186,35 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
     range=c(0,1),
     layer="below"
   )
-  
+
   mb<-mb[mb$date>st_date & mb$date<ed_date,]
-  
+
   if(mode=="runmax")
   {
     mb$max_drawdown<-mb$PX_LAST/runmax(mb$PX_LAST,days,align="right")-1
   }else{
     mb$max_drawdown<-mb$PX_LAST/cummax(mb$PX_LAST)-1
   }
-  
+
   mb$dddummy<-ifelse(mb$max_drawdown<0,1,0)
   mb$ddcount<-ifelse(mb$dddummy==1 & lagpad(mb$dddummy,k=1)==0,1,0)
   mb$ddcount[1]<-0
   mb$dds<-cumsum(mb$ddcount)
   mb$dds<-ifelse(mb$dddummy==0,0,mb$dds)
-  
+
   mb<-mb %>% group_by(dds) %>% mutate(through=min(max_drawdown))
-  
+
   mb$dd10<-ifelse(mb$through<(-threshold),1,0)
   mb$regime<-ifelse(mb$dddummy==1 & mb$max_drawdown==mb$through,"recovery",NA)
   mb$regime<-ifelse(mb$dddummy==1 & lagpad(mb$dddummy,k=1)==0,"bear",mb$regime)
   mb<-mb%>%group_by(dds)%>%mutate(regime=na.locf(regime,na.rm=F))
   mb$dd10_bear<-ifelse(mb$through<(-threshold) & mb$regime=="bear",1,0)
-  
+
 
   mb$bear_start<-ifelse(mb$dd10_bear==1 & lagpad(mb$dd10_bear,k=1)==0,1,NA)
   mb$bear_end<-ifelse(mb$dd10_bear==0 & lagpad(mb$dd10_bear,k=1)==1,1,NA)
   mb<-as.data.table(mb)
-  
+
   bear_starts <- (mb[mb$bear_start == 1, ]$date)
   bear_ends <- (mb[mb$bear_end == 1, ]$date)
   if (length(bear_starts) > length(bear_ends)) {
@@ -228,8 +228,8 @@ plotlyBear<-function(p,mb,st_date="2001-01-01",ed_date="2023-01-01",shade_color=
   names(recs) <- c("recession.start", "recession.end")
   recs$recession.start <- as.Date(recs$recession.start,origin="1970-01-01")
   recs$recession.end <- as.Date(recs$recession.end,origin="1970-01-01")
-  
-  
+
+
   if(nrow(recs)>0)
   {
     p<-p%>%
@@ -245,7 +245,7 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
 {
   if(!is.null(fredr_key))
   {
-    
+
 
   #install.packages("fredr")
   library(fredr)
@@ -253,20 +253,20 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
   library(xts)
   library(plotly)
   library(ggplot2)
-  #library(ecm) 
-    
-  
+  #library(ecm)
+
+
   #Sys.getenv('FRED_API_KEY')
   fredr_set_key(fredr_key)
-  
+
 
   de<-
     fredr(
       series_id = mnemonic,
       observation_start = as.Date(observation_start_dt)
     )
-  
-  
+
+
 
   #p<-plot_ly(de,x=~as.Date(date),y=~value,type='scatter',mode='lines+markers')
   de<-na.locf(de)
@@ -278,7 +278,7 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
     ggplot(data=de,aes(x=as.Date(date), y=value))
   if(recession_shading=="TRUE")
   {
-    p<-p+    
+    p<-p+
       ggRec(as.Date(min(de$date)),as.Date(Sys.Date()),fredr_key=fredr_key)
   }
   p<-p+
@@ -296,15 +296,15 @@ ggFRED<-function(mnemonic="T10YIE",chart_name="10 Year Treasury",subtitle="Yield
     #ylim(45,55)+
     theme(plot.margin=margin(5,5,5,5))
   p
-  
+
   if(target_path!="")
   {
     ggsave(paste0(target_path,save_name,".png"),plot = p,width=chart_width,height=chart_height)
-    ggsave(paste0(target_path,save_name,".svg"),plot = p,width=chart_width,height=chart_height)    
+    ggsave(paste0(target_path,save_name,".svg"),plot = p,width=chart_width,height=chart_height)
   }
 
   return(p)
-  
+
   }else{
     print("Missing API Key")
   }
@@ -319,16 +319,16 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
                  target_path="",cols="#04103b",source='Produced with the peRformance package',fredr_key=NULL,colorarea=T)
 {
 
-  
-  
+
+
   #install.packages("fredr")
   #library(fredr)
   library(dplyr)
   library(xts)
   library(plotly)
   library(ggplot2)
-  #library(ecm) 
-  
+  #library(ecm)
+
   names(dw)<-c('date','sums')
   dw$date<-as.Date(dw$date)
   dw<-na.locf(dw)
@@ -336,27 +336,27 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
   library(ggplot2)
   cols <- c("TS" = "#04103b")
   p<-ggplot(data=dw,aes(x=as.Date(date), y=sums))
-  # Add recession shading using the function and your API Key  
+  # Add recession shading using the function and your API Key
   # to obtain a key visit: https://fred.stlouisfed.org/docs/api/api_key.html
   tryCatch({
     if(!is.null(fredr_key))
     {
-      p<-p + ggRec(as.Date(min(dw$date)),as.Date(max(dw$date)),fredr_key=fredr_key)      
+      p<-p + ggRec(as.Date(min(dw$date)),as.Date(max(dw$date)),fredr_key=fredr_key)
     }
   }, error = function(e) {})
   #> NULL
-  # add formatting  
+  # add formatting
   library(scales)
   p<-p +
     # add a theme from the peRformance package
     theme_aq_black(base_size=20)+
     #Add other elements
     geom_line(size=1,aes(y=sums,color="TS"))
-  
+
   if(colorarea==T)
   {
     p<-p+
-      geom_area( fill="#3b5171", alpha=1)       
+      geom_area( fill="#3b5171", alpha=1)
   }
   p<-p+
     scale_colour_manual(values = cols)+
@@ -369,7 +369,27 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
     ylab("")+
     theme(legend.position = "none",legend.title = element_blank())+
     theme(plot.margin=margin(l=5,r=10,b=5,t=5))
-  
+
   return(p)
-  
+
+}
+
+
+
+bdhw<-function(sec,mnem,st="2000-01-01",ed=NULL)
+{
+  library(Rblpapi)
+
+  blpConnect()
+
+  if(is.null(ed))
+  {
+    df<-bdh(sec,mnem,start.date=as.Date(st),end.date=NULL)
+  }else{
+    df<-bdh(sec,mnem,start.date=as.Date(st),end.date=as.Date(ed))
+  }
+
+  df<-rbindlist(df,id="id")
+  dw<-data.table::dcast(as.data.table(df), date ~ id,value.var=mnem)
+  return(dw)
 }
