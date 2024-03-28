@@ -379,7 +379,7 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
 bdhw<-function(sec,mnem,st="2000-01-01",ed=NULL)
 {
   library(Rblpapi)
-
+  library(data.table)
   blpConnect()
 
   if(is.null(ed))
