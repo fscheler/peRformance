@@ -905,6 +905,36 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Po
 }
 
 
+ggaRea<-
+  function (df, title = "Title", subtitle = "Subtitle", xcap = "",
+            ycap = "", name1 = "Portfolio", perc = T, col_aq2 = c("#04103b",
+                                                                  "#dd0400"), fredr_key = NULL)
+  {
+    library(ggplot2)
+    names(df) <- c("date", "asset")
+    df$date <- as.Date(df$date)
+    cols <- setNames(c(col_aq2[1]), c(name1))
+    p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
+    if (!is.null(fredr_key)) {
+      p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)),
+                     fredr_key = fredr_key)
+    }
+    p <- p + geom_area(size = 0.8,fill = col_aq2[1])
+    p <- p + geom_line(size = 0.8,color = col_aq2[2]) +
+      #scale_colour_manual(values = cols) +
+      theme_aq_black(base_size = 24) +
+      labs(color = "") + labs(title = title, subtitle = subtitle,
+                              x = xcap) + labs(caption = "") + theme(legend.position = "none",
+                                                                     legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
+                                                                                                                                            0, 0, 0)) + guides(colour = guide_legend(nrow = 1)) +
+      scale_x_date(labels = date_format("%Y"))
+    if (perc == TRUE) {
+      p <- p + scale_y_continuous(labels = scales::percent)
+    }
+    p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
+                                                     5))
+    return(p)
+  }
 
 #Life Performance
 gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1,secaxisadd=0,legend_rows=1)
