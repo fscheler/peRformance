@@ -927,9 +927,9 @@ ggaRea<-
                               x = xcap) + labs(caption = "") + theme(legend.position = "none",
                                                                      legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
                                                                                                                                             0, 0, 0)) + guides(colour = guide_legend(nrow = 1)) +
-      scale_x_date(labels = date_format("%Y"))
+      scale_x_date(labels = date_format("%Y"), expand = c(0, 0))
     if (perc == TRUE) {
-      p <- p + scale_y_continuous(labels = scales::percent)
+      p <- p + scale_y_continuous(labels = scales::percent, expand = c(0, 0))
     }
     p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
                                                      5))
