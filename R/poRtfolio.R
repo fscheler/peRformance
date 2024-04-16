@@ -1337,40 +1337,44 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
 
 
 #Life Performance
-ggReg<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",markersize=1,percx=T,percy=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL)
+ggReg<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", captions=TRUE,regression="linear",
+                  ycap = "", markersize = 1, percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), fredr_key = NULL,nudge_x = 0, nudge_y = 0,xintercept=NULL)
 {
+
   library(ggplot2)
-  names(df)<-c("assetx","assety")
+  names(df) <- c("assetx", "assety")
+  p <- ggplot(df, aes(x = df$assetx, y = df$assety))
+  p <- p + geom_point(size = markersize, col = col_aq2[1])
 
-  #cols <- setNames(c(col_aq2[1]), c("assetx","assety"))
-
-  p<-
-    ggplot(df, aes(x=df$assetx, y=df$assety))
-  p<-p+
-    geom_point(size=markersize,col=col_aq2[1])+
-    geom_smooth(method=lm, se=FALSE,col=col_aq2[2])+
-    theme_aq_black(base_size=24)+
-    #size 22 for overleaf
-    labs(color='')+
-    labs(title=title,subtitle=subtitle,x =xcap)+
-    labs(caption = '')+
-    theme(legend.position = "none",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(0,0,0,0))+
-    guides(colour = guide_legend(nrow = 1))
-    #scale_x_date(labels = date_format("%Y"))
-  if(percx==TRUE)
+  if(regression=="linear")
   {
-    p<-p+scale_x_continuous(labels = scales::percent)
+    p<-p+geom_smooth(method = lm, se = FALSE, col = col_aq2[2])
   }
-  if(percy==TRUE)
-  {
-    p<-p+scale_y_continuous(labels = scales::percent)
-  }
-  p<-p+
-    ylab(ycap)+
-    theme(plot.margin=margin(5,5,5,5))
 
-  reg<-lm(assety~assetx,data=df)
-  plist=list("p"=p,"reg"=reg)
+
+  p<-p+theme_aq_black(base_size = 24) + labs(color = "") + labs(title = title,
+                                                                subtitle = subtitle, x = xcap) + labs(caption = "") +
+    theme(legend.position = "none", legend.margin = margin(-20,
+                                                           -20, -20, -20), legend.box.margin = margin(0, 0,
+                                                                                                      0, 0)) + guides(colour = guide_legend(nrow = 1))
+  if(captions==TRUE)
+  {
+    p<-p+geom_text(label=rownames(df),check_overlap = T,nudge_x = nudge_x, nudge_y = nudge_y)
+  }
+  if(!is.null(xintercept))
+  {
+    p<-p+geom_vline(xintercept = xintercept, colour="lightgrey", linetype = "longdash")
+  }
+  if (percx == TRUE) {
+    p <- p + scale_x_continuous(labels = scales::percent)
+  }
+  if (percy == TRUE) {
+    p <- p + scale_y_continuous(labels = scales::percent)
+  }
+  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
+                                                   5))
+  reg <- lm(assety ~ assetx, data = df)
+  plist = list(p = p, reg = reg)
   print(summary(reg))
   return(plist)
 }
