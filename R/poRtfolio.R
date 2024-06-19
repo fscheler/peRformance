@@ -913,7 +913,7 @@ gglineRoct<-
   }
 
 #Life Performance
-gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Portfolio",perc=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL)
+gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Portfolio",perc=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,base_size=24)
 {
   library(ggplot2)
   names(df)<-c("date","asset")
@@ -930,7 +930,7 @@ gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Po
   p<-p+
     geom_line(size=0.8,aes(y=df$asset,color=name1))+
     scale_colour_manual(values = cols)+
-    theme_aq_black(base_size=24)+
+    theme_aq_black(base_size=base_size)+
     #size 22 for overleaf
     labs(color='')+
     labs(title=title,subtitle=subtitle,x =xcap)+
@@ -1014,7 +1014,7 @@ ggaRea<-
   }
 
 #Life Performance
-gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1,secaxisadd=0,legend_rows=1)
+gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="asset",name2="benchmark",perc=F,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,secaxis=1,secaxisadd=0,legend_rows=1,base_size=24)
 {
   library(ggplot2)
   names(df)<-c("date","asset","benchmark")
@@ -1032,7 +1032,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
     geom_line(size=0.8,aes(y=df$asset,color=name1))+
     geom_line(size=0.8,aes(y=df$benchmark/secaxis-secaxisadd,color=name2))+
     scale_colour_manual(values = cols)+
-    theme_aq_black(base_size=24)+
+    theme_aq_black(base_size=base_size)+
     #size 22 for overleaf
     labs(color='')+
     labs(title=title,subtitle=subtitle,x =xcap)+
@@ -1065,7 +1065,7 @@ gglineRt<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="a
 
 
 
-ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")),minmaxx=F)
+ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400")),minmaxx=F,base_size=20)
 {
   library(ggplot2)
   #long <- melt(setDT(df), id.vars = "date")
@@ -1085,7 +1085,7 @@ ggStacked<-function(long,title="Title",subtitle="Subtitle",perc=T,rel=T,lrow=2,c
 
   p<-p+
     scale_fill_manual(values=cols)+
-    theme_aq_black_default_font(base_size = 20) +
+    theme_aq_black_default_font(base_size = base_size) +
     labs(color = "") + labs(title = title,
                             subtitle = subtitle, x = "") +
     labs(caption = "") + xlab("") +
