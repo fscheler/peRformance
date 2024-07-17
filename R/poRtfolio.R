@@ -447,148 +447,104 @@ rrScat<-function(da,ret_format="returns",table_format='wide',graphics=T,ann_fact
 
 
 
-rrScatEff<-function(da,ret_format="returns",table_format='wide',
-                    ann_factor=252,chart_export_width=600,chart_export_height=450,m = list(l = 50,r = 50,b = 80,t = 50,pad = 4),n.portfolios=30,box_constraint_list=NULL)
-{
 
-
-  #if (!require("purrr")) install.packages("data.table")
-  #if (!require("PortfolioAnalytics")) install.packages("dplyr")
-  #if (!require("ecm")) install.packages("ecm")
-  #if (!require("plotly")) install.packages("lubridate")
-  #if (!require("scales")) install.packages("scales")
-
-  library(purrr)
-  library(PortfolioAnalytics)
-  #library(ecm)
-  library(plotly)
-  library(scales)
-
-  calc_ret<-function(x)
+rrScatEff<-
+  function (da, ret_format = "returns", table_format = "wide",
+            ann_factor = 252, chart_export_width = 600, chart_export_height = 450,
+            m = list(l = 50, r = 50, b = 80, t = 50, pad = 4), n.portfolios = 30,
+            box_constraint_list = NULL,ggbase_size=24,flex_caption="Source: Created with the peRformance package")
   {
-    x<-x/lagpad(x,k=1)-1
-    x[1]<-0
-    return(x)
+
+    library(purrr)
+    library(PortfolioAnalytics)
+    library(plotly)
+    library(scales)
+    calc_ret <- function(x) {
+      x <- x/lagpad(x, k = 1) - 1
+      x[1] <- 0
+      return(x)
+    }
+    calc_log_ret <- function(x) {
+      x <- log(x/lagpad(x, k = 1))
+      x[1] <- 0
+      return(x)
+    }
+    dls <- rrScat(da, ret_format = ret_format, table_format = table_format,
+                  graphics = F)$dls
+    if (table_format != "wide") {
+      names(da) <- c("date", "id", "value")
+      da$date <- as.Date(da$date)
+      da <- data.table::dcast(as.data.table(da), date ~ id,
+                              value.var = "value")
+    }else {
+      names(da)[1] <- "date"
+      da$date <- as.Date(da$date)
+    }
+    dz <- read.zoo(da, index.column = 1)
+    R <- as.xts(dz)
+    if (ret_format != "returns") {
+      R <- apply(R, 2, calc_ret)
+    }
+    funds <- colnames(R)
+    init.portf <- portfolio.spec(assets = funds)
+    init.portf <- add.constraint(portfolio = init.portf, type = "weight_sum",
+                                 min_sum = 0.99999, max_sum = 1.0001)
+    init.portf <- add.constraint(portfolio = init.portf, type = "long_only")
+    init.portf <- add.objective(portfolio = init.portf, type = "return",
+                                name = "mean")
+    init.portf <- add.objective(portfolio = init.portf, type = "risk",
+                                name = "StdDev")
+    if (is.null(box_constraint_list)) {
+      box_constraint_list <- list(min = c(rep(0, length(funds))),
+                                  max = c(rep(1, length(funds))))
+    }
+    init.portf <- add.constraint(portfolio = init.portf, type = "box",
+                                 min = box_constraint_list$min[1:length(funds)], max = box_constraint_list$max[1:length(funds)])
+    annualized.moments <- function(R, scale = ann_factor, portfolio = NULL) {
+      out <- list()
+      out$mu <- (1 + dls$ret_ann)^(1/ann_factor) - 1
+      out$sigma <- cov(R)
+      return(out)
+    }
+    ef <- create.EfficientFrontier(R = R, portfolio = init.portf,
+                                   type = "mean-StdDev", n.portfolios = n.portfolios, match.col = "StdDev",
+                                   search_size = 500, momentFUN = "annualized.moments",
+                                   scale = ann_factor)
+    eff <- as.data.frame(cbind(ef$frontier[, 4:ncol(ef$frontier)]))
+    eff <- eff/rowSums(eff)
+    eff$ret_ann <- rowSums(map2_dfc(eff, dls$ret_ann, `*`))
+    eff$sd_ann <- ef$frontier[, 2] * 252^0.5
+    col_aq2 <- as.character(c("#04103b", "#5777a7", "#D1E2EC",
+                              "#dd0400"))
+    cols = colorRampPalette(col_aq2)(nrow(dls))
+    p <- plot_ly(eff, x = ~sd_ann, y = ~ret_ann, type = "scatter",
+                 mode = "line", colors = cols, line = list(color = "grey"),
+                 name = "Efficient Frontier") %>% add_trace(x = dls$sd_ann,
+                                                            y = dls$ret_ann, color = dls$variable, marker = list(size = 12),
+                                                            mode = "markers", name = dls$variable) %>% layout(margin = m,
+                                                                                                              title = "Risk & Return", xaxis = list(title = "Risk",
+                                                                                                                                                    tickformat = ".1%", range = list(min(eff$sd_ann/1.1),
+                                                                                                                                                                                     max(dls$sd_ann * 1.1))), yaxis = list(title = "Return",
+                                                                                                                                                                                                                           tickformat = ".1%"), legend = list(orientation = "h",
+                                                                                                                                                                                                                                                              xanchor = "center", x = 0.5, y = -0.2))
+    p <- p %>% config(toImageButtonOptions = list(format = "svg",
+                                                  filename = "efficient_frontier", width = chart_export_width,
+                                                  height = chart_export_height))
+    rr_ggplot <<- ggplot(NULL, aes(sd_ann, ret_ann)) + geom_point(cex = 5,
+                                                                  data = dls, aes(color = factor(variable))) + geom_line(data = eff) +
+      scale_color_manual(values = cols) + theme_aq_black_default_font(base_size = ggbase_size) +
+      labs(color = "") + labs(title = "Risk & Return", subtitle = "Annualized values in % including efficient frontier",
+                              x = "") + labs(caption = flex_caption) +
+      xlab("Risk") + ylab("Excess Return") + theme(legend.position = "bottom",
+                                                   legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,
+                                                                                                                          0, 30, 0)) + guides(colour = guide_legend(nrow = 2)) +
+      theme(plot.margin = margin(l = 5, r = 10, b = 5, t = 5)) +
+      scale_x_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+      scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+      theme(panel.grid.major.x = element_line(colour = "#D8D8D8"))
+    reslist <- list(dls = dls, eff = eff, eff_plotly = p, eff_ggplot = rr_ggplot)
+    return(reslist)
   }
-  calc_log_ret<-function(x)
-  {
-    x<-log(x/lagpad(x,k=1))
-    x[1]<-0
-    return(x)
-  }
-
-  dls<-rrScat(da,ret_format=ret_format,table_format=table_format,graphics=F)$dls
-
-  if(table_format!='wide')
-  {
-    names(da)<-c("date",'id','value')
-    da$date<-as.Date(da$date)
-    da<-data.table::dcast(as.data.table(da), date ~ id, value.var = "value")
-  }else{
-    names(da)[1]<-"date"
-    da$date<-as.Date(da$date)
-  }
-
-  dz<-read.zoo(da,index.column=1)
-  R<-as.xts(dz)
-
-  if(ret_format!="returns")
-  {
-    R<-apply(R,2,calc_ret)
-  }
-
-  funds <- colnames(R)
-
-  #' Construct initial portfolio with basic constraints.
-  init.portf <- portfolio.spec(assets=funds)
-  #init.portf <- add.constraint(portfolio=init.portf, type="full_investment")
-  init.portf <- add.constraint(portfolio = init.portf, type="weight_sum", min_sum = 0.99999, max_sum = 1.0001)
-  init.portf <- add.constraint(portfolio=init.portf, type="long_only")
-  init.portf <- add.objective(portfolio=init.portf, type="return", name="mean")
-  init.portf <- add.objective(portfolio=init.portf, type="risk", name="StdDev")
-
-  # Use random portfolios to run the optimization.
-  #maxSR.lo.RP <- optimize.portfolio(R=R, portfolio=init.portf,
-  #                                  optimize_method="random",
-  #                                  search_size=2000,
-  #                                  trace=TRUE)
-
-  #Add Box Constraints
-  if(is.null(box_constraint_list))
-  {
-    box_constraint_list<-list(
-      min=c(rep(0,length(funds))),
-      max=c(rep(1,length(funds)))
-    )
-  }
-  init.portf <- add.constraint(portfolio=init.portf,
-                               type="box",
-                               min=box_constraint_list$min[1:length(funds)],
-                               max=box_constraint_list$max[1:length(funds)])
-
-
-  #ef<-create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-var", n.portfolios = n.portfolios,risk_aversion = NULL, match.col = "ES", search_size = 500)
-
-
-  annualized.moments <- function(R, scale=ann_factor, portfolio=NULL){
-    out <- list()
-    out$mu <-   (1+dls$ret_ann)^(1/ann_factor)-1
-    out$sigma <- cov(R)
-    #out$siga <- corpcor::cov.shrink(R, shrinkage_lambda, shrinkage_lambda)[1:ncol(R),1:ncol(R)]
-    return(out)
-  }
-
-
-  ef <- create.EfficientFrontier(R=R, portfolio=init.portf, type="mean-StdDev", n.portfolios = n.portfolios, match.col = "StdDev", search_size = 500,
-                                   momentFUN="annualized.moments", scale=ann_factor)
-
-  eff<-as.data.frame(cbind(ef$frontier[,4:ncol(ef$frontier)]))
-
-  eff<-eff/rowSums(eff)
-
-  eff$ret_ann<-rowSums(map2_dfc(eff, dls$ret_ann, `*`))
-
-  eff$sd_ann<-ef$frontier[,2]*252^0.5
-
-  col_aq2<-as.character(c("#04103b","#5777a7","#D1E2EC","#dd0400"))
-  #col_aq2<-as.character(c("#04103b","#D1E2EC","#dd0400"))
-  cols = colorRampPalette(col_aq2)(nrow(dls))
-  #show_col(cols)
-
-  p<-plot_ly(eff, x=~sd_ann, y=~ret_ann,type='scatter',mode='line', colors = cols,line=list(color='grey'),name='Efficient Frontier')%>%
-    add_trace( x=dls$sd_ann,y=dls$ret_ann,color = dls$variable,marker=list(size=12),mode='markers',name=dls$variable)%>%
-    layout(margin = m,title="Risk & Return",
-           xaxis = list(title="Risk",tickformat =".1%",range = list(min(eff$sd_ann/1.1), max(dls$sd_ann*1.1))),
-           yaxis = list(title="Return",tickformat =".1%"),legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.2))
-  p<-p %>% config(toImageButtonOptions = list( format = "svg",filename = "efficient_frontier",width = chart_export_width,height = chart_export_height))
-
-
-  rr_ggplot<<-
-    #GGplot scatter
-    ggplot(NULL, aes(sd_ann, ret_ann)) +
-    geom_point(cex=5,data = dls,aes(color=factor(variable))) +
-    geom_line(data = eff)+
-    scale_color_manual(values=cols)+
-    theme_aq_black_default_font(base_size=14)+
-    #size 22 for overleaf
-    labs(color='')+
-    labs(title="Risk & Return",subtitle="Annualized values in % including efficient frontier",x ="")+
-    labs(caption = 'Source: Created with the peRformance package')+
-    xlab("Risk")+
-    ylab("Excess Return")+
-    theme(legend.position = "bottom",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(15,0,30,0))+
-    guides(colour = guide_legend(nrow = 2))+
-    theme(plot.margin=margin(l=5,r=10,b=5,t=5))+
-    scale_x_continuous(labels = scales::percent_format(accuracy=.1))+
-    scale_y_continuous(labels = scales::percent_format(accuracy=.1))+
-    theme(panel.grid.major.x = element_line(colour = "#D8D8D8"))
-
-  reslist<-list("dls"=dls,"eff"=eff,"eff_plotly"=p,"eff_ggplot"=rr_ggplot)
-
-  return(reslist)
-}
-
-
 
 
 
