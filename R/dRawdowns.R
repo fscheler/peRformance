@@ -132,6 +132,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_e
       'calmar_ratio'=calmar_ratio,
       'pos_observations'=pos_observations,
       'neg_observations'=neg_observations,
+      'da'=da,
       'all_drawdowns'=ds,
       'n'=n,
       'dd_dist'=dd_dist,
