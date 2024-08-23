@@ -1,6 +1,6 @@
 
 
-dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
 {
   if (!require("ecm")) install.packages("ecm")
   if (!require("plotly")) install.packages("ggplot2")
@@ -10,6 +10,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,ch
   library(ecm)
   library(plotly)
   library(dplyr)
+  library(caTools)
 
   if(ret_format=='returns')
   {
@@ -23,7 +24,13 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,ch
   da$date<-as.Date(da$date)
   da<-da[order(da$date),]
 
-  da$md<-da$asset_idx/cummax(da$asset_idx)-1
+  if(runmaxwindow=="")
+  {
+    da$md<-da$asset_idx/cummax(da$asset_idx)-1
+  }else{
+    da$md<-da$asset_idx/runmax(da$asset_idx,k=runmaxwindow,endrule="max",align="right")-1
+  }
+
 
   da$mdst<-ifelse(da$md<0 & lagpad(da$md,k=1)==0,1,0)
   da$mdn<-cumsum(da$mdst)
@@ -139,4 +146,6 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,ch
   return(res_list)
 
 }
+
+
 
