@@ -30,8 +30,12 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,ch
 
   ds<-da[da$md<0,]
   ds<-ds%>%group_by(mdn)%>%mutate(trough=min(md))
-  ds$trough_date<-ifelse(ds$md==ds$trough,ds$date,0)
-  ds<-ds%>%group_by(mdn)%>%summarise(st_date=head(date,1),ed_date=tail(date,1),trough=min(md),trough_date=as.Date(max(trough_date),origin="1970-01-01"))
+  browser()
+  ds$trough_date<-as.Date(ifelse(ds$md==ds$trough,ds$date,NA))
+
+  #dtorigin_adj="1970-01-01"
+  ds<-ds%>%group_by(mdn)%>%summarise(st_date=head(date,1),ed_date=tail(date,1),trough=min(md),trough_date=as.Date(max(trough_date,na.rm=T)))
+
   ds$trough_date
 
   ds$peak2trough<-ds$trough_date-ds$st_date

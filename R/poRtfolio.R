@@ -1911,3 +1911,96 @@ if(dups=="")
 }
 
 
+
+flextableR<-function(df,customwidth=1,alignnumbers="",alignvalues="",padding_left=20,padding_right=30)
+{
+
+  theme_zebra_fs<-
+    function (x, odd_header = "#CFCFCF", odd_body = "#EFEFEF", even_header = "transparent",
+              even_body = "transparent")
+    {
+      if (!inherits(x, "flextable")) {
+        stop(sprintf("Function `%s` supports only flextable objects.",
+                     "theme_zebra()"))
+      }
+      h_nrow <- nrow_part(x, "header")
+      f_nrow <- nrow_part(x, "footer")
+      b_nrow <- nrow_part(x, "body")
+      x <- border_remove(x)
+      x <- align(x = x, align = "center", part = "header")
+      if (h_nrow > 0) {
+        even <- seq_len(h_nrow)%%2 == 0
+        odd <- !even
+        x <- bg(x = x, i = odd, bg = odd_header, part = "header")
+        x <- bg(x = x, i = even, bg = even_header, part = "header")
+        x <- bold(x = x, bold = TRUE, part = "header")
+      }
+      if (f_nrow > 0) {
+        even <- seq_len(f_nrow)%%2 == 0
+        odd <- !even
+        x <- bg(x = x, i = odd, bg = odd_header, part = "footer")
+        x <- bg(x = x, i = even, bg = even_header, part = "footer")
+        x <- bold(x = x, bold = TRUE, part = "footer")
+      }
+      if (b_nrow > 0) {
+        even <- seq_len(b_nrow)%%2 == 0
+        odd <- !even
+        x <- bg(x = x, i = odd, bg = odd_body, part = "body")
+        x <- bg(x = x, i = even, bg = even_body, part = "body")
+      }
+      #x <- align_text_col(x, align = "left", header = TRUE)
+      #x <- align_nottext_col(x, align = "right", header = TRUE)
+      x
+    }
+
+  #df<-tmp_save
+  #alignnumbers=""
+
+  #df %>% kbl() %>% kable_styling(bootstrap_options = c("striped", "hover"))
+  std_border <- fp_border(color = "red")
+  #df<-flextable(df) %>%theme_zebra() %>% autofit()
+
+  if(alignnumbers=="")
+  {
+    ncol_align<-ncol(df)
+    alignnumbers<-c(1,2:ncol_align)
+    alignvalues<-c("left",rep("right",ncol_align-1))
+  }
+
+  df <- flextable(df)
+  df<- padding(df, padding.left = padding_left)
+  df<- padding(df, padding.right = padding_right)
+  #df <- align_text_col(df, align = "left")
+  #df <- align_nottext_col(df, align = "right")
+  df <- align(df, j = alignnumbers, align = alignvalues, part = "all")
+  df <- df%>%theme_zebra_fs() %>% autofit()
+  df<-color(df,color = "#04103b", part = "header")
+  df<-color(df,color = "#162653", part = "body")
+  df<-bg(df, bg = "white", part = "header")
+  df<-hline(df, part = "header", border = std_border)
+  #df<-padding(df, padding.top = 10, part = "header")
+  df<-set_table_properties(df, layout = "autofit", width = customwidth)
+  df<-df%>%fontsize(size = 9, part = "all")
+
+  return(df)
+}
+
+
+flextableD<-function(df,customwidth=1)
+{
+
+  #df %>% kbl() %>% kable_styling(bootstrap_options = c("striped", "hover"))
+  std_border <- fp_border(color = "#dd0400")
+  std_border2 <- fp_border(color = "#D1E2EC")
+  df<-flextable(df) %>%theme_zebra(odd_header="transparent",even_header="transparent",odd_body ="#04103b",even_body="#162653") %>% autofit()
+  df<-color(df,color = "#dd0400", part = "header")
+  df<-color(df,color = "#D1E2EC", part = "body")
+  #df<-bg(df, bg = "white", part = "header")
+  #df<-bg(df, bg = "#04103b", part = "body")
+  df<-hline(df, part = "header", border = std_border)
+  df<-hline(df, part = "body", border = std_border2)
+  #df<-padding(df, padding.top = 10, part = "header")
+  df<-set_table_properties(df, layout = "autofit", width = customwidth)
+  df<-df%>%fontsize(size = 9, part = "all")
+  return(df)
+}
