@@ -30,7 +30,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,chart_export_width=600,ch
 
   ds<-da[da$md<0,]
   ds<-ds%>%group_by(mdn)%>%mutate(trough=min(md))
-  browser()
+
   ds$trough_date<-as.Date(ifelse(ds$md==ds$trough,ds$date,NA))
 
   #dtorigin_adj="1970-01-01"
