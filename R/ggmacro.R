@@ -371,20 +371,43 @@ ggPretty<-function(dw,chart_name="10 Year Treasury",subtitle="Yield",save_name="
 
 
 
-bdhw<-function(sec,mnem,st="2000-01-01",ed=NULL)
-{
-  library(Rblpapi)
-  library(data.table)
-  blpConnect()
 
-  if(is.null(ed))
+bdhw<-
+  function (sec, mnem, st = "2000-01-01", ed = NULL, crncy="",periodicity="")
   {
-    df<-bdh(sec,mnem,start.date=as.Date(st),end.date=NULL)
-  }else{
-    df<-bdh(sec,mnem,start.date=as.Date(st),end.date=as.Date(ed))
-  }
+    library(Rblpapi)
+    library(data.table)
+    blpConnect()
 
-  df<-rbindlist(df,id="id")
-  dw<-data.table::dcast(as.data.table(df), date ~ id,value.var=mnem)
-  return(dw)
-}
+    opt=NULL
+    if(crncy !="")
+    {
+      #opt <- c("periodicitySelection"="MONTHLY")
+      opt <- c("currency"=crncy)
+      #df<-bdh(mnemonics,"PX_LAST",start.date = as.Date("2000-07-01"),NULL,options=opt)
+    }
+    if(periodicity !="")
+    {
+      #opt <- c("periodicitySelection"="MONTHLY")
+      opt <- c("periodicitySelection"=periodicity)
+      #df<-bdh(mnemonics,"PX_LAST",start.date = as.Date("2000-07-01"),NULL,options=opt)
+    }
+    if(periodicity !="" & crncy !="")
+    {
+      #opt <- c("periodicitySelection"="MONTHLY")
+      opt <- c("currency"=crncy,"periodicitySelection"=periodicity)
+      #df<-bdh(mnemonics,"PX_LAST",start.date = as.Date("2000-07-01"),NULL,options=opt)
+    }
+
+
+    if (is.null(ed)) {
+      df <- bdh(sec, mnem, start.date = as.Date(st), end.date = NULL,options=opt)
+    }
+    else {
+      df <- bdh(sec, mnem, start.date = as.Date(st), end.date = as.Date(ed),options=opt)
+    }
+    df <- rbindlist(df, id = "id")
+    df<-unique(df)
+    dw <- data.table::dcast(as.data.table(df), date ~ id, value.var = mnem)
+    return(dw)
+  }
