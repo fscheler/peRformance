@@ -1382,6 +1382,55 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
 
 
 
+ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
+                  captions = TRUE, regression = "linear", ycap = "", markersize = 1,
+                  percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7",
+                                                    "#D1E2EC"), fredr_key = NULL, nudge_x = 0, nudge_y = 0,linetype="dotted",
+                  xintercept = NULL)
+{
+  #df<-agg[,c("Prim_Exch","Sector_Name","Median_P_E","Exp_Earnings_Growth")]
+  library(ggplot2)
+  names(df) <- c("group","caption","assetx", "assety")
+
+
+  group_levels <- unique(df$group)  # Get unique group names
+  custom_colors <- setNames(col_aq2[seq_along(group_levels)], group_levels)
+
+  p <- ggplot(df, aes(x = df$assetx, y = df$assety, color = group))
+  p <- p + geom_point(size = markersize)
+  p <- p+scale_color_manual(values = custom_colors)
+  p <- p+ guides(caption = "none")
+  if (regression == "linear") {
+    p<-p+ geom_smooth(method = "lm", se = FALSE, aes(group = group, color = group),show.legend=FALSE,linetype =linetype, size = 0.7) +
+      scale_color_manual(values = custom_colors)
+  }
+  p <- p + theme_aq_black(base_size = 24) + labs(color = "") +
+    labs(title = title, subtitle = subtitle, x = xcap) +
+    labs(caption = "") + theme(legend.position = "bottom",
+                               legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
+                                                                                                      0, 0, 0)) + guides(colour = guide_legend(nrow = 1))
+  if (captions == TRUE) {
+    p <- p + geom_text(label = df$caption, check_overlap = T,
+                       nudge_x = nudge_x, nudge_y = nudge_y,show.legend=FALSE)
+  }
+  if (!is.null(xintercept)) {
+    p <- p + geom_vline(xintercept = xintercept, colour = "lightgrey",
+                        linetype = "longdash")
+  }
+  if (percx == TRUE) {
+    p <- p + scale_x_continuous(labels = scales::percent)
+  }
+  if (percy == TRUE) {
+    p <- p + scale_y_continuous(labels = scales::percent)
+  }
+  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,  5))
+
+  reg <- lm(assety ~ assetx, data = df)
+  plist = list(p = p, reg = reg)
+  print(summary(reg))
+  return(plist)
+}
+
 
 #Life Performance
 ggReg<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", captions=TRUE,regression="linear",
@@ -2005,3 +2054,67 @@ flextableD<-function(df,customwidth=1)
   df<-df%>%fontsize(size = 9, part = "all")
   return(df)
 }
+
+
+ggBar2<-function (da, chart_title = "Portfolio Allocation", chart_subtitle = "Optional", horizontal=T,
+                  chart_height = 400, chart_font_size = 11, chart_export_width = 600,
+                  chart_export_height = 450,col_aq2 = as.character(c("#04103b", "#D1E2EC","#dd0400", "#3b5171")), m = list(r = 0, l = 0, b = 0, t = 50, par = 4), plotly = F, title_pos = "center", perc = ".0%")
+{
+
+  library(dplyr)
+  library(plotly)
+  library(lubridate)
+  library(dplyr)
+  da <- as.data.frame(da)
+  da <- da[, 1:3]
+  names(da) <- c("group","valuex", "valuey")
+
+  y_axis_caption <- ""
+  da <- da %>% dplyr::group_by(group,valuex) %>% dplyr::summarize(valuey = sum(as.numeric(valuey)))
+  da$valuex <- factor(da$valuex, levels = unique(da$valuex)[order(as.numeric(da$valuey), decreasing = F)])
+
+  # Assign colors to each group dynamically
+  da$color <- factor(da$group, levels = unique(da$group))
+  color_mapping <- setNames(col_aq2, unique(da$group))
+  if(plotly != T)
+  {
+
+    p<-ggplot(da, aes(x = valuex, y = valuey, fill = color)) +
+      geom_bar(stat = "identity", position = "dodge") +
+      scale_fill_manual(values = color_mapping)
+
+    if(horizontal==T)
+    {
+      p<-p+coord_flip()  # Make the bar chart horizontal
+      if(perc == ".0%")
+      {
+        p <- p + scale_y_continuous(labels = scales::percent_format(accuracy = 1))
+      }
+    }else{
+      if(perc == ".0%")
+      {
+        p <- p + scale_x_continuous(labels = scales::percent_format(accuracy = 1))
+      }
+    }
+
+
+    p<-p+ theme_aq_black_default_font(base_size = 20) +
+      labs(title = chart_title, subtitle = chart_subtitle,
+           x = "") + labs(caption = "") + xlab("") + theme(plot.margin = margin(l = 5,
+                                                                                r = 10, b = 5, t = 5)) + xlab("") + ylab("") + theme(legend.position = "bottom",
+                                                                                                                                     legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(15,
+                                                                                                                                                                                                            0, 30, 0)) + guides(colour = guide_legend(nrow = 3)) +
+      theme(panel.grid.major.x = element_blank()) + theme(panel.grid.major.x = element_blank()) +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+      theme(legend.title = element_blank()) + guides(fill = guide_legend(nrow = 1,
+                                                                         byrow = TRUE))
+    if(title_pos == "left")
+    {
+      p <- p + theme(plot.caption = element_text(hjust = 0.2),
+                     plot.title.position = "plot", plot.caption.position = "plot")
+    }
+
+  }
+  return(p)
+}
+
