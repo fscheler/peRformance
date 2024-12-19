@@ -1384,8 +1384,8 @@ statleR<-function(returns_matrix_z,periodicity_adjustment=252,
 
 ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
                   captions = TRUE, regression = "linear", ycap = "", markersize = 1,
-                  percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7",legendposition="bottom",
-                                                    "#D1E2EC"), fredr_key = NULL, nudge_x = 0, nudge_y = 0,linetype="dotted",
+                  percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7",
+                                                    "#D1E2EC"), fredr_key = NULL, nudge_x = 0, nudge_y = 0,linetype="dotted",legendposition="bottom",
                   xintercept = NULL)
 {
   #df<-agg[,c("Prim_Exch","Sector_Name","Median_P_E","Exp_Earnings_Growth")]
@@ -1407,8 +1407,7 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
   p <- p + theme_aq_black(base_size = 24) + labs(color = "") +
     labs(title = title, subtitle = subtitle, x = xcap) +
     labs(caption = "") + theme(legend.position = legendposition,
-                               legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
-                                                                                                      0, 0, 0)) + guides(colour = guide_legend(nrow = 1))
+                               legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(20,20, 20, 20)) + guides(colour = guide_legend(nrow = 1))
   if (captions == TRUE) {
     p <- p + geom_text(label = df$caption, check_overlap = T,
                        nudge_x = nudge_x, nudge_y = nudge_y,show.legend=FALSE)
