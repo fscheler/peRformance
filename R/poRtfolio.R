@@ -2069,7 +2069,8 @@ ggBar2<-function (da, chart_title = "Portfolio Allocation", chart_subtitle = "Op
   names(da) <- c("group","valuex", "valuey")
 
   y_axis_caption <- ""
-  da <- da %>% dplyr::group_by(group,valuex) %>% dplyr::summarize(valuey = sum(as.numeric(valuey)))
+
+  #try(da <- da %>% dplyr::group_by(group,valuex) %>% dplyr::summarize(valuey = sum(as.numeric(valuey))),silent=T)
   da$valuex <- factor(da$valuex, levels = unique(da$valuex)[order(as.numeric(da$valuey), decreasing = F)])
 
   # Assign colors to each group dynamically
