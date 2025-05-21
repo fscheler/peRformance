@@ -617,3 +617,11 @@ get_root_path<-function(search_variable="OneDrive")
   root_path <- sub(paste0("(^.*", onedrive_path, ").*"), "\\1", full_path)
   return(root_path)
 }
+
+
+read_xlsb<-function(wb,sheet)
+{
+  library(RODBC)
+  con2 <- odbcConnectExcel2007(wb)
+  data <- sqlFetch(con2, sheet) # Provide name of sheet
+}
