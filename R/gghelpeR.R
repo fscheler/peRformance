@@ -1,5 +1,7 @@
 
 
+
+
 library(svglite)
 
 #----------------------------------------------------------------------------------------------------------------------------
@@ -603,4 +605,15 @@ umbRuch<-function(x,l)
   x<-gsub(repl, '\\1\n', x)
   x<-ifelse(substr(x,nchar(x)-0,nchar(x))=="\n",substr(x,0,nchar(x)-1),x)
   return(x)
+}
+
+get_root_path<-function(search_variable="OneDrive")
+{
+  require(rstudioapi,lib="C:/Rlib")
+  require(rstudioapi)
+
+  full_path <- dirname(rstudioapi::getSourceEditorContext()$path)
+  onedrive_path <- sub(paste0("(/",search_variable,"[^/]*).*"), "\\1", full_path)
+  root_path <- sub(paste0("(^.*", onedrive_path, ").*"), "\\1", full_path)
+  return(root_path)
 }
