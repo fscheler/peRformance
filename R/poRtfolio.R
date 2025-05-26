@@ -2118,3 +2118,64 @@ ggBar2<-function (da, chart_title = "Portfolio Allocation", chart_subtitle = "Op
   return(p)
 }
 
+
+PLradaR<-function(categories = c("Speed", "Power", "Accuracy", "Endurance", "Agility"),series1 = c(80, 60, 90, 70, 85),series2 =c(65, 75, 80, 60, 70),selected1,selected2)
+{
+
+
+
+
+  # Define categories (5 points)
+  #categories <- c("Speed", "Power", "Accuracy", "Endurance", "Agility")
+
+  # First series (loop closed by repeating first value)
+  #series1 <- c(80, 60, 90, 70, 85)
+  series1 <- c(series1, series1[1])
+  categories_closed <- c(categories, categories[1])
+
+  # Optional second series (if NULL, no overlay)
+  #series2 <- c(65, 75, 80, 60, 70)  # <-- Replace with NULL to hide
+
+  # Create radar chart
+  fig <- plot_ly(
+    type = 'scatterpolar',
+    r = series1,
+    theta = categories_closed,
+    fill = 'toself',
+    name = selected1,
+    line = list(color = '#99CCFF')
+  )
+
+  # Add second series if it exists
+  if (!is.null(series2)) {
+    series2 <- c(series2, series2[1])  # Close the loop
+    fig <- fig %>% add_trace(
+      r = series2,
+      theta = categories_closed,
+      fill = 'toself',
+      name = selected2,
+      line = list(color = '#dd0400')
+    )
+  }
+
+  # Layout settings
+  fig <- fig %>% layout(
+    polar = list(
+      radialaxis = list(
+        visible = TRUE,
+        range = c(0, 100)
+      )
+    ),
+    showlegend = TRUE,
+    legend = list(
+      orientation = 'h',
+      x = 0.5,
+      xanchor = 'center',
+      y = -0.1  # Adjust this if it cuts off in your output
+    )
+  )
+
+  return(fig)
+
+
+}
