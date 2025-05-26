@@ -2179,3 +2179,31 @@ PLradaR<-function(categories = c("Speed", "Power", "Accuracy", "Endurance", "Agi
 
 
 }
+
+
+chatgpt_query <- function(prompt, model = "gpt-3.5-turbo",api_key="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") {
+  library(httr)
+  library(jsonlite)
+
+  gpt_response <- POST(
+    url = "https://api.openai.com/v1/chat/completions",
+    add_headers(
+      Authorization = paste("Bearer", api_key),
+      "Content-Type" = "application/json"
+    ),
+    body = toJSON(list(
+      model = model,
+      messages = list(list(role = "user", content = prompt)),
+      temperature = 0.7
+    ), auto_unbox = TRUE)
+  )
+
+  gpt_content <- content(gpt_response, as = "parsed", type = "application/json")
+  try(print(gpt_content$error[[1]]),silent=T)
+  try(detach("package:plotly", unload=TRUE),silent=T)
+  try(detach("package:httr", unload=TRUE),silent=T)
+  try(detach("package:jsonlite", unload=TRUE),silent=T)
+  library(plotly)
+  # Return the assistant's reply
+  gpt_content$choices[[1]]$message$content
+}
