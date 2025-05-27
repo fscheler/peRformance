@@ -2181,7 +2181,7 @@ PLradaR<-function(categories = c("Speed", "Power", "Accuracy", "Endurance", "Agi
 }
 
 
-chatgpt_query <- function(prompt, model = "gpt-3.5-turbo",api_key="secretkey") {
+chatgpt_query <- function(prompt, model = "gpt-3.5-turbo",api_key="") {
   library(httr)
   library(jsonlite)
 
@@ -2218,8 +2218,8 @@ advanced_chat_gpt_query<-function(user_query, model = "gpt-3.5-turbo")
   library(jsonlite)
 
   # 1. Set your API keys
-  openai_api_key <- "secret_key_openai"        # Replace with your OpenAI key
-  serpapi_key <- "secret_key_serpapi" # Replace with your SerpAPI key
+  openai_api_key <- ""        # Replace with your OpenAI key
+  serpapi_key <- "" # Replace with your SerpAPI key
 
   # 2. Function to search the web using SerpAPI
   search_web <- function(query) {
