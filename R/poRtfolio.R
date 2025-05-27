@@ -2181,7 +2181,7 @@ PLradaR<-function(categories = c("Speed", "Power", "Accuracy", "Endurance", "Agi
 }
 
 
-chatgpt_query <- function(prompt, model = "gpt-3.5-turbo",api_key="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") {
+chatgpt_query <- function(prompt, model = "gpt-3.5-turbo",api_key="secretkey") {
   library(httr)
   library(jsonlite)
 
@@ -2206,4 +2206,77 @@ chatgpt_query <- function(prompt, model = "gpt-3.5-turbo",api_key="sk-DrWOvp2Zy1
   library(plotly)
   # Return the assistant's reply
   gpt_content$choices[[1]]$message$content
+}
+
+
+
+advanced_chat_gpt_query<-function(user_query, model = "gpt-3.5-turbo")
+{
+
+
+  library(httr)
+  library(jsonlite)
+
+  # 1. Set your API keys
+  openai_api_key <- "secret_key_openai"        # Replace with your OpenAI key
+  serpapi_key <- "secret_key_serpapi" # Replace with your SerpAPI key
+
+  # 2. Function to search the web using SerpAPI
+  search_web <- function(query) {
+    res <- GET("https://serpapi.com/search",
+               query = list(q = query,
+                            api_key = serpapi_key,
+                            engine = "google"))
+    data <- content(res, "parsed")
+
+    results <- data$organic_results
+    summaries <- sapply(results[1:20], function(r) {
+      paste0("- ", r$title, ": ", r$snippet)
+    })
+
+    paste(summaries, collapse = "\n")
+  }
+
+  # 3. Function to query OpenAI GPT-4-turbo with context
+  query_openai <- function(prompt, context) {
+    full_prompt <- paste0(
+      "You are a smart assistant. Use the context below to answer the user's query.\n\n",
+      "=== Context ===\n", context, "\n\n",
+      "=== Query ===\n", prompt, "\n\n",
+      "Answer:"
+    )
+
+    res <- POST("https://api.openai.com/v1/chat/completions",
+                add_headers(Authorization = paste("Bearer", openai_api_key)),
+                content_type_json(),
+                encode = "json",
+                timeout(180),
+                body = toJSON(list(
+                  model = model,
+                  messages = list(
+                    list(role = "system", content = "You are a helpful assistant."),
+                    list(role = "user", content = full_prompt)
+                  ),
+                  temperature = 0.4,
+                  max_tokens = 2000
+                ), auto_unbox = TRUE))
+
+    answer <- content(res, as = "parsed")
+    answer$choices[[1]]$message$content
+  }
+
+  # 4. Use the functions together
+  #user_query <- "What are the current business challenges facing Estée Lauder?"
+
+  web_context <- search_web(user_query)
+  gpt_response <- query_openai(user_query, web_context)
+
+  try(print(gpt_content$error[[1]]),silent=T)
+  try(detach("package:plotly", unload=TRUE),silent=T)
+  try(detach("package:httr", unload=TRUE),silent=T)
+  try(detach("package:jsonlite", unload=TRUE),silent=T)
+  library(plotly)
+
+  return(gpt_response)
+
 }
