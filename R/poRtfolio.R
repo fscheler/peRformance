@@ -1963,7 +1963,8 @@ if(dups=="")
 
 flextableR<-function(df,customwidth=1,alignnumbers="",alignvalues="",padding_left=20,padding_right=30)
 {
-
+  library(officer)
+  library(flextable)
   theme_zebra_fs<-
     function (x, odd_header = "#CFCFCF", odd_body = "#EFEFEF", even_header = "transparent",
               even_body = "transparent")
@@ -2037,7 +2038,8 @@ flextableR<-function(df,customwidth=1,alignnumbers="",alignvalues="",padding_lef
 
 flextableD<-function(df,customwidth=1)
 {
-
+  library(officer)
+  library(flextable)
   #df %>% kbl() %>% kable_styling(bootstrap_options = c("striped", "hover"))
   std_border <- fp_border(color = "#dd0400")
   std_border2 <- fp_border(color = "#D1E2EC")
@@ -2279,4 +2281,38 @@ advanced_chat_gpt_query<-function(user_query, model = "gpt-3.5-turbo")
 
   return(gpt_response)
 
+}
+
+
+plytableR<-function (dw, ts_format = "returns", rounding = 2, header_color = "#3b5171",
+                     header_font = "white", font_color = "#04103b", export_format = "svg",
+                     chart_export_width = 800, chart_export_height = 400, print_output = T,
+                     rowOddColor = "white", rowEvenColor = "lightgrey", fontsize = 10,
+                     cellsheight = 20, orders = c("Year", "Amadeus Very Defensive USD",
+                                                  "Amadeus Defensive USD", "Amadeus Balanced USD", "Amadeus Dynamic USD",
+                                                  "Amadeus Very Dynamic USD"))
+{
+
+
+  #dw<-display_ext
+
+
+  fig <- plot_ly(type = "table", columnwidth = c(150, rep(80,
+                                                          12)), header = list(values = paste0("<b>", names(dw),
+                                                                                              "</b>"), line = list(color = "white"), fill = list(color = headerColor),
+                                                                              font = list(color = header_font, size = fontsize + 1)),
+                 cells = list(height = cellsheight, values = t(dw), line = list(color = "white"),
+                              fill = list(color = list(rep(c(rowOddColor, rowEvenColor),
+                                                           length(dw[1,])/2 + 1))), align = c("left",
+                                                                                              "center", "center", "center", "center", "center",
+                                                                                              "center", "center"), font = list(color = c(font_color),
+                                                                                                                               size = fontsize)))
+  m <- list(r = 0, b = 0, t = 0, l = 0, par = 4)
+  fig <- fig %>% layout(margin = m)
+  fig <- fig %>% config(toImageButtonOptions = list(format = export_format,
+                                                    filename = "annual_returns_table", width = chart_export_width,
+                                                    height = chart_export_height))
+  fig_list <- list(fig = fig)
+
+  fig
 }
