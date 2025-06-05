@@ -2299,7 +2299,7 @@ plytableR<-function (dw, ts_format = "returns", rounding = 2, header_color = "#3
 
   fig <- plot_ly(type = "table", columnwidth = c(150, rep(80,
                                                           12)), header = list(values = paste0("<b>", names(dw),
-                                                                                              "</b>"), line = list(color = "white"), fill = list(color = headerColor),
+                                                                                              "</b>"), line = list(color = "white"), fill = list(color = header_color),
                                                                               font = list(color = header_font, size = fontsize + 1)),
                  cells = list(height = cellsheight, values = t(dw), line = list(color = "white"),
                               fill = list(color = list(rep(c(rowOddColor, rowEvenColor),
