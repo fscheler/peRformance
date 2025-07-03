@@ -340,6 +340,12 @@ mperfT<-function(da,ts_format="returns",header_color="#3b5171",header_font="whit
 
   }
   m<-list(r=0,b=0,t=0,l=0,par=4)
+
+  fig <- fig %>% layout(
+    paper_bgcolor = 'rgba(0,0,0,0)',  # Transparent outer background
+    plot_bgcolor = 'rgba(0,0,0,0)'    # Transparent plotting area
+  )
+
   fig<-fig%>%layout(margin=m)
   fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "monthly_returns_table",width = chart_export_width,height = chart_export_height))
 
@@ -451,6 +457,10 @@ mperfTa<-function(df,ts_format="returns",rounding=2,header_color="#3b5171",heade
 
   m<-list(r=0,b=0,t=0,l=0,par=4)
   fig<-fig%>%layout(margin=m)
+  fig <- fig %>% layout(
+    paper_bgcolor = 'rgba(0,0,0,0)',  # Transparent outer background
+    plot_bgcolor = 'rgba(0,0,0,0)'    # Transparent plotting area
+  )
   fig <- fig %>% config(toImageButtonOptions = list( format = export_format,filename = "annual_returns_table",width = chart_export_width,height = chart_export_height))
 
 
