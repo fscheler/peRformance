@@ -2316,3 +2316,87 @@ plytableR<-function (dw, ts_format = "returns", rounding = 2, header_color = "#3
 
   fig
 }
+
+
+allocTreeBold<-function (
+    df,
+    parent_label = "Portfolio",
+    chart_export_width = 600,
+    chart_export_height = 450,
+    fontsize=26,
+    fontsizeheader=28,
+    m = list(l = 0, r = 0, b = 0, t = 0, pad = 4),
+    col_aq2 = as.character(c("#04103b", "#5777a7", "#D1E2EC", "#dd0400"))
+)
+{
+  library(scales)
+  library(plotly)
+  library(dplyr)
+
+  names(df) <- c("assets", "weights")
+  df <- df %>%
+    group_by(assets) %>%
+    summarize(weights = sum(weights), .groups = 'drop')
+
+  df$weights <- df$weights / sum(df$weights)
+  wmp <- df
+  wmp$Parent_Label <- parent_label
+
+  regions <- wmp %>%
+    group_by(assets) %>%
+    summarize(sum = sum(weights, na.rm = TRUE), .groups = 'drop')
+
+  regions$perc <- regions$sum / sum(regions$sum)
+  regions$Parent_Label <- parent_label
+
+  # Add root node
+  regions <- rbind(
+    regions,
+    data.frame(
+      assets = parent_label,
+      sum = sum(regions$sum),
+      perc = 1,
+      Parent_Label = ""
+    )
+  )
+
+  regions <- as.data.frame(regions, stringsAsFactors = FALSE)
+  regions$perc <- as.numeric(regions$perc)
+
+  cols <- colorRampPalette(col_aq2)(length(unique(regions$assets)) - 1)
+
+  tree <- plot_ly(
+    height = 250,
+    type = "treemap",
+    labels = regions$assets,
+    parents = regions$Parent_Label,
+    values = as.numeric(regions$sum),
+    marker = list(colors = c(cols, "#020b2b")),
+    hovertemplate = paste(
+      regions$assets, "<br>",
+      round(as.numeric(regions$sum) * 100, 2), "%",
+      "<extra></extra>"
+    ),
+    branchvalues = "total",
+    text = paste0(round(regions$perc * 100, 1), "% <br>"),
+    outsidetextfont = list(
+      size = fontsizeheader,
+      color = "white",
+      family = "Arial Black"
+    ),
+    textfont = list(
+      size = fontsize,
+      color = "white",
+      family = "Arial Black"
+    )
+  ) %>% layout(margin = m)
+
+  tree <- tree %>% config(toImageButtonOptions = list(
+    format = "svg",
+    filename = "allocation_tree",
+    width = chart_export_width,
+    height = chart_export_height
+  ))
+
+  return(tree)
+}
