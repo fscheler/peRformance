@@ -2402,6 +2402,7 @@ allocTreeBold<-function (
 }
 
 
+
 msci_translate<-function(average_score)
 {
   average_score_l<-
@@ -2414,3 +2415,159 @@ msci_translate<-function(average_score)
                                        ))))))
   return(average_score_l)
 }
+
+
+msci_translate_qtr<-
+  function (average_score)
+  {
+    average_score_l <- ifelse(average_score < 25, "4th Quartile", ifelse(average_score <
+                                                                           50, "3rd Quartile", ifelse(average_score < 75, "2nd Quartile", ifelse(average_score <
+                                                                                                                                                   100, "1st Quartile","Not Rated"))))
+    return(average_score_l)
+  }
+
+
+#ESG
+msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating")
+{
+  msci_translate<-function(average_score)
+  {
+    average_score_l<-
+      ifelse(average_score < 1.428, "CCC",
+             ifelse(average_score<2.857,"B",
+                    ifelse(average_score<4.286,"BB",
+                           ifelse(average_score<5.714,"BBB",
+                                  ifelse(average_score<7.143,"A",
+                                         ifelse(average_score<8.571,"AA","AAA"
+                                         ))))))
+    return(average_score_l)
+  }
+
+  msci_translate_qtr<-
+    function (average_score)
+    {
+      average_score_l <- ifelse(average_score < 25, "4th Quartile", ifelse(average_score <
+                                                                             50, "3rd Quartile", ifelse(average_score < 75, "2nd Quartile", ifelse(average_score <
+                                                                                                                                                     100, "1st Quartile","Not Rated"))))
+      return(average_score_l)
+    }
+
+  ss<-df[,c("isin_or_account","perc_of_portfolio","AssetClass","SubClass")]
+  ss$ISIN<-ss$isin_or_account
+  ss$WeightEFA<-ss$perc_of_portfolio
+  all_isins<-paste0(df$isin_or_account,collapse="','")
+
+
+
+  df0<-dbGetQuery(pool,paste0("select * from esg.FundRatings where FUND_ISIN in ('",all_isins,"')"))
+  df1<-dbGetQuery(pool,paste0("select * from esg.FundRatings_ClimateChange where FUND_ISIN in ('",all_isins,"')"))
+  df2<-dbGetQuery(pool,paste0("select * from esg.FundRatings_EUSustainableFinance where FUND_ISIN in ('",all_isins,"')"))
+  df0a<-merge(df0,merge(as.data.table(df1)[,-c("FUND_NAME","FUND_CUSIP","FUND_TICKER","FUND_ID")],as.data.table(df2)[,-c("FUND_NAME","FUND_CUSIP","FUND_TICKER","FUND_ID")],by="FUND_ISIN"),by=c("FUND_ISIN"),all=T)
+  pfrating<-merge(ss,df0a,by.x="ISIN",by.y="FUND_ISIN",all.x=T)
+  pfrating<-pfrating[(pfrating$ISIN)!="-1" & pfrating$AssetClass!="LIQUIDITY",]
+
+
+
+  library(peRformance)
+  library(plotly)
+
+
+  #Average Score
+  score<-sum(pfrating$WeightEFA*pfrating$FUND_ESG_QUALITY_SCORE,na.rm=T)/sum(pfrating$WeightEFA[!is.na(pfrating$FUND_ESG_QUALITY_SCORE)],na.rm=T)
+  rating<-msci_translate(as.numeric(score))
+
+
+
+  fig0<-
+    gaugeR(value=score,chart_export_width_uploader=300,min=0,max=10,chart_export_height_uploader=200,text=paste0("Average Score: ",rating))
+  #orca(fig,file="avg_score.svg",width=380,height=280)
+
+
+  #Percentile Peers
+  score<-sum(pfrating$WeightEFA*pfrating$FUND_ESG_QUALITY_SCORE_PCTL_PEER,na.rm=T)/sum(pfrating$WeightEFA[!is.na(pfrating$FUND_ESG_QUALITY_SCORE_PCTL_PEER)],na.rm=T)
+  fig1<-
+    gaugeR(value=score,chart_export_width_uploader=300,min=0,max=100,chart_export_height_uploader=200,text="Percentile Peers")
+  #orca(fig,file="perc_peers.svg",width=380,height=280)
+
+  #Percentile Universe
+  score<-sum(pfrating$WeightEFA*pfrating$FUND_ESG_QUALITY_SCORE_PCTL_GLOBAL,na.rm=T)/sum(pfrating$WeightEFA[!is.na(pfrating$FUND_ESG_QUALITY_SCORE_PCTL_PEER)],na.rm=T)
+  fig2<-
+    gaugeR(value=score,chart_export_width_uploader=300,min=0,max=100,chart_export_height_uploader=200,text="Percentile Global")
+  #orca(fig,file="perc_universe.svg",width=380,height=280)
+
+  #Coverage Look-through
+  pfrating$FUND_ESG_COVERAGE_OVERALL<-ifelse(is.na(pfrating$FUND_ESG_COVERAGE_OVERALL),0,pfrating$FUND_ESG_COVERAGE_OVERALL)
+  score<-sum(pfrating$WeightEFA*pfrating$FUND_ESG_COVERAGE_OVERALL,na.rm=T)
+  fig3<-
+    gaugeR(value=score,chart_export_width_uploader=300,min=0,max=10,chart_export_height_uploader=200,text="Position Coverage %")
+  #orca(fig,file="coverage.svg",width=380,height=280)
+
+  #sel_statistic<-"FUND_ESG_QUALITY_SCORE_PCTL_PEER"
+  divide<-1
+  library(dplyr)
+  dst<-pfrating
+  dst$Perc<-dst$perc_of_portfolio
+  names(dst)[names(dst)=="FUND_ESG_QUALITY_SCORE"]<-"FUND_ESG_QUALITY_SCORE"
+  dst$Rating<-msci_translate(as.numeric(dst$FUND_ESG_QUALITY_SCORE)/divide)
+
+  score_selected<-sum(dst$WeightEFA*dst$FUND_ESG_QUALITY_SCORE,na.rm=T)/sum(dst$WeightEFA[!is.na(dst$FUND_ESG_QUALITY_SCORE)],na.rm=T)
+  average_score_l<-round(score_selected,1)
+
+  pie_cols<-as.character(c(colorRampPalette(as.character(c("#04103b","#3b5171","#dd0400")))(7),"#D9D9D9"))
+  dsta <- dst%>% group_by(Rating  ) %>% summarize(count = sum(Perc) )
+  dsta$Rating<-ifelse(is.na(dsta$Rating),"Not Rated",dsta$Rating)
+  mdst<-data.frame(Rating=c("AAA","AA","A","BBB","BB","B","CCC","Not Rated"),
+                   color=c(pie_cols))
+  mdsta<-merge(mdst,dsta,by="Rating",all.x=T)
+  mdsta<-mdsta[match(mdst$Rating, rev(mdsta$Rating)), ]
+  mdsta$Rating <- factor(mdsta$Rating, levels = mdsta$Rating)
+  plot_ly(mdsta, values = ~factor(count), labels = ~(Rating), marker = list(colors = mdsta$color), type = 'pie',sort=F)
+
+  m <- list(l = 0,r = 0,b = 10,t = 100,pad = 4)
+  donut<-
+    mdsta %>% plot_ly(labels = ~Rating, values = ~count, sort = FALSE, marker = list(colors = mdsta$color), rotation = 240,textfont = list(family = "Arial Black", size = 14)) %>%
+    add_pie(hole = 0.6) %>%
+    layout(margin=m,title = chart_title,  showlegend = T,
+           xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+           yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+           annotations=list(text=average_score_l, "showarrow"=F, font=list(size = 50)),
+           legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.15)
+    )
+
+
+  library(dplyr)
+  dst<-pfrating
+  dst$Perc<-dst$perc_of_portfolio
+  names(dst)[names(dst)=="FUND_ESG_QUALITY_SCORE_PCTL_PEER"]<-"FUND_ESG_QUALITY_SCORE_PCTL_PEER"
+  dst$Rating<-msci_translate_qtr(as.numeric(dst$FUND_ESG_QUALITY_SCORE_PCTL_PEER)/divide)
+
+  score_selected<-sum(dst$WeightEFA*dst$FUND_ESG_QUALITY_SCORE_PCTL_PEER,na.rm=T)/sum(dst$WeightEFA[!is.na(dst$FUND_ESG_QUALITY_SCORE_PCTL_PEER)],na.rm=T)
+  average_score_l<-round(score_selected,1)
+
+  pie_cols<-as.character(c(colorRampPalette(as.character(c("#04103b","#3b5171","#dd0400")))(4),"#D9D9D9"))
+  dsta <- dst%>% group_by(Rating  ) %>% summarize(count = sum(Perc) )
+  dsta$Rating<-ifelse(is.na(dsta$Rating),"Not Rated",dsta$Rating)
+  mdst<-data.frame(Rating=c("1st Quartile","2nd Quartile","3rd Quartile","4th Quartile","Not Rated"),
+                   color=c(pie_cols))
+  mdsta<-merge(mdst,dsta,by="Rating",all.x=T)
+  mdsta<-mdsta[match(mdst$Rating, rev(mdsta$Rating)), ]
+  mdsta$Rating <- factor(mdsta$Rating, levels = mdsta$Rating)
+  plot_ly(mdsta, values = ~factor(count), labels = ~(Rating), marker = list(colors = mdsta$color), type = 'pie',sort=F)
+
+  m <- list(l = 0,r = 0,b = 10,t = 100,pad = 4)
+  donut_peers<-
+    mdsta %>% plot_ly(labels = ~Rating, values = ~count, sort = FALSE, marker = list(colors = mdsta$color), rotation = 240,textfont = list(family = "Arial Black", size = 14)) %>%
+    add_pie(hole = 0.6) %>%
+    layout(margin=m,title = chart_title,  showlegend = T,
+           xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+           yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+           annotations=list(text=average_score_l, "showarrow"=F, font=list(size = 50)),
+           legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.15)
+    )
+
+  rlist=list("donut"=donut,"donut_peers"=donut_peers,"avg_score"=score,"fig0"=fig0,"fig1"=fig1,"fig2"=fig2,"fig3"=fig3)
+
+  return(rlist)
+
+}
+
