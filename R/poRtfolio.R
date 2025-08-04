@@ -2400,3 +2400,17 @@ allocTreeBold<-function (
 
   return(tree)
 }
+
+
+msci_translate<-function(average_score)
+{
+  average_score_l<-
+    ifelse(average_score < 1.428, "CCC",
+           ifelse(average_score<2.857,"B",
+                  ifelse(average_score<4.286,"BB",
+                         ifelse(average_score<5.714,"BBB",
+                                ifelse(average_score<7.143,"A",
+                                       ifelse(average_score<8.571,"AA","AAA"
+                                       ))))))
+  return(average_score_l)
+}
