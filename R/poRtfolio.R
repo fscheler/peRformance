@@ -2427,8 +2427,7 @@ msci_translate_qtr<-
   }
 
 
-#ESG
-msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating")
+msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating",flex_height=250,chart_font_size=12)
 {
   msci_translate<-function(average_score)
   {
@@ -2468,8 +2467,8 @@ msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating"
 
 
 
-  library(peRformance)
-  library(plotly)
+  #library(peRformance)
+  #library(plotly)
 
 
   #Average Score
@@ -2504,7 +2503,7 @@ msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating"
 
   #sel_statistic<-"FUND_ESG_QUALITY_SCORE_PCTL_PEER"
   divide<-1
-  library(dplyr)
+  #library(dplyr)
   dst<-pfrating
   dst$Perc<-dst$perc_of_portfolio
   names(dst)[names(dst)=="FUND_ESG_QUALITY_SCORE"]<-"FUND_ESG_QUALITY_SCORE"
@@ -2516,6 +2515,7 @@ msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating"
   pie_cols<-as.character(c(colorRampPalette(as.character(c("#04103b","#3b5171","#dd0400")))(7),"#D9D9D9"))
   dsta <- dst%>% group_by(Rating  ) %>% summarize(count = sum(Perc) )
   dsta$Rating<-ifelse(is.na(dsta$Rating),"Not Rated",dsta$Rating)
+  dsta$count<-ifelse(is.na(dsta$count),1-sum(dsta$count,na.rm=T),dsta$count)
   mdst<-data.frame(Rating=c("AAA","AA","A","BBB","BB","B","CCC","Not Rated"),
                    color=c(pie_cols))
   mdsta<-merge(mdst,dsta,by="Rating",all.x=T)
@@ -2535,6 +2535,16 @@ msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating"
     )
 
 
+  #hms<-hms[order(hms$Wgt),]
+  y_axis_caption<-""
+  mdsta$Rating <- factor(mdsta$Rating, levels = c("AAA","AA","A","BBB","BB","B","CCC","Not Rated"))
+  mdsta$count<-ifelse(is.na(mdsta$count),0,mdsta$count)
+  m<-list(b=50,t=0,r=0,l=0,par=4)
+  rating_distribution_plot <- plot_ly(mdsta, x =mdsta$Rating, y =mdsta$count ,height=flex_height, type = 'bar', name = 'Gross',marker = list(color = col_aq2[1]),
+                                      text = paste0(round(mdsta$count*100,1),"%"), textposition = 'inside',textfont =list(color=toRGB(col_aq[2])))
+  rating_distribution_plot <- rating_distribution_plot %>% layout(margin = m,font=list(size=chart_font_size),title=chart_title,yaxis=list(tickformat =".0%"), xaxis = list(title=y_axis_caption), barmode = 'group')
+  rating_distribution_plot
+
   library(dplyr)
   dst<-pfrating
   dst$Perc<-dst$perc_of_portfolio
@@ -2544,9 +2554,11 @@ msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating"
   score_selected<-sum(dst$WeightEFA*dst$FUND_ESG_QUALITY_SCORE_PCTL_PEER,na.rm=T)/sum(dst$WeightEFA[!is.na(dst$FUND_ESG_QUALITY_SCORE_PCTL_PEER)],na.rm=T)
   average_score_l<-round(score_selected,1)
 
+
   pie_cols<-as.character(c(colorRampPalette(as.character(c("#04103b","#3b5171","#dd0400")))(4),"#D9D9D9"))
   dsta <- dst%>% group_by(Rating  ) %>% summarize(count = sum(Perc) )
   dsta$Rating<-ifelse(is.na(dsta$Rating),"Not Rated",dsta$Rating)
+  dsta$count<-ifelse(is.na(dsta$count),1-sum(dsta$count,na.rm=T),dsta$count)
   mdst<-data.frame(Rating=c("1st Quartile","2nd Quartile","3rd Quartile","4th Quartile","Not Rated"),
                    color=c(pie_cols))
   mdsta<-merge(mdst,dsta,by="Rating",all.x=T)
@@ -2565,9 +2577,32 @@ msci_esg_donut<-function(df,chart_title="Positions by Aggregate MSCI ESG Rating"
            legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.15)
     )
 
-  rlist=list("donut"=donut,"donut_peers"=donut_peers,"avg_score"=score,"fig0"=fig0,"fig1"=fig1,"fig2"=fig2,"fig3"=fig3)
+
+
+
+
+
+  rlist=list("donut"=donut,"donut_peers"=donut_peers,"avg_score"=score,"fig0"=fig0,"fig1"=fig1,"fig2"=fig2,"fig3"=fig3,"rating_distribution_plot"=rating_distribution_plot)
 
   return(rlist)
 
 }
 
+fxtRanslate<-function(dfe,fx_rates,base_currency="CHF",instrument_currency="USD")
+{
+  #Currency translation
+  if(base_currency=="EUR")
+  {
+    eurref<-fx_rates[,c("Dates",paste0("EUR"))]
+  }else{
+    eurref<-fx_rates[,c("Dates",paste0("EUR",base_currency))]
+  }
+  names(eurref)<-c("dates","EURREF")
+  eurusd<-fx_rates[,c("Dates",paste0("EUR",instrument_currency))]
+  names(eurusd)<-c("dates",paste0("EUR",instrument_currency))
+  dfe <- Reduce(function(x, y) merge(x, y, by = "dates"), list(dfe, eurref, eurusd))
+  dfe$pf_idx<-dfe$pf_idx/dfe$EURUSD*dfe$EURREF
+  dfe$pf_ret<-dfe$pf_idx/lagpad(dfe$pf_idx,k=1)-1
+  dfe$pf_ret[1]<-0
+  return(dfe)
+}
