@@ -1433,7 +1433,7 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
 
 #Life Performance
 ggReg<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", captions=TRUE,regression="linear",
-                  ycap = "", markersize = 1, percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), fredr_key = NULL,nudge_x = 0, nudge_y = 0,xintercept=NULL)
+                  ycap = "", markersize = 1, percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), fredr_key = NULL,nudge_x = 0, nudge_y = 0,xintercept=NULL,regsize=0.5,reglinetype ="dashed")
 {
 
   library(ggplot2)
@@ -1443,7 +1443,7 @@ ggReg<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", captions
 
   if(regression=="linear")
   {
-    p<-p+geom_smooth(method = lm, se = FALSE, col = col_aq2[2])
+    p<-p+geom_smooth(method = lm, se = FALSE, col = col_aq2[2],size=regsize,linetype =reglinetype)
   }
 
 

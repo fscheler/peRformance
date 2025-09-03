@@ -625,3 +625,60 @@ read_xlsb<-function(wb,sheet)
   con2 <- odbcConnectExcel2007(wb)
   data <- sqlFetch(con2, sheet) # Provide name of sheet
 }
+
+
+
+#install.packages("blastula")
+send_conf_email <- function(
+    server = "",
+    receiver = "",
+    sender = "Quantamental Platform Alerts <your_email@example.com>",
+    smtp_user = "",
+    smtp_password = "",
+    smtp_port = 0,
+    body_text="",
+    subject_text="",
+    count_files_path=""
+) {
+  library(blastula)
+  # --- Find the most recent file ---
+  folder <- count_files_path
+  files <- list.files(folder, full.names = TRUE)
+
+  if (length(files) == 0) {
+    arr <- character(0)
+  } else {
+    latest_file <- files[which.max(file.info(files)$mtime)]
+    arr <- basename(latest_file)
+  }
+
+  file_count <- length(arr)
+
+  # --- Build message ---
+  body <- glue::glue(
+    body_text,"\n\n",
+    "Data as of: ",Sys.Date()
+  )
+
+  Sys.setenv(SMTP_USER =smtp_user)
+  Sys.setenv(SMTP_PASSWORD =smtp_password)
+  email <- compose_email(
+    body = md(body)
+  )
+  email %>%
+    smtp_send(
+      from = sender,
+      to = receiver,
+      subject = subject_text,
+      credentials = creds_envvar(
+        user = smtp_user,
+        pass_envvar = "SMTP_PASSWORD",
+        host = server,
+        port = smtp_port,
+        use_ssl = TRUE
+      )
+    )
+
+
+  message("Email sent successfully with subject line!")
+}
