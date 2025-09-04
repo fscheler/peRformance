@@ -657,7 +657,7 @@ send_conf_email <- function(
   # --- Build message ---
   body <- glue::glue(
     body_text,"\n\n",
-    "Data as of: ",Sys.Date()
+    "Data as of: ",as.character(Sys.time())
   )
 
   Sys.setenv(SMTP_USER =smtp_user)
