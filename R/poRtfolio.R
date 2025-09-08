@@ -762,65 +762,49 @@ boxeR<-function()
 
 }
 
-rangeR<-function(y=c('Dividend Yield %'),benchmark=2.2,portfolio=3.9,caption_bm=paste0(2.2,"%"),caption_po=paste0(3.9,"%"),chart_height=200,m=list(r=0,l=0,b=0,t=0,par=4))
-{
-  library(plotly)
+rangeR<-
+  rangeR <- function (y = c("Dividend Yield %"), benchmark = 2.2, portfolio = 3.9,
+                      caption_bm = paste0(2.2, "%"), caption_po = paste0(3.9, "%"),
+                      chart_height = 200, m = list(r = 0, l = 0, b = 0, t = 0, par = 4),minoffset=25,specialoffsetthreshold=0.5) {
 
-  #,range=c(0,(data$MXWO+data$Portfolio)*1.5)
-  #y <- c('Dividend Yield %')
-  #benchmark <- c(2.2)
-  #portfolio <- c(3.9)
-  s <- data.frame(y, benchmark, portfolio)
-  library(plotly)
-  fig <- plot_ly(s, color = I("#BDBDBD"),height=chart_height)
-  fig <- fig %>% add_segments(x = ~benchmark, xend = ~portfolio, y = ~y, yend = ~y, showlegend = FALSE)
-  fig <- fig %>% add_markers(x = ~benchmark, y = ~y, name = "Benchmark", color = I("#dd0400"),text = paste0("Market<br>",benchmark))
-  fig <- fig %>% add_markers(x = ~portfolio, y = ~y, name = "Portfolio", color = I("#5777a7"))
-  fig <- fig %>% layout(
-    title = "",
-    xaxis = list(title = ""),
-    margin = list(l = 65,t=65)
-  )
+    library(plotly)
+    s <- data.frame(y, benchmark, portfolio)
 
-  #fig <- fig %>% add_text(x = ~benchmark, y = ~y,text = ~caption_bm,
-  #                        textposition = "bottom right",color = I("#dd0400"), showlegend = FALSE)
+    fig <- plot_ly(s, color = I("lightgrey"), height = chart_height)
+    fig <- fig %>% add_segments(x = ~benchmark, xend = ~portfolio,
+                                y = ~y, yend = ~y, showlegend = FALSE,line = list(color = "lightgrey", width = 1))
+    fig <- fig %>% add_markers(x = ~benchmark, y = ~y, name = "Benchmark",
+                               color = I("#dd0400"), text = paste0("Market<br>", benchmark))
+    fig <- fig %>% add_markers(x = ~portfolio, y = ~y, name = "Portfolio",
+                               color = I("#5777a7"))
 
-  #fig <- fig %>% add_text(x = ~portfolio, y = ~y,text = ~caption_po,
-  #                        textposition = "bottom left",color = I("#5777a7"), showlegend = FALSE)
+    # ---- Avoid overlapping annotations (left & right offset) ----
+    dx <- abs(s$benchmark - s$portfolio)
+    offset <- ifelse(dx < specialoffsetthreshold, 40, minoffset)   # increase horizontal offset if too close
 
-  fig <- fig %>% add_annotations(x = s$benchmark,
-                                 y = s$y,
-                                 text = caption_bm,
-                                 xref = "x",
-                                 yref = "y",
-                                 showarrow = TRUE,
-                                 arrowhead = 0,
-                                 arrowsize = 0,
-                                 ax = 0,
-                                 ay = -10)
+    fig <- fig %>% add_annotations(x = s$benchmark, y = s$y,
+                                   text = caption_bm, xref = "x", yref = "y",
+                                   showarrow = TRUE, arrowhead = 0, arrowsize = 0,
+                                   ax = -offset, ay = 0,
+                                   arrowwidth = 0.5)   # thinner arrow line
 
-  fig
-  fig <- fig %>% add_annotations(x = s$portfolio,
-                                 y = s$y,
-                                 text = caption_po,
-                                 xref = "x",
-                                 yref = "y",
-                                 showarrow = TRUE,
-                                 arrowhead = 0,
-                                 arrowsize = 0,
-                                 ax = 0,
-                                 ay = -10)
+    fig <- fig %>% add_annotations(x = s$portfolio, y = s$y,
+                                   text = caption_po, xref = "x", yref = "y",
+                                   showarrow = TRUE, arrowhead = 0, arrowsize = 0,
+                                   ax = offset, ay = 0,
+                                   arrowwidth = 0.5)    # thinner arrow line
+    # -------------------------------------------------------------
 
-  fig
+    fig <- fig %>% layout(margin = m, barmode = "stack", showlegend = F,
+                          xaxis = list(title = "", showgrid = FALSE, showticklabels = FALSE),
+                          yaxis = list(title = "", showgrid = FALSE)) %>%
+      layout(plot_bgcolor = "rgba(0, 0, 0, 0)",
+             paper_bgcolor = "rgba(0, 0, 0, 0)",
+             yaxis = list(zerolinecolor = "#f9f9f9", showgrid = FALSE),
+             xaxis = list(zerolinecolor = "#f9f9f9", showgrid = FALSE))
 
-  fig <- fig %>% layout(margin=m,barmode = 'stack',showlegend=F,
-                        xaxis = list(title = "",showgrid=FALSE,showticklabels = FALSE),
-                        yaxis = list(title ="",showgrid=FALSE))
-  fig<-fig %>%layout(plot_bgcolor  = "rgba(0, 0, 0, 0)",paper_bgcolor = "rgba(0, 0, 0, 0)",yaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE),xaxis = list(zerolinecolor = '#f9f9f9',showgrid = FALSE))
-
-  return(fig)
-
-}
+    return(fig)
+  }
 
 gglineRoct<-
   function (df, title = "Title", subtitle = "Subtitle", xcap = "",
