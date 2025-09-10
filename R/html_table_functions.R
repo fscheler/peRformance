@@ -1,28 +1,28 @@
 
 generate_html_table_calendar_years<-function(df)
 {
-  
-  
-  
+
+
+
   # ---- Helper: compute calendar year return ----
   compute_calendar_return <- function(dates, nav, year) {
     end_date   <- as.Date(paste0(year, "-12-31"))
     start_date <- as.Date(paste0(year - 1, "-12-31"))
-    
+
     if (min(dates) > start_date) return("")
-    
+
     end_idx   <- which(dates <= end_date)
     start_idx <- which(dates <= start_date)
     if (length(end_idx) == 0 || length(start_idx) == 0) return("")
-    
+
     end_nav   <- nav[max(end_idx)]
     start_nav <- nav[max(start_idx)]
-    
+
     if (is.na(start_nav) || start_nav == 0) return("")
-    
+
     as.character(scales::percent(end_nav / start_nav - 1, accuracy = 0.1))
   }
-  
+
   # ---- Main results ----
   results_base <- df %>%
     mutate(Date = as.Date(Date)) %>%
@@ -35,13 +35,13 @@ generate_html_table_calendar_years<-function(df)
       all_nav   = list(NAV),
       .groups = "drop"
     )
-  
+
   # Define global last date for consistency
   global_last_date <- max(results_base$last_date, na.rm = TRUE)
-  
+
   # Which years to show
   years_to_show <- (year(global_last_date) - 1):(year(global_last_date) - 4)
-  
+
   results <- results_base %>%
     rowwise() %>%
     mutate(
@@ -49,7 +49,7 @@ generate_html_table_calendar_years<-function(df)
       YTD = {
         current_year <- year(global_last_date)
         start_date <- as.Date(paste0(current_year - 1, "-12-31"))
-        
+
         if (min(all_dates) > start_date) "" else {
           ref_idx <- max(which(all_dates <= start_date))
           ref_nav <- all_nav[ref_idx]
@@ -57,28 +57,36 @@ generate_html_table_calendar_years<-function(df)
             as.character(scales::percent(last_nav / ref_nav - 1, accuracy = 0.1))
         }
       },
-      
-      # Volatility 1Y
+
+      # Volatility 1Y per fund
       `Vol 1Y` = {
-        one_year_ago <- global_last_date %m-% years(1)
-        
-        # subset only last 1Y of data
-        nav_1y <- all_nav[all_dates >= one_year_ago]
-        dates_1y <- all_dates[all_dates >= one_year_ago]
-        
-        # Require at least ~1 year of coverage
-        if (length(nav_1y) < 2 || max(dates_1y) - min(dates_1y) < 365) {
-          ""
+        # Use the last date of this fund's series
+        fund_last_date <- max(all_dates, na.rm = TRUE)
+        one_year_ago <- fund_last_date %m-% years(1)
+
+        # Subset NAV and dates in the last 1 year
+        nav_1y <- all_nav[all_dates >= one_year_ago & all_dates <= fund_last_date]
+        dates_1y <- all_dates[all_dates >= one_year_ago & all_dates <= fund_last_date]
+
+        # Require at least 2 observations AND coverage of ~1 year
+        span_days <- as.numeric(max(dates_1y) - min(dates_1y), units = "days")
+        if (length(nav_1y) < 2 || span_days < 360) {
+          ""  # Not enough data
         } else {
           rets <- diff(log(nav_1y))
-          freq <- ifelse(mean(diff(sort(unique(all_dates)))) <= 8, 252, 52)
+
+          # Annualization factor based on actual spacing
+          avg_diff_days <- mean(diff(sort(dates_1y)))
+          freq <- 365 / as.numeric(avg_diff_days, units = "days")
+
+          # Annualized volatility
           as.character(scales::percent(sd(rets, na.rm = TRUE) * sqrt(freq), accuracy = 0.1))
         }
       }
-      
+
     ) %>%
     ungroup()
-  
+
   # Add calendar year returns dynamically
   for (yr in years_to_show) {
     results[[as.character(yr)]] <- mapply(
@@ -87,7 +95,7 @@ generate_html_table_calendar_years<-function(df)
       results$all_nav
     )
   }
-  
+
   # Format output
   results <- results %>%
     mutate(
@@ -96,19 +104,19 @@ generate_html_table_calendar_years<-function(df)
     ) %>%
     dplyr::select(Category, IB_ID, AccountAlias, currency, `As of`, NAV, YTD,
                   all_of(as.character(years_to_show)), `Vol 1Y`)
-  
+
   results <- results %>%
-    dplyr::select(-IB_ID) %>% 
+    dplyr::select(-IB_ID) %>%
     dplyr::rename(
       Strategy = AccountAlias,
       Currency = currency
     )
-  
+
   # Use your results
   results_no_currency <- results %>% dplyr::select(-Currency)
-  
+
   table_html <- "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>"
-  
+
   # Header
   table_html <- paste0(
     table_html,
@@ -116,10 +124,10 @@ generate_html_table_calendar_years<-function(df)
     paste0("<th style='padding: 5px;'>", colnames(results_no_currency), "</th>", collapse = ""),
     "</tr>"
   )
-  
+
   # Process currency blocks
-  unique_currencies <- unique(results$Currency)
-  
+  unique_currencies <- sort(unique(results$Currency))
+
   for (curr in unique_currencies) {
     # Spacer row before currency block (except first)
     if (curr != unique_currencies[1]) {
@@ -128,7 +136,7 @@ generate_html_table_calendar_years<-function(df)
         "<tr style='height:15px;'><td colspan='", ncol(results_no_currency), "'></td></tr>"
       )
     }
-    
+
     # Currency row with grey line below
     table_html <- paste0(
       table_html,
@@ -137,15 +145,15 @@ generate_html_table_calendar_years<-function(df)
       curr,
       "</td></tr>"
     )
-    
+
     # Add rows for this currency
     curr_rows <- results %>% filter(Currency == curr) %>% dplyr::select(-Currency)
     for (i in 1:nrow(curr_rows)) {
       table_html <- paste0(table_html, "<tr style='height:22px;'>") # row height
-      
+
       for (col in colnames(curr_rows)) {
         value <- curr_rows[[col]][i]
-        
+
         # Color positive % green (except Vol 1Y)
         if (grepl("%", value) & col != "Vol 1Y") {
           numeric_val <- as.numeric(gsub("%","",value))
@@ -170,61 +178,65 @@ generate_html_table_calendar_years<-function(df)
       table_html <- paste0(table_html, "</tr>")
     }
   }
-  
+
   table_html <- paste0(table_html, "</table>")
-  
+
   return(table_html)
 }
 
 
+
+
+
+
 generate_html_table_periods<-function(df)
 {
-  
+
   # Helper for multi-year returns
   compute_return <- function(dates, nav, years) {
     last_date <- max(dates)
-    
+
     # Reference date: day before the previous year date
     target_date <- last_date %m-% years(years) - 1
-    
+
     # Filter all NAVs <= target_date (closest available before target)
     valid_idx <- which(dates <= target_date)
     if (length(valid_idx) == 0) return("")  # not enough history
-    
+
     # Take the NAV closest to target_date but not after it
     ref_idx <- valid_idx[which.max(dates[valid_idx])]
-    
+
     last_idx <- which.max(dates)
-    
+
     ref_nav <- nav[ref_idx]
     last_nav <- nav[last_idx]
-    
+
     print(ref_nav)
-    
+
     if (is.na(ref_nav) || ref_nav == 0) return("")
-    
+
     scales::percent(last_nav / ref_nav - 1, accuracy = 0.01)
   }
-  
+
   library(dplyr)
   library(lubridate)
   library(scales)
-  
+
   # Safe compute_return: always returns character
   compute_return <- function(dates, nav, years) {
     last_date <- max(dates)
     ref_date <- (last_date %m-% years(years)) - 1  # day before the same day last year
-    
+
     # Find closest previous date if exact ref_date not available
-    if (min(dates) > ref_date) return("")  
+    if (min(dates) > ref_date) return("")
     ref_idx <- which.min(abs(dates - ref_date))
     ref_nav <- nav[ref_idx]
     last_nav <- nav[which.max(dates)]
-    
+
     if (is.na(ref_nav) || ref_nav == 0) return("")
     as.character(scales::percent(last_nav / ref_nav - 1, accuracy = 0.1))
   }
-  
+
   # Main results calculation
   results <- df %>%
     mutate(Date = as.Date(Date)) %>%
@@ -233,7 +245,7 @@ generate_html_table_periods<-function(df)
     summarise(
       last_date = max(Date),
       last_nav = last(NAV),
-      
+
       # YTD return
       ytd = {
         year_start <- as.Date(paste0(year(max(Date))-1, "-12-31"))
@@ -244,38 +256,37 @@ generate_html_table_periods<-function(df)
             as.character(scales::percent(last(NAV) / ref_nav - 1, accuracy = 0.1))
         }
       },
-      
+
       # Multi-year returns
       ret_1y = compute_return(Date, NAV, 1),
       ret_2y = compute_return(Date, NAV, 2),
       ret_3y = compute_return(Date, NAV, 3),
       ret_5y = compute_return(Date, NAV, 5),
-      
+
       # 1-year annualized volatility
-      #vol_1y = {
-      #  nav_1y <- NAV[Date >= max(Date) %m-% years(1)]
-      #  if (length(nav_1y) < 2) "" else {
-      #    rets <- diff(log(nav_1y))
-      #    freq <- ifelse(mean(diff(sort(unique(Date)))) <= 8, 252, 52)
-      #    as.character(scales::percent(sd(rets, na.rm = TRUE) * sqrt(freq), accuracy = 0.1))
-      #  }
-      #},
-      
       vol_1y = {
         one_year_ago <- max(Date) %m-% years(1)
+
+        # Subset NAV and dates in last 1 year
         nav_1y <- NAV[Date >= one_year_ago]
         dates_1y <- Date[Date >= one_year_ago]
-        
-        # Require at least 1 year of span and min 2 observations
-        if (length(nav_1y) < 2 || (max(dates_1y) - min(dates_1y)) < 365) {
+
+        # Require at least 2 observations AND coverage of at least ~1 year
+        span_days <- as.numeric(max(dates_1y) - min(dates_1y), units = "days")
+        if (length(nav_1y) < 2 || span_days < 360) {  # 360 to allow for weekends/holidays
           ""
         } else {
           rets <- diff(log(nav_1y))
-          freq <- ifelse(mean(diff(sort(unique(Date)))) <= 8, 252, 52)
+
+          # Annualization factor based on actual spacing
+          avg_diff_days <- mean(diff(sort(dates_1y)))
+          freq <- 365 / as.numeric(avg_diff_days, units = "days")
+
           as.character(scales::percent(sd(rets, na.rm = TRUE) * sqrt(freq), accuracy = 0.1))
         }
-      },
-      
+      }
+      ,
+
       .groups = "drop"
     ) %>%
     arrange(Category,AccountAlias, currency) %>%
@@ -284,8 +295,8 @@ generate_html_table_periods<-function(df)
       NAV = comma(last_nav, accuracy = 0.01)
     ) %>%
     dplyr::select(Category,IB_ID, AccountAlias, currency, `As of`, NAV, ytd, ret_1y, ret_2y, ret_3y, ret_5y, vol_1y)
-  
-  
+
+
   # Prepare data
   results_chr <- results %>%
     mutate(
@@ -293,7 +304,7 @@ generate_html_table_periods<-function(df)
     ) %>%
     dplyr::select(currency,Category, Strategy, `As of`, NAV, ytd, ret_1y, ret_2y, ret_3y, ret_5y, vol_1y) %>%
     mutate(across(everything(), as.character))
-  
+
   # Add empty row between currencies
   results_with_blanks <- results_chr %>%
     dplyr::group_split(currency) %>%
@@ -304,17 +315,17 @@ generate_html_table_periods<-function(df)
       NAV = "",
       ytd = "", ret_1y = "", ret_2y = "", ret_3y = "", ret_5y = "", vol_1y = ""
     )))
-  
-  
+
+
   results<-results_with_blanks
-  
+
   #------------------------------------------------------------------------------------------------------------------------
   # Remove completely empty rows
   results <- results %>% filter(!(currency == "" & Strategy == "" & `As of` == ""))
-  
+
   # Remove currency column from main table
   results_no_currency <- results %>% dplyr::select(-currency)
-  
+
   # Column name mapping
   col_names_map <- c(
     "Category"="Category",
@@ -328,9 +339,9 @@ generate_html_table_periods<-function(df)
     "ret_5y" = "5Y",
     "vol_1y" = "Vol 1Y"
   )
-  
+
   table_html <- "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>"
-  
+
   # Header
   table_html <- paste0(
     table_html,
@@ -338,7 +349,7 @@ generate_html_table_periods<-function(df)
     paste0("<th style='padding: 5px;'>", col_names_map[colnames(results_no_currency)], "</th>", collapse = ""),
     "</tr>"
   )
-  
+
   # Process currency blocks
   unique_currencies <- unique(results$currency)
   for (curr in unique_currencies) {
@@ -349,7 +360,7 @@ generate_html_table_periods<-function(df)
         "<tr style='height:15px;'><td colspan='", ncol(results_no_currency), "'></td></tr>"
       )
     }
-    
+
     # Currency row with grey line below
     table_html <- paste0(
       table_html,
@@ -357,8 +368,8 @@ generate_html_table_periods<-function(df)
       curr,
       "</td></tr>"
     )
-    
-    
+
+
     # Add rows for this currency
     curr_rows <- results %>% filter(currency == curr) %>% dplyr::select(-currency)
     for (i in 1:nrow(curr_rows)) {
@@ -376,12 +387,12 @@ generate_html_table_periods<-function(df)
         } else {
           table_html <- paste0(table_html, "<td style='padding:5px; text-align:left;'>", value, "</td>")
         }
-        
+
       }
       table_html <- paste0(table_html, "</tr>")
     }
   }
-  
+
   table_html <- paste0(table_html, "</table>")
   return(table_html)
 }
