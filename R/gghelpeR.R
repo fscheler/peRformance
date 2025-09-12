@@ -607,16 +607,47 @@ umbRuch<-function(x,l)
   return(x)
 }
 
-get_root_path<-function(search_variable="OneDrive")
-{
-  require(rstudioapi,lib="C:/Rlib")
-  require(rstudioapi)
+#get_root_path<-function(search_variable="OneDrive")
+#{
+#  require(rstudioapi,lib="C:/Rlib")
+#  require(rstudioapi)
+#
+#  full_path <- dirname(rstudioapi::getSourceEditorContext()$path)
+#  onedrive_path <- sub(paste0("(/",search_variable,"[^/]*).*"), "\\1", full_path)
+#  root_path <- sub(paste0("(^.*", onedrive_path, ").*"), "\\1", full_path)
+#  return(root_path)
+#}
 
-  full_path <- dirname(rstudioapi::getSourceEditorContext()$path)
-  onedrive_path <- sub(paste0("(/",search_variable,"[^/]*).*"), "\\1", full_path)
+get_root_path <- function(search_variable = "OneDrive", file_path = NULL) {
+  # Determine the full path
+  full_path <- NULL
+
+  # Option 1: User provides a file path explicitly
+  if (!is.null(file_path)) {
+    full_path <- normalizePath(file_path, winslash = "/", mustWork = TRUE)
+  } else {
+    # Option 2: RStudio session
+    if (requireNamespace("rstudioapi", quietly = TRUE) &&
+        rstudioapi::isAvailable()) {
+      context_path <- rstudioapi::getSourceEditorContext()$path
+      if (nzchar(context_path)) {
+        full_path <- normalizePath(dirname(context_path), winslash = "/", mustWork = TRUE)
+      }
+    }
+
+    # Option 3: Fallback to working directory
+    if (is.null(full_path)) {
+      full_path <- normalizePath(getwd(), winslash = "/", mustWork = TRUE)
+    }
+  }
+
+  # Extract root path based on search_variable
+  onedrive_path <- sub(paste0("(/", search_variable, "[^/]*).*"), "\\1", full_path)
   root_path <- sub(paste0("(^.*", onedrive_path, ").*"), "\\1", full_path)
+
   return(root_path)
 }
+
 
 
 read_xlsb<-function(wb,sheet)
