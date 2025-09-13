@@ -38,7 +38,19 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_e
   ds<-da[da$md<0,]
   ds<-ds%>%group_by(mdn)%>%mutate(trough=min(md))
 
-  ds$trough_date<-as.Date(ifelse(ds$md==ds$trough,ds$date,NA))
+  #ds$trough_date<-as.Date(ifelse(ds$md==ds$trough,ds$date,NA))
+
+  ds$trough_date <- ifelse(ds$md == ds$trough, ds$date, NA)
+  #ds$trough_date<-as.Date(ds$trough_date)
+
+  ds$trough_date <- tryCatch(
+    as.Date(ds$trough_date),
+    error = function(e) {
+      message("Error converting to Date. Printing original values:")
+      print(ds$trough_date)
+      return(ds$trough_date)  # return the original column unchanged
+    }
+  )
 
   #dtorigin_adj="1970-01-01"
   ds<-ds%>%group_by(mdn)%>%summarise(st_date=head(date,1),ed_date=tail(date,1),trough=min(md),trough_date=as.Date(max(trough_date,na.rm=T)))
