@@ -47,7 +47,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_e
     as.Date(ds$trough_date),
     error = function(e) {
       message("Error converting to Date. Printing original values:")
-      print(ds$trough_date)
+      print(head(ds$trough_date,5))
       return(ds$trough_date)  # return the original column unchanged
     }
   )
