@@ -579,6 +579,15 @@ indexR<-function(df,normalization="index",first_value_adj=0,rolln=NULL,annualiza
     }
   }
 
+  if(normalization=="convertnumeric")
+  {
+    indexfunction<-function(x)
+    {
+      x<-as.numeric(x)
+    }
+  }
+
+
   dfs<-df[,2:ncol(df)]
   dfs<-as.data.frame(dfs)
   dfs<-apply(dfs,2,indexfunction)

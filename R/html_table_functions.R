@@ -186,8 +186,8 @@ generate_html_table_calendar_years<-function(df)
 
 
 
-
-
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 generate_html_table_periods<-function(df)
 {
@@ -379,7 +379,7 @@ generate_html_table_periods<-function(df)
         value <- curr_rows[[col]][i]
         if (grepl("%", value) & col != "vol_1y") {
           numeric_val <- as.numeric(gsub("%","",value))
-          color <- ifelse(!is.na(numeric_val) & numeric_val > 0, "green", "black")
+          color <- ifelse(!is.na(numeric_val) & numeric_val > 0, "black", "green")
           display <- ifelse(is.na(numeric_val), "", value)
           table_html <- paste0(table_html, "<td style='padding:5px; color:", color, "; text-align:right;'>", display, "</td>")
         } else if (col %in% c("NAV","vol_1y")) {
@@ -396,3 +396,121 @@ generate_html_table_periods<-function(df)
   table_html <- paste0(table_html, "</table>")
   return(table_html)
 }
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+generate_html_table_meta_data <- function(df) {
+  library(scales)
+  currency_col <- if ("currency" %in% colnames(df)) "currency" else if ("Currency" %in% colnames(df)) "Currency" else stop("No currency column found.")
+
+  # Header display names (keys must match column names exactly)
+  col_names_map <- c(
+    "Category"     = "Category",
+    "Strategy"     = "Strategy",
+    "ISIN"         = "ISIN",
+    "As of"        = "As of",
+    "Mgmt. Fees"   = "Mgmt Fees",
+    "Perf. Fees"   = "Perf Fees",
+    "Certificates" = "Certificates",
+    "AUM"          = "AuM"
+  )
+
+  # Sort by currency, then by Category
+  results <- df[order(as.character(df[[currency_col]]), as.character(df$Category)), , drop = FALSE]
+  results_no_currency <- results[, setdiff(colnames(results), currency_col), drop = FALSE]
+
+  # Start table
+  table_html <- "<table style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>"
+
+  # Header row: left aligned, font color #04103b
+  header_labels <- sapply(colnames(results_no_currency), function(nm) {
+    if (nm %in% names(col_names_map)) col_names_map[[nm]] else nm
+  }, USE.NAMES = FALSE)
+
+  table_html <- paste0(
+    table_html,
+    "<tr style='background-color: #04103b; color: white; text-align:left;'>",
+    paste0("<th style='padding:5px; text-align:left;'>", header_labels, "</th>", collapse = ""),
+    "</tr>"
+  )
+
+  # Currency blocks
+  unique_currencies <- sort(unique(results[[currency_col]]))
+  month_abbr_custom <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec")
+  first_currency <- unique_currencies[1]
+
+  for (curr in unique_currencies) {
+    # Spacer row before currency block (except first)
+    if (!is.na(curr) && curr != first_currency) {
+      table_html <- paste0(table_html, "<tr style='height:15px;'><td colspan='", ncol(results_no_currency), "'></td></tr>")
+    }
+
+    # Currency row
+    table_html <- paste0(
+      table_html,
+      "<tr><td colspan='", ncol(results_no_currency),
+      "' style='font-weight:bold; text-align:left; padding:5px; border-bottom:0.5px solid #264478; color:#04103b;'>",
+      curr,
+      "</td></tr>"
+    )
+
+    # Rows for this currency
+    curr_rows <- results[as.character(results[[currency_col]]) == as.character(curr), , drop = FALSE]
+    curr_rows <- curr_rows[, setdiff(colnames(curr_rows), currency_col), drop = FALSE]
+
+    for (i in seq_len(nrow(curr_rows))) {
+      table_html <- paste0(table_html, "<tr style='height:22px;'>")
+
+      for (col in colnames(curr_rows)) {
+        raw_val <- curr_rows[[col]][i]
+        val_char <- if (is.na(raw_val)) "" else as.character(raw_val)
+
+        # Certificates / AUM
+        if (col %in% c("Certificates","AUM")) {
+          num <- suppressWarnings(as.numeric(gsub("[,\\s]", "", val_char)))
+          display <- if (!is.na(num)) formatC(num, format="f", big.mark=",", digits=0) else ""
+          table_html <- paste0(table_html, "<td style='padding:5px; text-align:right; color:#04103b;'>", display, "</td>")
+
+          # Mgmt. Fees / Perf. Fees
+        } else if (col %in% c("Mgmt. Fees","Perf. Fees")) {
+          if (val_char == "") { display <- ""; color <- "#04103b" } else {
+            num <- if (grepl("%", val_char)) suppressWarnings(as.numeric(gsub("%","",val_char))/100) else suppressWarnings(as.numeric(val_char))
+            display <- ifelse(is.na(num), "", percent(num, accuracy=0.01))
+            color <- ifelse(!is.na(num) && num > 0, "green", "#04103b")
+          }
+          table_html <- paste0(table_html, "<td style='padding:5px; text-align:right; color:", color, ";'>", display, "</td>")
+
+          # As of
+        } else if (col == "As of") {
+          if (val_char == "") { display <- "" } else {
+            date_val <- suppressWarnings(as.Date(val_char))
+            if (is.na(date_val)) date_val <- suppressWarnings(as.Date(val_char, "%Y-%m-%d"))
+            if (is.na(date_val)) { display <- val_char } else {
+              day <- format(date_val,"%d")
+              mnum <- as.integer(format(date_val,"%m"))
+              display <- paste0(day,"-",month_abbr_custom[mnum])
+            }
+          }
+          table_html <- paste0(table_html, "<td style='padding:5px; text-align:center; color:#04103b;'>", display, "</td>")
+
+          # default: left-align text
+        } else {
+          table_html <- paste0(table_html, "<td style='padding:5px; text-align:left; color:#04103b;'>", val_char, "</td>")
+        }
+      }
+
+      table_html <- paste0(table_html,"</tr>")
+    }
+  }
+
+  table_html <- paste0(table_html,"</table>")
+  return(table_html)
+}
+
+# Example usage:
+# names(df) <- c("Category","Strategy","ISIN","As of","Mgmt. Fees","Perf. Fees","currency","Certificates","AUM")
+# meta_data_table <- generate_html_table_meta_data(df)
+# cat(meta_data_table)
