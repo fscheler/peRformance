@@ -2658,3 +2658,45 @@ allocBarHL<-
     }
     return(p)
   }
+
+
+plotly_line <- function(df, title = "Title", subtitle = "Subtitle",
+                        xcap = "", ycap = "", name1 = "Portfolio",
+                        perc = TRUE,
+                        col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"),
+                        base_size = 24,dateformat="%m/%Y") {
+  library(plotly)
+
+  names(df) <- c("date", "asset")
+  df$date <- as.Date(df$date)
+
+  # Format y-axis if perc = TRUE
+  y_format <- if (perc) {
+    list(tickformat = ".2%")  # percentage with 2 decimals
+  } else {
+    list(tickformat = ".2f")  # numeric with 2 decimals
+  }
+
+  # Build plotly object
+  p <- plot_ly(
+    data = df,
+    x = ~date,
+    y = ~asset,
+    type = "scatter",
+    mode = "lines",
+    name = name1,
+    line = list(color = col_aq2[1], width = 2)
+  ) %>%
+    layout(
+      title = list(
+        text = paste0(title, "<br><sup>", subtitle, "</sup>"),
+        font = list(size = base_size)
+      ),
+      xaxis = list(title = xcap, tickformat = dateformat),
+      yaxis = c(list(title = ycap), y_format),
+      showlegend = FALSE,
+      margin = list(l = 50, r = 50, b = 50, t = 50, pad = 5)
+    )
+
+  return(p)
+}
