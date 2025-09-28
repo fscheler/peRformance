@@ -2708,7 +2708,7 @@ plotly_line <- function(df, title = "Title", subtitle = "Subtitle",
 
 
 
-performance_attribution_plotly<-function(pandldaily,amc,chart_title)
+performance_attribution_plotly<-function(pandldaily,amc,chart_title,base_cols = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"))
 {
 
 
@@ -2744,7 +2744,7 @@ performance_attribution_plotly<-function(pandldaily,amc,chart_title)
 
   # build a palette (you can replace with your own vector)
   nstrat <- length(strategy_order)
-  base_cols <- c("#04103b", "#dd0400", "#5777a7", "#D1E2EC")
+
   cols <- if (nstrat <= length(base_cols)) {
     base_cols[1:nstrat]
   } else {
