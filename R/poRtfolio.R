@@ -2700,3 +2700,127 @@ plotly_line <- function(df, title = "Title", subtitle = "Subtitle",
 
   return(p)
 }
+
+
+
+
+
+
+
+
+performance_attribution_plotly<-function(pandldaily,amc,chart_title)
+{
+
+
+  library(plotly)
+  library(dplyr)
+  library(tidyr)
+
+  # ensure dates are Date
+  pandldaily <- pandldaily %>% mutate(as_per = as.Date(as_per, format = "%d.%m.%Y"))
+  amc$Date <- as.Date(amc$Date)
+  amc_index <- indexR(amc[, c("Date", "NAV")], normalization = "index-1")
+
+  # ungroup first (important!)
+  pandldaily <- pandldaily %>% ungroup()
+
+  # create complete grid
+  unique_dates <- sort(unique(pandldaily$as_per))
+
+  pandldaily_complete <- pandldaily %>%
+    tidyr::complete(
+      as_per = unique_dates,
+      strategy = unique(strategy),  # explicit
+      fill = list(cumperc = 0)
+    ) %>%
+    arrange(strategy, as_per)
+
+  # order strategies (optional): by total absolute cumperc so stacking order is stable
+  strategy_order <- pandldaily_complete %>%
+    group_by(strategy) %>%
+    summarize(total_abs = sum(abs(cumperc), na.rm = TRUE)) %>%
+    arrange(desc(total_abs)) %>%
+    pull(strategy)
+
+  # build a palette (you can replace with your own vector)
+  nstrat <- length(strategy_order)
+  base_cols <- c("#04103b", "#dd0400", "#5777a7", "#D1E2EC")
+  cols <- if (nstrat <= length(base_cols)) {
+    base_cols[1:nstrat]
+  } else {
+    colorRampPalette(base_cols)(nstrat)
+  }
+  color_map <- setNames(cols, strategy_order)
+
+  # START building fig
+  fig <- plot_ly()
+
+  for (s in strategy_order) {
+    dpos <- pandldaily_complete %>% filter(strategy == s, cumperc >= 0)
+    dneg <- pandldaily_complete %>% filter(strategy == s, cumperc < 0)
+    col <- color_map[[s]]
+    fill_col <- grDevices::adjustcolor(col, alpha.f = 0.6)  # semi-transparent fill
+
+    # positive trace (show legend here if exists)
+    if (nrow(dpos) > 0) {
+      fig <- fig %>%
+        add_trace(
+          data = dpos,
+          x = ~as_per,
+          y = ~cumperc,
+          type = "scatter",
+          mode = "none",
+          stackgroup = "positive",    # all positives stack together
+          name = s,
+          legendgroup = s,
+          showlegend = TRUE,
+          fillcolor = fill_col,
+          line = list(color = col, width = 0.5)
+        )
+    }
+
+    # negative trace (hide legend if positive shown; otherwise show)
+    if (nrow(dneg) > 0) {
+      showleg <- ifelse(nrow(dpos) > 0, FALSE, TRUE)
+      fig <- fig %>%
+        add_trace(
+          data = dneg,
+          x = ~as_per,
+          y = ~cumperc,
+          type = "scatter",
+          mode = "none",
+          stackgroup = "negative",    # negatives stack downward
+          name = s,
+          legendgroup = s,
+          showlegend = showleg,
+          fillcolor = fill_col,
+          line = list(color = col, width = 0.5)
+        )
+    }
+  }
+
+  # add NAV line on top
+  fig <- fig %>%
+    add_trace(
+      data = amc_index,
+      x = ~Date,
+      y = ~NAV,
+      type = "scatter",
+      mode = "lines",
+      line = list(color = "black", width = 2),
+      name = "Amadeus Decorrelated Strategies",
+      inherit = FALSE
+    ) %>%
+    layout(
+      title = list(text = chart_title),
+      xaxis = list(title = "Date"),
+      yaxis = list(
+        title = "",
+        tickformat = ".2%"  # percentage with 2 decimals
+      ),
+      legend = list(orientation = "h", y = -0.2)
+    )
+
+  fig
+
+}
