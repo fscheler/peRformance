@@ -2718,8 +2718,12 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
 
   # ensure dates are Date
   pandldaily <- pandldaily %>% mutate(as_per = as.Date(as_per, format = "%d.%m.%Y"))
-  try(amc$Date <- as.Date(amc$Date),silent=T)
-  try(amc_index <- indexR(amc[, c("Date", "NAV")], normalization = "index-1"),silent=T)
+  if(!is.null(amc))
+  {
+    try(amc$Date <- as.Date(amc$Date),silent=T)
+    try(amc_index <- indexR(amc[, c("Date", "NAV")], normalization = "index-1"),silent=T)
+  }
+
 
   # ungroup first (important!)
   pandldaily <- pandldaily %>% ungroup()
@@ -2812,17 +2816,18 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
         line = list(color = "black", width = 2),
         name = "Amadeus Decorrelated Strategies",
         inherit = FALSE
-      ) %>%
-      layout(
-        title = list(text = chart_title),
-        xaxis = list(title = "Date"),
-        yaxis = list(
-          title = "",
-          tickformat = ".2%"  # percentage with 2 decimals
-        ),
-        legend = list(orientation = "h", y = -0.2)
       )
   }
-  fig
+  fig<-fig%>%
+    layout(
+      title = list(text = chart_title),
+      xaxis = list(title = "Date"),
+      yaxis = list(
+        title = "",
+        tickformat = ".2%"  # percentage with 2 decimals
+      ),
+      legend = list(orientation = "h", y = -0.2)
+    )
+  return(fig)
 
 }
