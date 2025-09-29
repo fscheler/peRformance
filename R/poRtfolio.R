@@ -2708,7 +2708,7 @@ plotly_line <- function(df, title = "Title", subtitle = "Subtitle",
 
 
 
-performance_attribution_plotly<-function(pandldaily,amc,chart_title,base_cols = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"))
+performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_cols = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"))
 {
 
 
@@ -2718,8 +2718,8 @@ performance_attribution_plotly<-function(pandldaily,amc,chart_title,base_cols = 
 
   # ensure dates are Date
   pandldaily <- pandldaily %>% mutate(as_per = as.Date(as_per, format = "%d.%m.%Y"))
-  amc$Date <- as.Date(amc$Date)
-  amc_index <- indexR(amc[, c("Date", "NAV")], normalization = "index-1")
+  try(amc$Date <- as.Date(amc$Date),silent=T)
+  try(amc_index <- indexR(amc[, c("Date", "NAV")], normalization = "index-1"),silent=T)
 
   # ungroup first (important!)
   pandldaily <- pandldaily %>% ungroup()
@@ -2799,28 +2799,30 @@ performance_attribution_plotly<-function(pandldaily,amc,chart_title,base_cols = 
     }
   }
 
-  # add NAV line on top
-  fig <- fig %>%
-    add_trace(
-      data = amc_index,
-      x = ~Date,
-      y = ~NAV,
-      type = "scatter",
-      mode = "lines",
-      line = list(color = "black", width = 2),
-      name = "Amadeus Decorrelated Strategies",
-      inherit = FALSE
-    ) %>%
-    layout(
-      title = list(text = chart_title),
-      xaxis = list(title = "Date"),
-      yaxis = list(
-        title = "",
-        tickformat = ".2%"  # percentage with 2 decimals
-      ),
-      legend = list(orientation = "h", y = -0.2)
-    )
-
+  if(is.null(amc))
+  {
+    # add NAV line on top
+    fig <- fig %>%
+      add_trace(
+        data = amc_index,
+        x = ~Date,
+        y = ~NAV,
+        type = "scatter",
+        mode = "lines",
+        line = list(color = "black", width = 2),
+        name = "Amadeus Decorrelated Strategies",
+        inherit = FALSE
+      ) %>%
+      layout(
+        title = list(text = chart_title),
+        xaxis = list(title = "Date"),
+        yaxis = list(
+          title = "",
+          tickformat = ".2%"  # percentage with 2 decimals
+        ),
+        legend = list(orientation = "h", y = -0.2)
+      )
+  }
   fig
 
 }
