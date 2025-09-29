@@ -2799,7 +2799,7 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
     }
   }
 
-  if(is.null(amc))
+  if(!is.null(amc))
   {
     # add NAV line on top
     fig <- fig %>%
