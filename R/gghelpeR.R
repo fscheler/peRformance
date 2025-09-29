@@ -722,3 +722,32 @@ send_conf_email <- function(
 
   message("Email sent successfully with subject line!")
 }
+
+
+get_clean_root <- function(search_variable = "OneDrive", file_path = NULL) {
+  full_path <- NULL
+
+  # 1. Decide which path to normalize
+  if (!is.null(file_path)) {
+    full_path <- normalizePath(file_path, winslash = "/", mustWork = TRUE)
+  } else {
+    if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+      context_path <- rstudioapi::getSourceEditorContext()$path
+      if (nzchar(context_path)) {
+        full_path <- normalizePath(dirname(context_path), winslash = "/", mustWork = TRUE)
+      }
+    }
+    if (is.null(full_path)) {
+      full_path <- normalizePath(getwd(), winslash = "/", mustWork = TRUE)
+    }
+  }
+
+  # 2. Strip out the OneDrive portion (case-insensitive, literal match)
+  root_path <- sub(paste0("/", search_variable, "[^/]*"), "", full_path, ignore.case = TRUE)
+
+  # 3. Return only up to the user directory (C:/Users/Name)
+  # e.g. remove everything after "C:/Users/<username>"
+  root_path <- sub("^((?:.*/Users/[^/]+)).*$", "\\1", root_path)
+
+  return(root_path)
+}
