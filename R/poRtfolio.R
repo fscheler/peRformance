@@ -2689,8 +2689,8 @@ plotly_line <- function(df, title = "Title", subtitle = "Subtitle",
   ) %>%
     layout(
       title = list(
-        text = paste0(title, "<br><sup>", subtitle, "</sup>"),
-        font = list(size = base_size)
+        text = paste0(title)
+        #font = list(size = base_size)
       ),
       xaxis = list(title = xcap, tickformat = dateformat),
       yaxis = c(list(title = ycap), y_format),
