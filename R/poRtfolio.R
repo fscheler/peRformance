@@ -2594,70 +2594,96 @@ fxtRanslate<-function(dfe,fx_rates,base_currency="CHF",instrument_currency="USD"
 
 
 
+allocBarHL <- function(da, chart_title = "Portfolio Allocation", chart_subtitle = "Optional",
+                       chart_height = 400, chart_font_size = 11, chart_export_width = 600,
+                       chart_export_height = 450, m = list(r = 0, l = 0, b = 0, t = 50, par = 4),
+                       plotly = TRUE, title_pos = "center", perc = ".0%", highlight_assets = "Germany",
+                       base_size = 20,col_aq2 = as.character(c("#04103b", "#dd0400", "#3b5171"))) {
 
-allocBarHL<-
-  function (da, chart_title = "Portfolio Allocation", chart_subtitle = "Optional",
-            chart_height = 400, chart_font_size = 11, chart_export_width = 600,
-            chart_export_height = 450, m = list(r = 0, l = 0, b = 0,
-                                                t = 50, par = 4), plotly = T, title_pos = "center",
-            perc = ".0%",highlight_assets="Germany",base_size=20)
-  {
-    library(dplyr)
-    library(plotly)
-    library(lubridate)
-    library(dplyr)
-    da <- as.data.frame(da)
-    da <- da[, 1:2]
-    names(da) <- c("assets", "weight")
-    da$weight <- as.numeric(da$weight)
-    col_aq2 <- as.character(c("#04103b", "#dd0400", "#3b5171"))
-    y_axis_caption <- ""
-    da <- da %>% dplyr::group_by(assets) %>% dplyr::summarize(weight = sum(as.numeric(weight)))
-    da$assets <- factor(da$assets, levels = unique(da$assets)[order(as.numeric(da$weight),
-                                                                    decreasing = F)])
-    p <- plot_ly(da, x = as.numeric(da$weight), y = da$assets,
-                 height = chart_height, type = "bar", name = "Portfolio",
-                 marker = list(color = col_aq2[1]))
-    p <- p %>% layout(margin = m, font = list(size = chart_font_size),
-                      title = chart_title, xaxis = list(title = y_axis_caption,
-                                                        tickformat = perc), yaxis = list(title = y_axis_caption),
-                      barmode = "group")
-    p <- p %>% config(toImageButtonOptions = list(format = "svg",
-                                                  filename = "allocation_pie", width = chart_export_width,
-                                                  height = chart_export_height))
-    if (plotly != T) {
-      p <- ggplot(da, aes(
-        x = as.numeric(weight),
-        y = assets,
-        fill = ifelse(assets == highlight_assets, "highlight", "normal")
-      )) +
-        geom_bar(stat = "identity") +
-        scale_fill_manual(
-          values = c("normal" = col_aq2[1], "highlight" = col_aq2[2])
-        ) +
-        theme_aq_black_default_font(base_size = base_size) +
-        labs(title = chart_title, subtitle = chart_subtitle, x = "",y="", caption = "") +
-        theme(
-          plot.margin = margin(l = 5, r = 10, b = 5, t = 5),
-          legend.position = "none",
-          legend.margin = margin(-20, -20, -20, -20),
-          legend.box.margin = margin(15, 0, 30, 0),
-          panel.grid.major.x = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          legend.title = element_blank()
-        ) +
-        guides(fill = guide_legend(nrow = 1, byrow = TRUE))
-      if (title_pos == "left") {
-        p <- p + theme(plot.caption = element_text(hjust = 0.2),
-                       plot.title.position = "plot", plot.caption.position = "plot")
-      }
-      if (perc == ".0%") {
-        p <- p + scale_x_continuous(labels = scales::percent_format(accuracy = 1))
-      }
+  library(dplyr)
+  library(plotly)
+  library(lubridate)
+
+  da <- as.data.frame(da)
+  da <- da[, 1:2]
+  names(da) <- c("assets", "weight")
+  da$weight <- as.numeric(da$weight)
+
+
+
+  y_axis_caption <- ""
+
+  # Aggregate weights by asset
+  da <- da %>% group_by(assets) %>% summarize(weight = sum(weight), .groups = "drop")
+
+  # Order assets by weight
+  da$assets <- factor(da$assets, levels = unique(da$assets)[order(da$weight, decreasing = FALSE)])
+
+  # Define colors for Plotly bars
+  da$color <- ifelse(da$assets == highlight_assets, col_aq2[2], col_aq2[1])
+
+  if (plotly) {
+    # Plotly version
+    p <- plot_ly(
+      da,
+      x = as.numeric(da$weight),
+      y = da$assets,
+      height = chart_height,
+      type = "bar",
+      name = "Portfolio",
+      marker = list(color = da$color)
+    )
+
+    p <- p %>% layout(
+      margin = m,
+      font = list(size = chart_font_size),
+      title = chart_title,
+      xaxis = list(title = y_axis_caption, tickformat = perc),
+      yaxis = list(title = y_axis_caption),
+      barmode = "group"
+    )
+
+    p <- p %>% config(
+      toImageButtonOptions = list(
+        format = "svg",
+        filename = "allocation_pie",
+        width = chart_export_width,
+        height = chart_export_height
+      )
+    )
+
+  } else {
+    # ggplot version
+    library(ggplot2)
+
+    p <- ggplot(da, aes(x = weight, y = assets,
+                        fill = ifelse(assets == highlight_assets, "highlight", "normal"))) +
+      geom_bar(stat = "identity") +
+      scale_fill_manual(values = c(normal = col_aq2[1], highlight = col_aq2[2])) +
+      theme_minimal(base_size = base_size) +
+      labs(title = chart_title, subtitle = chart_subtitle, x = "", y = "", caption = "") +
+      theme(
+        plot.margin = margin(l = 5, r = 10, b = 5, t = 5),
+        legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+      )
+
+    if (title_pos == "left") {
+      p <- p + theme(plot.title.position = "plot", plot.caption.position = "plot")
     }
-    return(p)
+
+    if (perc == ".0%") {
+      p <- p + scale_x_continuous(labels = scales::percent_format(accuracy = 1))
+    }
   }
+
+  return(p)
+}
+
+
+
 
 
 plotly_line <- function(df, title = "Title", subtitle = "Subtitle",
