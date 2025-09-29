@@ -2847,12 +2847,12 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
   fig<-fig%>%
     layout(
       title = list(text = chart_title),
-      xaxis = list(title = "Date"),
+      xaxis = list(title = ""),
       yaxis = list(
         title = "",
         tickformat = ".2%"  # percentage with 2 decimals
       ),
-      legend = list(orientation = "h", y = -0.2)
+      legend = list(orientation = "h",h=0.5,y=-0.2)
     )
   return(fig)
 
