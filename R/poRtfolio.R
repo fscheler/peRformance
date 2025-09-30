@@ -2857,3 +2857,117 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
   return(fig)
 
 }
+
+
+
+allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_height = 600,
+                            chart_font_size = 12, title_font_size = 16, bargap = 0.2,
+                            barcol = "#5777a7", barborder = "#04103b",
+                            line_color = "#5777a7", line_width = 0.5, connector_space = 0.05,
+                            category_font_color = "#5777a7", min_label_spacing = 0.03) {
+  library(dplyr)
+  library(plotly)
+  da <- da[, 1:3]
+  names(da) <- c("asset", "weight", "strategy")
+  da$weight <- as.numeric(da$weight)
+
+  # Order descending by weight
+  da <- da %>% arrange(desc(weight))
+  da$asset_factor <- factor(da$asset, levels = da$asset)
+
+  # Compute range for proportional spacing
+  range_height <- max(da$weight) - min(da$weight)
+
+  # Base bar chart
+  p <- plot_ly() %>% add_bars(
+    data = da,
+    x = ~asset_factor,
+    y = ~weight,
+    marker = list(color = barcol, line = list(color = barborder, width = 0.5)),
+    text = ~paste0(round(weight * 100, 2), "%"),
+    textposition = "outside",
+    name = "Portfolio"
+  )
+
+  strategies <- unique(da$strategy)
+  label_positions <- c()  # Track previous label y-positions
+
+  for (strat in strategies) {
+    da_strat <- da %>% filter(strategy == strat)
+    if (nrow(da_strat) < 1) next
+
+    x_start <- da_strat$asset_factor[1]
+    x_end <- da_strat$asset_factor[nrow(da_strat)]
+
+    # Initial connector height based on tallest bar
+    y_connector <- max(da_strat$weight, 0) + connector_space * range_height
+
+    # Strategy label position (bumped for min spacing)
+    y_label <- y_connector + connector_space * range_height * 0.8
+    if (length(label_positions) > 0) {
+      for (prev_y in label_positions) {
+        while (abs(y_label - prev_y) < min_label_spacing * range_height) {
+          y_label <- y_label + min_label_spacing * range_height
+        }
+      }
+    }
+
+    # Horizontal connector line just below the label
+    y_horiz <- y_label - connector_space * range_height / 8
+    p <- p %>% add_segments(
+      x = x_start, xend = x_end,
+      y = y_horiz, yend = y_horiz,
+      line = list(color = line_color, width = line_width),
+      showlegend = FALSE
+    )
+
+    # Vertical lines from bar top (or 0) up to horizontal connector
+    for (x_vert in c(x_start, x_end)) {
+      y_val <- da_strat$weight[which(da_strat$asset_factor == x_vert)]
+      y_bottom <- ifelse(y_val > 0, y_val, 0)
+      p <- p %>% add_segments(
+        x = x_vert, xend = x_vert,
+        y = y_bottom, yend = y_horiz,
+        line = list(color = line_color, width = line_width),
+        showlegend = FALSE
+      )
+    }
+
+    # Add strategy label
+    mid_index <- ceiling(nrow(da_strat) / 2)
+    x_center <- da_strat$asset_factor[mid_index]
+    p <- p %>% add_text(
+      x = x_center,
+      y = y_label,
+      text = strat,
+      textposition = "top center",
+      showlegend = FALSE,
+      textfont = list(color = category_font_color)
+    )
+
+    # Store label position
+    label_positions <- c(label_positions, y_label)
+  }
+
+  # Layout
+  p <- p %>% layout(
+    title = list(text = chart_title, font = list(size = title_font_size)),
+    xaxis = list(
+      title = "",
+      tickangle = -45,
+      categoryorder = "array",
+      categoryarray = da$asset_factor
+    ),
+    yaxis = list(
+      title = "",
+      showticklabels = TRUE,
+      tickformat = ".2%"
+    ),
+    barmode = "overlay",
+    bargap = bargap,
+    font = list(size = chart_font_size),
+    height = chart_height
+  )
+
+  return(p)
+}
