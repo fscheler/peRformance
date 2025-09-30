@@ -2859,7 +2859,6 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
 }
 
 
-
 allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_height = 600,
                             chart_font_size = 12, title_font_size = 16, bargap = 0.2,
                             barcol = "#5777a7", barborder = "#04103b",
@@ -2867,6 +2866,7 @@ allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_heig
                             category_font_color = "#5777a7", min_label_spacing = 0.03) {
   library(dplyr)
   library(plotly)
+
   da <- da[, 1:3]
   names(da) <- c("asset", "weight", "strategy")
   da$weight <- as.numeric(da$weight)
@@ -2878,14 +2878,12 @@ allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_heig
   # Compute range for proportional spacing
   range_height <- max(da$weight) - min(da$weight)
 
-  # Base bar chart
+  # Base bar chart (without text labels)
   p <- plot_ly() %>% add_bars(
     data = da,
     x = ~asset_factor,
     y = ~weight,
     marker = list(color = barcol, line = list(color = barborder, width = 0.5)),
-    text = ~paste0(round(weight * 100, 2), "%"),
-    textposition = "outside",
     name = "Portfolio"
   )
 
@@ -2949,6 +2947,22 @@ allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_heig
     label_positions <- c(label_positions, y_label)
   }
 
+  # Add numeric value annotations with white semi-transparent background (no border)
+  for (i in 1:nrow(da)) {
+    p <- p %>% add_annotations(
+      x = da$asset_factor[i],
+      y = da$weight[i],
+      text = paste0(round(da$weight[i] * 100, 2), "%"),
+      xanchor = "center",
+      yanchor = ifelse(da$weight[i] >= 0, "bottom", "top"),
+      showarrow = FALSE,
+      font = list(size = chart_font_size),
+      bgcolor = "rgba(255,255,255,0.7)",  # white, 70% opacity
+      bordercolor = "rgba(0,0,0,0)",      # fully transparent border
+      borderpad = 2
+    )
+  }
+
   # Layout
   p <- p %>% layout(
     title = list(text = chart_title, font = list(size = title_font_size)),
@@ -2961,12 +2975,14 @@ allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_heig
     yaxis = list(
       title = "",
       showticklabels = TRUE,
-      tickformat = ".2%"
+      tickformat = ".2%",
+      showgrid = FALSE   # remove horizontal gridlines
     ),
     barmode = "overlay",
     bargap = bargap,
     font = list(size = chart_font_size),
-    height = chart_height
+    height = chart_height,
+    plot_bgcolor = "white"
   )
 
   return(p)
