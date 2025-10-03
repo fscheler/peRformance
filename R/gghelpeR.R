@@ -751,3 +751,50 @@ get_clean_root <- function(search_variable = "OneDrive", file_path = NULL) {
 
   return(root_path)
 }
+
+
+
+
+
+sftpZIPReader<-function(sftp_file_path="",sftp_user="",sftp_password="",clean_up="Yes")
+{
+  library(curl)
+
+  # Remote SFTP path to the ZIP
+  sftp_file = paste0("sftp://",sftp_user,":",sftp_password,"@",sftp_file_path)
+
+  # Local temporary path
+  local_zip <- tempfile(fileext = ".zip")
+
+  # Download the ZIP
+  curl_download(sftp_file, local_zip)
+
+  # List contents of the ZIP
+  files_in_zip <- unzip(local_zip, list = TRUE)$Name
+
+  # Keep only CSVs
+  csv_files <- files_in_zip[grepl("\\.csv$", files_in_zip, ignore.case = TRUE)]
+
+  # Extract and read A1 from each CSV inside the ZIP
+  results <- lapply(csv_files, function(f) {
+    val <- read.csv(unz(local_zip, f), header = FALSE, nrows = 1)[1,1]
+    data.frame(file = f, A1 = val, stringsAsFactors = FALSE)
+  })
+
+  # Combine results
+  final_df <- do.call(rbind, results)
+
+  # Clean up temporary ZIP
+  if(clean_up=="Yes")
+  {
+    unlink(local_zip)
+    resl<-list("contents"=final_df)
+  }else{
+    resl<-list("contents"=final_df,local_zip=local_zip)
+  }
+
+
+
+  return(resl)
+
+}

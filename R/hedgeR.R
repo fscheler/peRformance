@@ -4,6 +4,23 @@
 FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates_gui=NULL,fxforwards_gui=NULL)
 {
 
+  if(base_currency==exp_currency)
+  {
+    hedge_perf<-data.frame(
+      Dates=fxrates_gui$Dates,
+      Hedge=rep(1,length(fxrates_gui$Dates))
+    )
+    hedge_cost_perc<-data.frame(
+      Dates=fxrates_gui$Dates,
+      Hedge=rep(0,length(fxrates_gui$Dates))
+    )
+    cumulative_hedge_cost<-data.frame(
+      Dates=fxrates_gui$Dates,
+      Hedge=rep(1,length(fxrates_gui$Dates))
+    )
+  }else{
+
+
   options(warn=-1)
 
   if (!require("tibble")) install.packages("tibble")
@@ -99,6 +116,7 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 
   }else{
 
+
     divide_head<-function(x)
     { x<-x/head(x,1) }
     cumprod_apply<-function(x)
@@ -126,6 +144,8 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
   hedge_perf<-hedge_perf[,c("Dates","Hedge")]
 
   names(cumulative_hedge_cost)<-c("Dates","Hedge")
+
+  }
 
   hl<-list('hedge_perf'=hedge_perf,'hedge_cost_perc'=hedge_cost_perc,'cumulative_hedge_cost'=cumulative_hedge_cost)
 
