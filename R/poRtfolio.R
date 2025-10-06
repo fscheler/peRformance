@@ -765,7 +765,7 @@ boxeR<-function()
 rangeR<-
   rangeR <- function (y = c("Dividend Yield %"), benchmark = 2.2, portfolio = 3.9,
                       caption_bm = paste0(2.2, "%"), caption_po = paste0(3.9, "%"),
-                      chart_height = 200, m = list(r = 0, l = 0, b = 0, t = 0, par = 4),minoffset=25,specialoffsetthreshold=0.5) {
+                      chart_height = 200, m = list(r = 0, l = 0, b = 0, t = 0, par = 4),minoffset=25,specialoffsetthreshold=0.5,specialoffset=70) {
 
     library(plotly)
     s <- data.frame(y, benchmark, portfolio)
@@ -780,7 +780,7 @@ rangeR<-
 
     # ---- Avoid overlapping annotations (left & right offset) ----
     dx <- abs(s$benchmark - s$portfolio)
-    offset <- ifelse(dx < specialoffsetthreshold, 40, minoffset)   # increase horizontal offset if too close
+    offset <- ifelse(dx < specialoffsetthreshold, specialoffset, minoffset)   # increase horizontal offset if too close
 
     fig <- fig %>% add_annotations(x = s$benchmark, y = s$y,
                                    text = caption_bm, xref = "x", yref = "y",
