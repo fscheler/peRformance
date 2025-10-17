@@ -798,3 +798,41 @@ sftpZIPReader<-function(sftp_file_path="",sftp_user="",sftp_password="",clean_up
   return(resl)
 
 }
+
+
+write_with_varchar_margin <- function(con, table_name, df, overwrite = TRUE, varchar_margin = 50) {
+  # Compute maximum observed string length per character/factor column
+  max_len <- sapply(df, function(x) if (is.character(x)) max(nchar(x), na.rm = TRUE) else NA)
+
+  # Build SQL type definitions
+  field.types <- sapply(names(df), function(col) {
+    x <- df[[col]]
+    if (is.character(x)) {
+      base_len <- ifelse(is.finite(max_len[col]), max_len[col], 0)
+      paste0("VARCHAR(", base_len + varchar_margin, ")")
+    } else if (is.factor(x)) {
+      levels_len <- max(nchar(levels(x)), na.rm = TRUE)
+      paste0("VARCHAR(", levels_len + varchar_margin, ")")
+    } else if (is.numeric(x)) {
+      "DOUBLE"
+    } else if (inherits(x, "Date")) {
+      "DATE"
+    } else if (inherits(x, "POSIXt")) {
+      "DATETIME"
+    } else if (is.logical(x)) {
+      "TINYINT(1)"
+    } else {
+      "TEXT"  # fallback
+    }
+  }, USE.NAMES = TRUE)
+
+  # Ensure it's a named character vector
+  field.types <- as.character(field.types)
+  names(field.types) <- names(df)
+
+  # Write the table
+  DBI::dbWriteTable(con, table_name, df, overwrite = overwrite, field.types = field.types)
+
+  message(sprintf("Table '%s' written successfully with +%d character margin for VARCHAR columns.",
+                  table_name, varchar_margin))
+}
