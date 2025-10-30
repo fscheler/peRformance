@@ -156,6 +156,58 @@ FXhedgeR<-function(base_currency='USD',exp_currency='EUR',just_convert=F,fxrates
 }
 
 
+fxConvert <- function(df, fx, target_ccy) {
+
+  #Takes gaa_fx_rates dataframe
+
+  # --- Basic validation ---
+  stopifnot(
+    "portfolio_ref_ccy" %in% names(df),
+    "current_net_total_ref_ccy" %in% names(df),
+    "Dates" %in% names(fx)
+  )
+
+  # Use the latest available fx row (you can extend to date matching later)
+  fx_latest <- fx[nrow(fx), , drop = FALSE]
+
+  # Helper: get EUR→currency rate
+  get_eur_to <- function(ccy, fx_row) {
+    if (ccy == "EUR") return(1)
+    col <- paste0("EUR", ccy)
+    if (col %in% names(fx_row)) {
+      as.numeric(fx_row[[col]])
+    } else {
+      NA_real_
+    }
+  }
+
+  # Compute cross rate via EUR
+  get_fx_rate <- function(from, to, fx_row) {
+    if (from == to) return(1)
+    eur_to_from <- get_eur_to(from, fx_row)   # EUR→FROM
+    eur_to_to   <- get_eur_to(to, fx_row)     # EUR→TO
+
+    if (is.na(eur_to_from) || is.na(eur_to_to)) {
+      return(NA_real_)
+    }
+
+    # from→to = (EUR→to) / (EUR→from)
+    eur_to_to / eur_to_from
+  }
+
+  # Vectorized apply
+  df$fx_rate <- mapply(
+    function(ref_ccy, value) get_fx_rate(ref_ccy, target_ccy, fx_latest),
+    df$portfolio_ref_ccy,
+    df$current_net_total_ref_ccy
+  )
+
+  df$converted_to_target <- df$current_net_total_ref_ccy * df$fx_rate
+
+  df
+}
+
+
 #df<-FXhedgeR(base_currency='EUR',exp_currency='CHF',just_convert=F)
 
 #tail(df$forwards_perc,1)
