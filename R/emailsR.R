@@ -113,4 +113,18 @@ search_and_save_emails<-function(search_for_subject,search_in_folder,save_in_fol
 }
 
 
+fileemoveR<-function(folder_path,names)
+{
+  # Define folder path
+
+  # List all files (adjust pattern if you only want PDFs, etc.)
+  files <- list.files(folder_path, full.names = TRUE)
+
+  # Define undesired pattern (example: files containing 'temp' or 'old')
+  undesired_files <- files[grepl(names, basename(files), ignore.case = TRUE)]
+
+  # Delete them
+  file.remove(undesired_files)
+
+}
 
