@@ -50,7 +50,7 @@ search_and_save_emails_multi_search <- function(search_terms, search_in_folder, 
 
   # Filter emails containing any of the search strings
   emails <- Filter(function(m) {
-    subj <- m$properties$subject %||% ""
+    subj <- m$properties$subject rlang::`%||%` ""
     any(sapply(search_terms, function(term) grepl(term, subj, fixed = TRUE, ignore.case = TRUE)))
   }, emails)
 
@@ -148,7 +148,7 @@ search_and_save_emails<-function(search_for_subject,search_in_folder,save_in_fol
     }
   }
 
-  emails <- Filter(function(m) grepl(search_for_subject, m$properties$subject %||% "", fixed = TRUE, ignore.case = TRUE), emails)
+  emails <- Filter(function(m) grepl(search_for_subject, m$properties$subject rlang::`%||%` "", fixed = TRUE, ignore.case = TRUE), emails)
 
   # Define output folder
   output_dir <- save_in_folder
@@ -252,7 +252,7 @@ search_and_save_emails_no_attachment <- function(search_for_subject, search_in_f
   }
 
   # Filter emails by subject
-  emails <- Filter(function(m) grepl(search_for_subject, m$properties$subject %||% "", fixed = TRUE, ignore.case = TRUE), emails)
+  emails <- Filter(function(m) grepl(search_for_subject, m$properties$subject rlang::`%||%` "", fixed = TRUE, ignore.case = TRUE), emails)
 
   # Keep only emails without attachments
   emails_to_process <- Filter(function(em) {
