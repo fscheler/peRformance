@@ -391,3 +391,36 @@ fuzzyfileR <- function(search_term, folder_path, threshold = 80) {
     return(matching_files[1])
   }
 }
+
+
+fuzzyfileR2 <- function(search_term, all_files, threshold = 80) {
+  # Load required library
+  if (!requireNamespace("stringdist", quietly = TRUE)) {
+    stop("Please install the 'stringdist' package: install.packages('stringdist')")
+  }
+
+
+
+  # Define a helper function for fuzzy similarity (Jaro-Winkler scaled 0–100)
+  fuzzy_score <- function(a, b) {
+    (1 - stringdist::stringdist(tolower(a), tolower(b), method = "jw")) * 100
+  }
+
+  # Compute similarity for all files
+  scores <- vapply(all_files, function(f) fuzzy_score(search_term, f), numeric(1))
+
+  # Filter matches above threshold
+  matching_files <- all_files[scores > threshold]
+
+  # Print results
+  cat("Matching files:\n")
+  if (length(matching_files) == 0) {
+    cat("No matches found.\n")
+    return(NULL)
+  } else {
+    cat(paste(matching_files, collapse = "\n"), "\n")
+    # Return best match (first match)
+    return(matching_files[1])
+  }
+}
+
