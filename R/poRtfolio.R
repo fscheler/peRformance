@@ -2590,7 +2590,59 @@ fxtRanslate<-function(dfe,fx_rates,base_currency="CHF",instrument_currency="USD"
   dfe$pf_ret[1]<-0
   return(dfe)
 }
+fxTranslateIDs <- function(dfe, fx_rates, base_currency) {
+  # Rename input columns to standard names
+  names(dfe) <- c("ticker", "price", "instrument_currency")
+  dfe$instrument_currency <- toupper(dfe$instrument_currency)
 
+  # Check base_currency vector length
+  if (length(base_currency) != nrow(dfe)) {
+    stop("Length of base_currency must equal number of rows in dfe.")
+  }
+
+  # Preserve original order
+  dfe$row_id <- seq_len(nrow(dfe))
+  dfe$base_currency <- base_currency
+
+  # --- Use the most recent FX rates ---
+  latest_date <- max(fx_rates$Dates, na.rm = TRUE)
+  fx_latest <- fx_rates[fx_rates$Dates == latest_date, , drop = FALSE]
+
+  # Remove date column and convert to named numeric vector
+  fx_vec <- as.list(fx_latest[1, -which(names(fx_latest) == "Dates")])
+
+  # --- Helper function to convert one row ---
+  convert_price <- function(price, inst_cur, base_cur, fx) {
+    if (inst_cur == base_cur) return(price)
+
+    # Handle EUR as base or instrument
+    rate_base <- if (base_cur == "EUR") 1 else fx[[paste0("EUR", base_cur)]]
+    rate_inst <- if (inst_cur == "EUR") 1 else fx[[paste0("EUR", inst_cur)]]
+
+    if (is.null(rate_base) || is.null(rate_inst)) {
+      warning(paste("Missing FX rate for", inst_cur, "or", base_cur))
+      return(NA_real_)
+    }
+
+    price / rate_inst * rate_base
+  }
+
+  # --- Apply conversion row-wise (order preserved) ---
+  dfe$price_translated <- mapply(
+    convert_price,
+    price = dfe$price,
+    inst_cur = dfe$instrument_currency,
+    base_cur = dfe$base_currency,
+    MoreArgs = list(fx = fx_vec),
+    SIMPLIFY = TRUE
+  )
+
+  # --- Ensure order is identical to input ---
+  dfe <- dfe[order(dfe$row_id), ]
+
+  # --- Return translated table ---
+  dfe[, c("ticker", "price", "instrument_currency", "base_currency", "price_translated")]
+}
 
 
 
