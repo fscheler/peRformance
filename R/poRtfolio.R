@@ -3039,3 +3039,63 @@ allocBarhDendro <- function(da, chart_title = "Portfolio Allocation", chart_heig
 
   return(p)
 }
+
+
+
+#Correlation with lags
+coRRelrobust <- function(df_returns, n_lags = 5) {
+  library(zoo)
+
+  # Keep only numeric columns
+  returns <- df_returns[, sapply(df_returns, is.numeric)]
+  cols <- colnames(returns)
+
+  # Initialize correlation matrix
+  cor_matrix <- matrix(NA, nrow = length(cols), ncol = length(cols))
+  rownames(cor_matrix) <- cols
+  colnames(cor_matrix) <- cols
+
+  for(dep_col in cols) {
+    X <- returns[[dep_col]]
+
+    for(ind_col in cols) {
+      if(dep_col == ind_col) {
+        cor_matrix[dep_col, ind_col] <- 1
+        next
+      }
+
+      Y <- returns[[ind_col]]
+      n <- length(X)
+
+      # Skip if not enough data for lags
+      if(n <= n_lags) {
+        cor_matrix[dep_col, ind_col] <- NA
+        next
+      }
+
+      # Create lagged predictors
+      df <- data.frame(Y0 = Y)
+      for(l in 1:n_lags) df[[paste0("Y_lag", l)]] <- lag(Y, l)
+
+      # Remove rows with NA (first n_lags rows)
+      valid_idx <- complete.cases(df, X)
+      df_clean <- df[valid_idx, , drop = FALSE]
+      X_clean <- X[valid_idx]
+
+      # Run regression
+      lm_res <- lm(X_clean ~ ., data = df_clean)
+
+      # Use net sign of all lag coefficients (excluding intercept)
+      coefs <- coef(lm_res)[-1]
+      net_sign <- sign(sum(coefs))
+
+      # Compute signed correlation: magnitude from sqrt(R²), sign from net effect
+      signed_corr <- net_sign * sqrt(summary(lm_res)$r.squared)
+
+      cor_matrix[dep_col, ind_col] <- signed_corr
+    }
+  }
+
+  return(cor_matrix)
+}
+
