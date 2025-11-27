@@ -853,41 +853,50 @@ gglineRoct<-
   }
 
 #Life Performance
-gglineR<-function(df,title="Title",subtitle="Subtitle",xcap="",ycap="",name1="Portfolio",perc=T,col_aq2 = c("#04103b", "#dd0400","#5777a7", "#D1E2EC"),fredr_key=NULL,base_size=24)
+gglineR<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
+                   ycap = "", name1 = "Portfolio", perc = T, col_aq2 = c("#04103b",
+                                                                         "#dd0400", "#5777a7", "#D1E2EC"), fredr_key = NULL,
+                   base_size = 24,dateformat="Yes")
 {
   library(ggplot2)
-  names(df)<-c("date","asset")
-  df$date<-as.Date(df$date)
-  cols <- setNames(c(col_aq2[1]), c(name1))
-
-  p<-
-    ggplot(data=df,aes(x=as.Date(df$date), y=df$asset))
-
-    if(!is.null(fredr_key))
-    {
-      p<-p+ggRec(as.Date(min(df$date)),as.Date(max(df$date)),fredr_key=fredr_key)
-    }
-  p<-p+
-    geom_line(size=0.8,aes(y=df$asset,color=name1))+
-    scale_colour_manual(values = cols)+
-    theme_aq_black(base_size=base_size)+
-    #size 22 for overleaf
-    labs(color='')+
-    labs(title=title,subtitle=subtitle,x =xcap)+
-    labs(caption = '')+
-    theme(legend.position = "none",legend.margin=margin(-20,-20,-20,-20),legend.box.margin=margin(0,0,0,0))+
-    guides(colour = guide_legend(nrow = 1))+
-    scale_x_date(labels = date_format("%Y"))
-  if(perc==TRUE)
+  names(df) <- c("date", "asset")
+  if(dateformat=="Yes")
   {
-    p<-p+scale_y_continuous(labels = scales::percent)
+    df$date <- as.Date(df$date)
   }
-  p<-p+
-    ylab(ycap)+
-    theme(plot.margin=margin(5,5,5,5))
 
+  cols <- setNames(c(col_aq2[1]), c(name1))
+  if(dateformat=="Yes")
+  {
+    p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
+  }else{
+    p <- ggplot(data = df, aes(x = (df$date), y = df$asset))
+  }
+
+  if (!is.null(fredr_key)) {
+    p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)),
+                   fredr_key = fredr_key)
+  }
+  p <- p + geom_line(size = 0.8, aes(y = df$asset, color = name1)) +
+    scale_colour_manual(values = cols) + theme_aq_black(base_size = base_size) +
+    labs(color = "") + labs(title = title, subtitle = subtitle,
+                            x = xcap) + labs(caption = "") + theme(legend.position = "none",
+                                                                   legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
+                                                                                                                                          0, 0, 0)) + guides(colour = guide_legend(nrow = 1))
+  if(dateformat=="Yes")
+  {
+    p<-p+scale_x_date(labels = date_format("%Y"))
+  }
+
+
+  if (perc == TRUE) {
+    p <- p + scale_y_continuous(labels = scales::percent)
+  }
+  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
+                                                   5))
   return(p)
 }
+
 
 
 ggbaR<-
