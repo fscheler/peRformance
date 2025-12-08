@@ -871,7 +871,7 @@ defaultPoolConn<-function(dbname,activepath,driver="MariaDB")
   return(pool)
 }
 
-qp_sel_dbconnection<-function(dbconnection,sel_dbconnection="QP",dbname="gaa")
+qp_sel_dbconnection<-function(dbconnection,sel_dbconnection="QP",dbname="gaa",driver="MySQL")
 {
   #dbconnection <- read.csv("www/dbconnection.txt")
 
