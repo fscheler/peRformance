@@ -836,3 +836,23 @@ write_with_varchar_margin <- function(con, table_name, df, overwrite = TRUE, var
   message(sprintf("Table '%s' written successfully with +%d character margin for VARCHAR columns.",
                   table_name, varchar_margin))
 }
+
+
+
+defaultPoolConn<-function(dbname,activepath)
+{
+
+
+  # pool connection
+  default_dbconnection<-read.csv(paste0(activepath,"default_dbconnection.txt"))
+  dbconnection <- read.csv(paste0(activepath,"dbconnection.txt"))
+  pool <- dbPool(
+    drv = RMySQL::MySQL(),
+    dbname = dbname,
+    host=dbconnection$value[dbconnection$setting=="host" & dbconnection$database  == default_dbconnection$dbname],
+    username = dbconnection$value[dbconnection$setting=="username" & dbconnection$database  == default_dbconnection$dbname],
+    password=dbconnection$value[dbconnection$setting=="password" & dbconnection$database  == default_dbconnection$dbname],
+    port=as.integer(dbconnection$value[dbconnection$setting=="port" & dbconnection$database  == default_dbconnection$dbname])
+  )
+  return(pool)
+}
