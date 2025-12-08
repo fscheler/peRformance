@@ -871,3 +871,29 @@ defaultPoolConn<-function(dbname,activepath,driver="MariaDB")
   return(pool)
 }
 
+qp_sel_dbconnection<-function(sel_dbconnection="QP",dbname="gaa")
+{
+  dbconnection <- read.csv("www/dbconnection.txt")
+
+  if(driver=="MySQL")
+  {
+    pool <- dbPool(
+      drv = RMySQL::MySQL(),
+      dbname = dbname,
+      host=dbconnection$value[dbconnection$setting=="host" & dbconnection$database==sel_dbconnection],
+      username = dbconnection$value[dbconnection$setting=="username" & dbconnection$database==sel_dbconnection],
+      password=dbconnection$value[dbconnection$setting=="password" & dbconnection$database==sel_dbconnection],
+      port=as.integer(dbconnection$value[dbconnection$setting=="port" & dbconnection$database==sel_dbconnection])
+    )
+  }else{
+    pool <- dbPool(
+      drv = RMariaDB::MariaDB(),
+      dbname = dbname,
+      host=dbconnection$value[dbconnection$setting=="host" & dbconnection$database==sel_dbconnection],
+      username = dbconnection$value[dbconnection$setting=="username" & dbconnection$database==sel_dbconnection],
+      password=dbconnection$value[dbconnection$setting=="password" & dbconnection$database==sel_dbconnection],
+      port=as.integer(dbconnection$value[dbconnection$setting=="port" & dbconnection$database==sel_dbconnection])
+    )
+  }
+  return(pool)
+}
