@@ -1424,50 +1424,101 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
 }
 
 
-#Life Performance
-ggReg<-function (df, title = "Title", subtitle = "Subtitle", xcap = "", captions=TRUE,regression="linear",
-                  ycap = "", markersize = 1, percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"), fredr_key = NULL,nudge_x = 0, nudge_y = 0,xintercept=NULL,regsize=0.5,reglinetype ="dashed")
-{
+#Live Performance
+ggReg <- function(
+    df,
+    title = "Title",
+    subtitle = "Subtitle",
+    xcap = "",
+    captions = TRUE,
+    regression = "linear",
+    degree = 2,
+    ycap = "",
+    markersize = 1,
+    percx = TRUE,
+    percy = TRUE,
+    col_aq2 = c("#04103b", "#dd0400", "#5777a7", "#D1E2EC"),
+    fredr_key = NULL,
+    nudge_x = 0,
+    nudge_y = 0,
+    xintercept = NULL,
+    regsize = 0.5,
+    reglinetype = "dashed"
+) {
 
   library(ggplot2)
+
   names(df) <- c("assetx", "assety")
-  p <- ggplot(df, aes(x = df$assetx, y = df$assety))
-  p <- p + geom_point(size = markersize, col = col_aq2[1])
 
-  if(regression=="linear")
-  {
-    p<-p+geom_smooth(method = lm, se = FALSE, col = col_aq2[2],size=regsize,linetype =reglinetype)
+  p <- ggplot(df, aes(x = assetx, y = assety)) +
+    geom_point(size = markersize, col = col_aq2[1])
+
+  # ----- Regression options -----
+  if (regression == "linear") {
+
+    p <- p + geom_smooth(
+      method = lm,
+      se = FALSE,
+      col = col_aq2[2],
+      size = regsize,
+      linetype = reglinetype
+    )
+
+    reg <- lm(assety ~ assetx, data = df)
+
+  } else if (regression == "poly") {
+
+    p <- p + geom_smooth(
+      method = lm,
+      formula = y ~ poly(x, degree, raw = TRUE),
+      se = FALSE,
+      col = col_aq2[2],
+      size = regsize,
+      linetype = reglinetype
+    )
+
+    reg <- lm(assety ~ poly(assetx, degree, raw = TRUE), data = df)
   }
 
+  # ----- Styling -----
+  p <- p +
+    theme_aq_black(base_size = 24) +
+    labs(
+      title = title,
+      subtitle = subtitle,
+      x = xcap,
+      y = ycap,
+      caption = ""
+    ) +
+    theme(
+      legend.position = "none",
+      plot.margin = margin(5, 5, 5, 5)
+    )
 
-  p<-p+theme_aq_black(base_size = 24) + labs(color = "") + labs(title = title,
-                                                                subtitle = subtitle, x = xcap) + labs(caption = "") +
-    theme(legend.position = "none", legend.margin = margin(-20,
-                                                           -20, -20, -20), legend.box.margin = margin(0, 0,
-                                                                                                      0, 0)) + guides(colour = guide_legend(nrow = 1))
-  if(captions==TRUE)
-  {
-    p<-p+geom_text(label=rownames(df),check_overlap = T,nudge_x = nudge_x, nudge_y = nudge_y)
+  if (captions) {
+    p <- p + geom_text(
+      label = rownames(df),
+      check_overlap = TRUE,
+      nudge_x = nudge_x,
+      nudge_y = nudge_y
+    )
   }
-  if(!is.null(xintercept))
-  {
-    p<-p+geom_vline(xintercept = xintercept, colour="lightgrey", linetype = "longdash")
+
+  if (!is.null(xintercept)) {
+    p <- p + geom_vline(
+      xintercept = xintercept,
+      colour = "lightgrey",
+      linetype = "longdash"
+    )
   }
-  if (percx == TRUE) {
-    p <- p + scale_x_continuous(labels = scales::percent)
-  }
-  if (percy == TRUE) {
-    p <- p + scale_y_continuous(labels = scales::percent)
-  }
-  p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
-                                                   5))
-  reg <- lm(assety ~ assetx, data = df)
-  plist = list(p = p, reg = reg)
+
+  if (percx) p <- p + scale_x_continuous(labels = scales::percent)
+  if (percy) p <- p + scale_y_continuous(labels = scales::percent)
+
   print(summary(reg))
-  return(plist)
+
+  return(list(p = p, reg = reg))
 }
-
-
 
 
 allocSun2<-function(sb,sb_title="")
