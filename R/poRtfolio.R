@@ -1517,6 +1517,9 @@ ggReg <- function(
 
   reg <- lm(assety ~ assetx, data = df)
 
+  cfit <- lm(assety ~ poly(assetx, degree = 2, raw = TRUE), data = df)
+  convexity<-coef(cfit)["poly(x, degree = 2, raw = TRUE)2"]
+
   correlation<-cor(df$assetx,df$assety, use = "complete.obs")
   beta <- coef(reg)[2]
   stdev<-list(
@@ -1524,7 +1527,7 @@ ggReg <- function(
     "Asset_Y"=sd(df$assety,na.rm=T)
   )
 
-  plist = list(p = p, reg = reg, correlation=correlation,beta=beta,stdev=stdev)
+  plist = list(p = p, reg = reg, correlation=correlation,beta=beta,stdev=stdev,convexity=convexity)
 
   print(summary(reg))
 
