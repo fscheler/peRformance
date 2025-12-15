@@ -1515,10 +1515,16 @@ ggReg <- function(
   if (percx) p <- p + scale_x_continuous(labels = scales::percent)
   if (percy) p <- p + scale_y_continuous(labels = scales::percent)
 
+  reg <- lm(assety ~ assetx, data = df)
+
+  plist = list(p = p, reg = reg)
+
   print(summary(reg))
 
-  return(list(p = p, reg = reg))
+  return(plist)
+
 }
+
 
 
 allocSun2<-function(sb,sb_title="")
