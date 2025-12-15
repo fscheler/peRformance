@@ -1520,7 +1520,7 @@ ggReg <- function(
   correlation<-cor(df$assetx,df$assety, use = "complete.obs")
   beta <- coef(reg)[2]
   stdev<-list(
-    "Asset"=sd(assetx,na.rm=T)
+    "Asset"=sd(assetx,na.rm=T),
     "Benchmark"=sd(assetx,na.rm=T)
   )
 
