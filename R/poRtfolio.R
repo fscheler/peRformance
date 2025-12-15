@@ -1521,7 +1521,7 @@ ggReg <- function(
   beta <- coef(reg)[2]
   stdev<-list(
     "Asset"=sd(df$assetx,na.rm=T),
-    "Benchmark"=sd(df$assetx,na.rm=T)
+    "Benchmark"=sd(df$assety,na.rm=T)
   )
 
   plist = list(p = p, reg = reg, correlation=correlation,beta=beta,sddev=stdev)
