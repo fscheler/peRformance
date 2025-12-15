@@ -1520,11 +1520,11 @@ ggReg <- function(
   correlation<-cor(df$assetx,df$assety, use = "complete.obs")
   beta <- coef(reg)[2]
   stdev<-list(
-    "Asset"=sd(df$assetx,na.rm=T),
-    "Benchmark"=sd(df$assety,na.rm=T)
+    "Asset_X"=sd(df$assetx,na.rm=T),
+    "Asset_Y"=sd(df$assety,na.rm=T)
   )
 
-  plist = list(p = p, reg = reg, correlation=correlation,beta=beta,sddev=stdev)
+  plist = list(p = p, reg = reg, correlation=correlation,beta=beta,stdev=stdev)
 
   print(summary(reg))
 
