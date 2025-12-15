@@ -1517,7 +1517,10 @@ ggReg <- function(
 
   reg <- lm(assety ~ assetx, data = df)
 
-  plist = list(p = p, reg = reg)
+  correlation<-cor(assetx,assety)
+  beta <- coef(reg)[2]
+
+  plist = list(p = p, reg = reg, correlation=correlation,beta=beta)
 
   print(summary(reg))
 
