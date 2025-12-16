@@ -1379,7 +1379,7 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
                   captions = TRUE, regression = "linear", ycap = "", markersize = 1,
                   percx = T, percy = T, col_aq2 = c("#04103b", "#dd0400", "#5777a7",
                                                     "#D1E2EC"), fredr_key = NULL, nudge_x = 0, nudge_y = 0,linetype="dotted",legendposition="bottom",
-                  xintercept = NULL)
+                  xintercept = NULL,captionsize=6,base_size=24)
 {
   #df<-agg[,c("Prim_Exch","Sector_Name","Median_P_E","Exp_Earnings_Growth")]
   library(ggplot2)
@@ -1397,13 +1397,13 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
     p<-p+ geom_smooth(method = "lm", se = FALSE, aes(group = group, color = group),show.legend=FALSE,linetype =linetype, size = 0.7) +
       scale_color_manual(values = custom_colors)
   }
-  p <- p + theme_aq_black(base_size = 24) + labs(color = "") +
+  p <- p + theme_aq_black(base_size = base_size) + labs(color = "") +
     labs(title = title, subtitle = subtitle, x = xcap) +
     labs(caption = "") + theme(legend.position = legendposition,
                                legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(20,20, 20, 20)) + guides(colour = guide_legend(nrow = 1))
   if (captions == TRUE) {
     p <- p + geom_text(label = df$caption, check_overlap = T,
-                       nudge_x = nudge_x, nudge_y = nudge_y,show.legend=FALSE)
+                       nudge_x = nudge_x, nudge_y = nudge_y,show.legend=FALSE,size=captionsize)
   }
   if (!is.null(xintercept)) {
     p <- p + geom_vline(xintercept = xintercept, colour = "lightgrey",
@@ -1443,7 +1443,8 @@ ggReg <- function(
     nudge_y = 0,
     xintercept = NULL,
     regsize = 0.5,
-    reglinetype = "dashed"
+    reglinetype = "dashed",
+    captionsize=6
 ) {
 
   library(ggplot2)
@@ -1500,7 +1501,8 @@ ggReg <- function(
       label = rownames(df),
       check_overlap = TRUE,
       nudge_x = nudge_x,
-      nudge_y = nudge_y
+      nudge_y = nudge_y,
+      size = captionsize
     )
   }
 
@@ -1518,7 +1520,7 @@ ggReg <- function(
   reg <- lm(assety ~ assetx, data = df)
 
   cfit <- lm(assety ~ poly(assetx, degree = 2, raw = TRUE), data = df)
-  convexity<-coef(cfit)["poly(x, degree = 2, raw = TRUE)2"]
+  convexity<-coef(cfit)["poly(assetx, degree = 2, raw = TRUE)2"]
 
   correlation<-cor(df$assetx,df$assety, use = "complete.obs")
   beta <- coef(reg)[2]
