@@ -1381,8 +1381,11 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
                                                     "#D1E2EC"), fredr_key = NULL, nudge_x = 0, nudge_y = 0,linetype="dotted",legendposition="bottom",
                   xintercept = NULL,captionsize=6,base_size=24)
 {
+
   #df<-agg[,c("Prim_Exch","Sector_Name","Median_P_E","Exp_Earnings_Growth")]
   library(ggplot2)
+  library(ggrepel)
+
   names(df) <- c("group","caption","assetx", "assety")
 
 
@@ -1391,6 +1394,7 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
 
   p <- ggplot(df, aes(x = df$assetx, y = df$assety, color = group))
   p <- p + geom_point(size = markersize)
+
   p <- p+scale_color_manual(values = custom_colors)
   p <- p+ guides(caption = "none")
   if (regression == "linear") {
@@ -1401,10 +1405,25 @@ ggReg2<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
     labs(title = title, subtitle = subtitle, x = xcap) +
     labs(caption = "") + theme(legend.position = legendposition,
                                legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(20,20, 20, 20)) + guides(colour = guide_legend(nrow = 1))
+  #if (captions == TRUE) {
+  #  p <- p + geom_text(label = df$caption, check_overlap = T,
+  #                     nudge_x = nudge_x, nudge_y = nudge_y,show.legend=FALSE,size=captionsize)
+  #}
+
   if (captions == TRUE) {
-    p <- p + geom_text(label = df$caption, check_overlap = T,
-                       nudge_x = nudge_x, nudge_y = nudge_y,show.legend=FALSE,size=captionsize)
+    p <- p + geom_text_repel(
+      aes(label = caption),
+      data = df,
+      nudge_x = nudge_x,
+      nudge_y = nudge_y,
+      size = captionsize / 3,             # adjust text size
+      show.legend = FALSE,
+      segment.color = "lightgrey",        # color of the lines
+      segment.size = 0.3,                 # thickness of the lines
+      segment.alpha = 0.5                 # transparency for a more subtle look
+    )
   }
+
   if (!is.null(xintercept)) {
     p <- p + geom_vline(xintercept = xintercept, colour = "lightgrey",
                         linetype = "longdash")
