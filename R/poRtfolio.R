@@ -2483,6 +2483,107 @@ allocTreeBold<-function (
 }
 
 
+allocTreeBoldcol <- function (
+    df,
+    parent_label = "Portfolio",
+    chart_export_width = 600,
+    chart_export_height = 450,
+    fontsize = 26,
+    fontsizeheader = 28,
+    m = list(l = 0, r = 0, b = 0, t = 0, pad = 4),
+    asset_levels,
+    asset_colors
+) {
+  library(scales)
+  library(plotly)
+  library(dplyr)
+
+  if (length(asset_levels) != length(asset_colors)) {
+    stop("'asset_levels' and 'asset_colors' must have the same length.")
+  }
+
+  names(df) <- c("assets", "weights")
+  df <- df %>%
+    group_by(assets) %>%
+    summarize(weights = sum(weights), .groups = 'drop')
+
+  df$weights <- df$weights / sum(df$weights)
+  wmp <- df
+  wmp$Parent_Label <- parent_label
+
+  regions <- wmp %>%
+    group_by(assets) %>%
+    summarize(sum = sum(weights, na.rm = TRUE), .groups = 'drop')
+
+  regions$perc <- regions$sum / sum(regions$sum)
+  regions$Parent_Label <- parent_label
+
+  # Add root node
+  regions <- rbind(
+    regions,
+    data.frame(
+      assets = parent_label,
+      sum = sum(regions$sum),
+      perc = 1,
+      Parent_Label = ""
+    )
+  )
+
+  regions <- as.data.frame(regions, stringsAsFactors = FALSE)
+  regions$perc <- as.numeric(regions$perc)
+
+  ## ---- Explicit asset → color mapping ----
+  color_map <- setNames(asset_colors, asset_levels)
+
+  # Make sure all non-root assets have a color
+  non_root_assets <- regions$assets[regions$assets != parent_label]
+  if (!all(non_root_assets %in% asset_levels)) {
+    stop("Some assets in the data are not present in 'asset_levels'.")
+  }
+
+  # Assign colors
+  asset_colors_final <- color_map[non_root_assets]
+  # Append a color for the root node
+  asset_colors_final <- c(asset_colors_final, "#020b2b")
+  ## ----------------------------------------
+
+  tree <- plot_ly(
+    height = 250,
+    type = "treemap",
+    labels = regions$assets,
+    parents = regions$Parent_Label,
+    values = as.numeric(regions$sum),
+    marker = list(colors = asset_colors_final),
+    hovertemplate = paste(
+      regions$assets, "<br>",
+      round(as.numeric(regions$sum) * 100, 2), "%",
+      "<extra></extra>"
+    ),
+    branchvalues = "total",
+    text = paste0(round(regions$perc * 100, 1), "% <br>"),
+    outsidetextfont = list(
+      size = fontsizeheader,
+      color = "white",
+      family = "Arial Black"
+    ),
+    textfont = list(
+      size = fontsize,
+      color = "white",
+      family = "Arial Black"
+    )
+  ) %>% layout(margin = m)
+
+  tree <- tree %>% config(toImageButtonOptions = list(
+    format = "svg",
+    filename = "allocation_tree",
+    width = chart_export_width,
+    height = chart_export_height
+  ))
+
+  return(tree)
+}
+
+
 
 msci_translate<-function(average_score)
 {
@@ -3005,6 +3106,181 @@ performance_attribution_plotly<-function(pandldaily,amc=NULL,chart_title,base_co
     )
   return(fig)
 
+}
+
+
+allocBarhDendrocol <- function (
+    da,
+    chart_title = "Portfolio Allocation",
+    chart_height = 600,
+    chart_font_size = 12,
+    title_font_size = 16,
+    bargap = 0.2,
+    barborder = "#04103b",
+    line_width = 0.5,
+    connector_space = 0.05,
+    min_label_spacing = 0.03,
+    strategy_levels,
+    strategy_colors
+) {
+
+  library(dplyr)
+  library(plotly)
+
+  ## ---- Input prep ----
+  da <- da[, 1:3]
+  names(da) <- c("asset", "weight", "strategy")
+  da$weight <- as.numeric(da$weight)
+
+  da <- da %>% arrange(desc(weight))
+  da$asset_factor <- factor(da$asset, levels = da$asset)
+
+  ## ---- Explicit strategy → color mapping ----
+  if (length(strategy_levels) != length(strategy_colors)) {
+    stop("'strategy_levels' and 'strategy_colors' must have the same length.")
+  }
+
+  strategy_color_map <- setNames(strategy_colors, strategy_levels)
+
+  if (!all(da$strategy %in% strategy_levels)) {
+    stop("Some strategies in the data are not present in 'strategy_levels'.")
+  }
+
+  da$bar_color <- strategy_color_map[da$strategy]
+  ## ------------------------------------------
+
+  range_height <- max(da$weight) - min(da$weight)
+
+  ## ---- Bars ----
+  p <- plot_ly() %>%
+    add_bars(
+      data = da,
+      x = ~asset_factor,
+      y = ~weight,
+      marker = list(
+        color = da$bar_color,
+        line = list(color = barborder, width = 0.5)
+      ),
+      name = "Portfolio"
+    )
+
+  ## ---- Strategy connectors & labels ----
+  strategies <- unique(da$strategy)
+  label_positions <- c()
+
+  for (strat in strategies) {
+
+    da_strat <- da %>% filter(strategy == strat)
+    if (nrow(da_strat) < 1) next
+
+    x_start <- da_strat$asset_factor[1]
+    x_end   <- da_strat$asset_factor[nrow(da_strat)]
+
+    y_connector <- max(da_strat$weight, 0) + connector_space * range_height
+    y_label <- y_connector + connector_space * range_height * 0.8
+
+    if (length(label_positions) > 0) {
+      for (prev_y in label_positions) {
+        while (abs(y_label - prev_y) < min_label_spacing * range_height) {
+          y_label <- y_label + min_label_spacing * range_height
+        }
+      }
+    }
+
+    y_horiz <- y_label - connector_space * range_height / 8
+
+    ## horizontal connector
+    p <- p %>%
+      add_segments(
+        x = x_start, xend = x_end,
+        y = y_horiz, yend = y_horiz,
+        line = list(
+          color = strategy_color_map[strat],
+          width = line_width
+        ),
+        showlegend = FALSE
+      )
+
+    ## vertical connectors
+    for (x_vert in c(x_start, x_end)) {
+
+      y_val <- da_strat$weight[da_strat$asset_factor == x_vert]
+      y_bottom <- ifelse(y_val > 0, y_val, 0)
+
+      p <- p %>%
+        add_segments(
+          x = x_vert, xend = x_vert,
+          y = y_bottom, yend = y_horiz,
+          line = list(
+            color = strategy_color_map[strat],
+            width = line_width
+          ),
+          showlegend = FALSE
+        )
+    }
+
+    ## strategy label
+    mid_index <- ceiling(nrow(da_strat) / 2)
+    x_center <- da_strat$asset_factor[mid_index]
+
+    p <- p %>%
+      add_text(
+        x = x_center,
+        y = y_label,
+        text = strat,
+        textposition = "top center",
+        showlegend = FALSE,
+        textfont = list(color = strategy_color_map[strat])
+      )
+
+    label_positions <- c(label_positions, y_label)
+  }
+
+  ## ---- Bar value labels ----
+  for (i in seq_len(nrow(da))) {
+
+    p <- p %>%
+      add_annotations(
+        x = da$asset_factor[i],
+        y = da$weight[i],
+        text = paste0(round(da$weight[i] * 100, 2), "%"),
+        xanchor = "center",
+        yanchor = ifelse(da$weight[i] >= 0, "bottom", "top"),
+        showarrow = FALSE,
+        font = list(size = chart_font_size),
+        bgcolor = "rgba(255,255,255,0.7)",
+        bordercolor = "rgba(0,0,0,0)",
+        borderpad = 2
+      )
+  }
+
+  ## ---- Layout ----
+  p <- p %>%
+    layout(
+      title = list(
+        text = chart_title,
+        font = list(size = title_font_size)
+      ),
+      xaxis = list(
+        title = "",
+        tickangle = -45,
+        categoryorder = "array",
+        categoryarray = da$asset_factor
+      ),
+      yaxis = list(
+        title = "",
+        showticklabels = TRUE,
+        tickformat = ".2%",
+        showgrid = FALSE
+      ),
+      barmode = "overlay",
+      bargap = bargap,
+      font = list(size = chart_font_size),
+      height = chart_height,
+      plot_bgcolor = "white"
+    )
+
+  return(p)
 }
 
 
