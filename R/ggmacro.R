@@ -409,6 +409,7 @@ bdhw<-
     df <- rbindlist(df, id = "id")
     df<-unique(df)
     dw <- data.table::dcast(as.data.table(df), date ~ id, value.var = mnem)
+    dw<-dw[,c("date",sec)]
     return(dw)
   }
 
