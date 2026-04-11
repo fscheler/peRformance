@@ -36,11 +36,12 @@ fastwRiter <- function(conn, name, value, overwrite=FALSE, append=TRUE, row.name
 
 chunkwRiter<-function(pool,name,value,overwrite=F,append=T,row.names=F)
 {
+  library(pool)
   start<-Sys.time()
   
-  if(overwrite==T | append==F)
+  if(overwrite==T)
   {
-    dbWriteTable(pool,name,head(value,0),overwrite=T,row.names= row.names)
+    RMariaDB::dbWriteTable(pool,name,head(value,0),overwrite=T,row.names= row.names)
   }
   
   conn <- poolCheckout(pool)
@@ -49,6 +50,10 @@ chunkwRiter<-function(pool,name,value,overwrite=F,append=T,row.names=F)
   chunks <- split(value, (seq_len(nrow(value)) - 1) %/% chunk_size)
   
   dbBegin(conn)
+  if(overwrite ==F & append==F)
+  {
+    dbExecute(conn, paste0("TRUNCATE TABLE ", name))    
+  }
   
   for (chunk in chunks) {
     values_sql <- paste(
