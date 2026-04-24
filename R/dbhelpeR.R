@@ -38,42 +38,61 @@ chunkwRiter<-function(pool,name,value,overwrite=F,append=T,row.names=F)
 {
   library(pool)
   start<-Sys.time()
-  
+
   if(overwrite==T)
   {
-    RMariaDB::dbWriteTable(pool,name,head(value,0),overwrite=T,row.names= row.names)
+    RMariaDB::dbWriteTable(pool,name,head(value,0),overwrite=T,row.names=row.names)
+  } else {
+    # Sync schema: add any columns present in value but missing from the table
+    db_cols <- tryCatch(
+      dbGetQuery(pool, paste0("SHOW COLUMNS FROM `", name, "`"))$Field,
+      error = function(e) character(0)
+    )
+    if (length(db_cols) > 0) {
+      missing_cols <- setdiff(names(value), db_cols)
+      for (col in missing_cols) {
+        col_type <- switch(class(value[[col]])[1],
+          "numeric"   = "DOUBLE",
+          "integer"   = "INT",
+          "Date"      = "DATE",
+          "logical"   = "TINYINT(1)",
+          "TEXT"
+        )
+        dbExecute(pool, paste0("ALTER TABLE `", name, "` ADD COLUMN `", col, "` ", col_type))
+        message("Added missing column '", col, "' (", col_type, ") to table '", name, "'")
+      }
+    }
   }
-  
-  conn <- poolCheckout(pool)
-  
+
+  conn<-pool
+  try(conn <- poolCheckout(pool),silent=T)
+
+  # Use explicit column list so positional mismatches never cause INSERT failures
+  col_names <- paste0("`", names(value), "`", collapse=",")
+
   chunk_size <- 10000
   chunks <- split(value, (seq_len(nrow(value)) - 1) %/% chunk_size)
-  
+
   dbBegin(conn)
-  if(overwrite ==F & append==F)
+  if(overwrite==F & append==F)
   {
-    dbExecute(conn, paste0("TRUNCATE TABLE ", name))    
+    dbExecute(conn, paste0("TRUNCATE TABLE `", name, "`"))
   }
-  
+
   for (chunk in chunks) {
     values_sql <- paste(
       apply(chunk, 1, function(row) {
-        paste0("(", paste(DBI::dbQuoteLiteral(conn, row), collapse = ","), ")")
+        paste0("(", paste(DBI::dbQuoteLiteral(conn, row), collapse=","), ")")
       }),
-      collapse = ","
+      collapse=","
     )
-    
-    sql <- paste0(
-      paste0("INSERT INTO ",name," VALUES "),
-      values_sql
-    )
-    
+    sql <- paste0("INSERT INTO `", name, "` (", col_names, ") VALUES ", values_sql)
     dbExecute(conn, sql)
   }
-  
+
   dbCommit(conn)
-  poolReturn(conn)
-  
+  try(poolReturn(conn),silent=T)
+
   end<-Sys.time()
-  end-start  
+  end-start
 }
