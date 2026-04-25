@@ -1,6 +1,6 @@
 
 
-dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4))
+dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_export_width=600,chart_export_height=450,m=list(r=0,l=0,b=0,t=50,par=4),periodicity=252)
 {
   if (!require("ecm")) install.packages("ecm")
   if (!require("plotly")) install.packages("ggplot2")
@@ -74,7 +74,7 @@ dRawdowns<-function(da,ret_format='returns',graphics=F,runmaxwindow=2000,chart_e
   #library(lubridate)
   #da%>%group_by(year(date))%>%summarise(n=n())
 
-  sharpe_ratio<-ann_return/(sd(da$asset_ret)*252^0.5)
+  sharpe_ratio<-ann_return/(sd(da$asset_ret)*periodicity^0.5)
   calmar_ratio<-ann_return/max_drawdown
 
 
