@@ -1014,7 +1014,7 @@ gglineReleven<-
   {
     library(ggplot2)
     names(df) <- c("date", "asset", "benchmark", "benchmark1",
-                   "benchmark2", "benchmark3", "benchmark4", "benchmark5", "benchmark6")
+                   "benchmark2", "benchmark3", "benchmark4", "benchmark5", "benchmark6", "benchmark7", "benchmark8", "benchmark9")
     df$date <- as.Date(df$date)
     cols <- setNames(c(col_aq2[1], col_aq2[2], col_aq2[3], col_aq2[4],
                        col_aq2[5],col_aq2[6],col_aq2[7],col_aq2[8],col_aq2[9],col_aq2[10],col_aq2[11]), c(name1, name2, name3, name4, name5, name6, name7, name8, name9, name10, name11))
