@@ -1008,8 +1008,8 @@ gglineReleven<-
   function (df, title = "Title", subtitle = "Subtitle", xcap = "",
             ycap = "", name1 = "asset", name2 = "benchmark", name3 = "benchmark1",
             name4 = "benchmark2", name5 = "benchmark3", name6 = "benchmark4", name7 = "benchmark5", name8 = "benchmark6",
-            name7 = "benchmark7", name8 = "benchmark8", name9 = "benchmark9", name10 = "benchmark10", name11 = "benchmark11",
-            perc = F, col_aq2 = c("#04103B", "#DD0400", "#0057D9", "#007C91", "#008A3B", "#2E6B00", "#C45500", "#9A6A00", "#6A1BB1", "#B0005A", "#4A5568") fredr_key = NULL,
+            name9 = "benchmark7", name10 = "benchmark8", name11 = "benchmark9",
+            perc = F, col_aq2 = c("#04103B", "#DD0400", "#0057D9", "#007C91", "#008A3B", "#2E6B00", "#C45500", "#9A6A00", "#6A1BB1", "#B0005A", "#4A5568") ,fredr_key = NULL,
             secaxis = 1, base_size = 24, legend_rows = 2)
   {
     library(ggplot2)
