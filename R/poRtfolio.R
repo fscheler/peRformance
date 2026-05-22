@@ -852,6 +852,274 @@ gglineRoct<-
     return(p)
   }
 
+gglineRnine <-
+  function(df, title = "Title", subtitle = "Subtitle", xcap = "",
+           ycap = "", name1 = "asset", name2 = "benchmark",
+           name3 = "benchmark1", name4 = "benchmark2",
+           name5 = "benchmark3", name6 = "benchmark4",
+           name7 = "benchmark5", name8 = "benchmark6",
+           name9 = "benchmark7",
+           perc = FALSE,
+           col_aq2 = c("#04103B", "#DD0400", "#0057D9", "#007C91",
+                       "#008A3B", "#2E6B00", "#C45500",
+                       "#9A6A00", "#6A1BB1"),
+           fredr_key = NULL,
+           secaxis = 1, base_size = 24, legend_rows = 2)
+  {
+    library(ggplot2)
+
+    names(df) <- c("date", "asset", "benchmark", "benchmark1",
+                   "benchmark2", "benchmark3", "benchmark4",
+                   "benchmark5", "benchmark6", "benchmark7")
+
+    df$date <- as.Date(df$date)
+
+    cols <- setNames(col_aq2[1:9],
+                     c(name1, name2, name3, name4,
+                       name5, name6, name7, name8, name9))
+
+    p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
+
+    if (!is.null(fredr_key)) {
+      p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)),
+                     fredr_key = fredr_key)
+    }
+
+    p <- p +
+      geom_line(size = 0.8, aes(y = df$asset, color = name1)) +
+      geom_line(size = 0.8, aes(y = df$benchmark/secaxis, color = name2)) +
+      geom_line(size = 0.8, aes(y = df$benchmark1/secaxis, color = name3)) +
+      geom_line(size = 0.8, aes(y = df$benchmark2/secaxis, color = name4)) +
+      geom_line(size = 0.8, aes(y = df$benchmark3/secaxis, color = name5)) +
+      geom_line(size = 0.8, aes(y = df$benchmark4/secaxis, color = name6)) +
+      geom_line(size = 0.8, aes(y = df$benchmark5/secaxis, color = name7)) +
+      geom_line(size = 0.8, aes(y = df$benchmark6/secaxis, color = name8)) +
+      geom_line(size = 0.8, aes(y = df$benchmark7/secaxis, color = name9)) +
+      scale_colour_manual(values = cols) +
+      theme_aq_black(base_size = base_size) +
+      labs(color = "", title = title, subtitle = subtitle,
+           x = xcap, caption = "") +
+      theme(
+        legend.position = "bottom",
+        legend.margin = margin(-20, -20, -20, -20),
+        legend.box.margin = margin(0, 0, 0, 0)
+      ) +
+      guides(colour = guide_legend(nrow = legend_rows)) +
+      scale_x_date(labels = date_format("%Y"))
+
+    if (perc == TRUE) {
+      p <- p + scale_y_continuous(labels = scales::percent)
+    }
+
+    p <- p + ylab(ycap) +
+      theme(plot.margin = margin(5, 5, 5, 5))
+
+    if (secaxis != 1) {
+      p <- p +
+        scale_y_continuous(
+          name = "",
+          sec.axis = sec_axis(trans = ~ . * secaxis, name = "")
+        )
+    }
+
+    return(p)
+  }
+
+gglineRten <-
+  function(df, title = "Title", subtitle = "Subtitle", xcap = "",
+           ycap = "", name1 = "asset", name2 = "benchmark",
+           name3 = "benchmark1", name4 = "benchmark2",
+           name5 = "benchmark3", name6 = "benchmark4",
+           name7 = "benchmark5", name8 = "benchmark6",
+           name9 = "benchmark7", name10 = "benchmark8",
+           perc = FALSE,
+           col_aq2 = c("#04103B", "#DD0400", "#0057D9", "#007C91",
+                       "#008A3B", "#2E6B00", "#C45500",
+                       "#9A6A00", "#6A1BB1", "#B0005A"),
+           fredr_key = NULL,
+           secaxis = 1, base_size = 24, legend_rows = 2)
+  {
+    library(ggplot2)
+
+    names(df) <- c("date", "asset", "benchmark", "benchmark1",
+                   "benchmark2", "benchmark3", "benchmark4",
+                   "benchmark5", "benchmark6", "benchmark7",
+                   "benchmark8")
+
+    df$date <- as.Date(df$date)
+
+    cols <- setNames(col_aq2[1:10],
+                     c(name1, name2, name3, name4, name5,
+                       name6, name7, name8, name9, name10))
+
+    p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
+
+    if (!is.null(fredr_key)) {
+      p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)),
+                     fredr_key = fredr_key)
+    }
+
+    series <- c("asset", "benchmark", "benchmark1", "benchmark2",
+                "benchmark3", "benchmark4", "benchmark5",
+                "benchmark6", "benchmark7", "benchmark8")
+
+    names_vec <- c(name1, name2, name3, name4, name5,
+                   name6, name7, name8, name9, name10)
+
+    for(i in seq_along(series)) {
+      p <- p + geom_line(
+        size = 0.8,
+        aes_string(y = paste0("df$", series[i], "/secaxis"),
+                   color = shQuote(names_vec[i]))
+      )
+    }
+
+    p <- p +
+      scale_colour_manual(values = cols) +
+      theme_aq_black(base_size = base_size) +
+      labs(color = "", title = title, subtitle = subtitle,
+           x = xcap, caption = "") +
+      theme(
+        legend.position = "bottom",
+        legend.margin = margin(-20, -20, -20, -20),
+        legend.box.margin = margin(0, 0, 0, 0)
+      ) +
+      guides(colour = guide_legend(nrow = legend_rows)) +
+      scale_x_date(labels = date_format("%Y"))
+
+    if (perc == TRUE) {
+      p <- p + scale_y_continuous(labels = scales::percent)
+    }
+
+    p <- p + ylab(ycap)
+
+    if (secaxis != 1) {
+      p <- p +
+        scale_y_continuous(
+          name = "",
+          sec.axis = sec_axis(trans = ~ . * secaxis, name = "")
+        )
+    }
+
+    return(p)
+  }
+
+gglineReleven<-
+  function (df, title = "Title", subtitle = "Subtitle", xcap = "",
+            ycap = "", name1 = "asset", name2 = "benchmark", name3 = "benchmark1",
+            name4 = "benchmark2", name5 = "benchmark3", name6 = "benchmark4", name7 = "benchmark5", name8 = "benchmark6",
+            name7 = "benchmark7", name8 = "benchmark8", name9 = "benchmark9", name10 = "benchmark10", name11 = "benchmark11",
+            perc = F, col_aq2 = c("#04103B", "#DD0400", "#0057D9", "#007C91", "#008A3B", "#2E6B00", "#C45500", "#9A6A00", "#6A1BB1", "#B0005A", "#4A5568") fredr_key = NULL,
+            secaxis = 1, base_size = 24, legend_rows = 2)
+  {
+    library(ggplot2)
+    names(df) <- c("date", "asset", "benchmark", "benchmark1",
+                   "benchmark2", "benchmark3", "benchmark4", "benchmark5", "benchmark6")
+    df$date <- as.Date(df$date)
+    cols <- setNames(c(col_aq2[1], col_aq2[2], col_aq2[3], col_aq2[4],
+                       col_aq2[5],col_aq2[6],col_aq2[7],col_aq2[8],col_aq2[9],col_aq2[10],col_aq2[11]), c(name1, name2, name3, name4, name5, name6, name7, name8, name9, name10, name11))
+    secaxisfactor <- 2
+    p <- ggplot(data = df, aes(x = as.Date(df$date), y = df$asset))
+    if (!is.null(fredr_key)) {
+      p <- p + ggRec(as.Date(min(df$date)), as.Date(max(df$date)),
+                     fredr_key = fredr_key)
+    }
+    p <- p + geom_line(size = 0.8, aes(y = df$asset, color = name1)) +
+      geom_line(size = 0.8, aes(y = df$benchmark/secaxis, color = name2)) +
+      geom_line(size = 0.8, aes(y = df$benchmark1/secaxis, color = name3)) +
+      geom_line(size = 0.8, aes(y = df$benchmark2/secaxis,   color = name4)) +
+      geom_line(size = 0.8, aes(y = df$benchmark3/secaxis, color = name5))+
+      geom_line(size = 0.8, aes(y = df$benchmark4/secaxis, color = name6))+
+      geom_line(size = 0.8, aes(y = df$benchmark5/secaxis, color = name7))+
+      geom_line(size = 0.8, aes(y = df$benchmark6/secaxis, color = name8))+
+      geom_line(size = 0.8, aes(y = df$benchmark7/secaxis, color = name9))+
+      geom_line(size = 0.8, aes(y = df$benchmark8/secaxis, color = name10))+
+      geom_line(size = 0.8, aes(y = df$benchmark9/secaxis, color = name11))+
+      scale_colour_manual(values = cols) +
+      theme_aq_black(base_size = base_size) + labs(color = "") +
+      labs(title = title, subtitle = subtitle, x = xcap) +
+      labs(caption = "") + theme(legend.position = "bottom",
+                                 legend.margin = margin(-20, -20, -20, -20), legend.box.margin = margin(0,
+                                                                                                        0, 0, 0)) + guides(colour = guide_legend(nrow = legend_rows)) +
+      scale_x_date(labels = date_format("%Y"))
+    if (perc == TRUE) {
+      p <- p + scale_y_continuous(labels = scales::percent)
+    }
+    p <- p + ylab(ycap) + theme(plot.margin = margin(5, 5, 5,
+                                                     5))
+    if (secaxis != 1) {
+      p <- p + scale_y_continuous(name = "", sec.axis = sec_axis(trans = ~. *
+                                                                   secaxis, name = ""))
+    }
+    return(p)
+  }
+
+gglineRtwelve <-
+  function(df, title = "Title", subtitle = "Subtitle", xcap = "",
+           ycap = "", perc = FALSE,
+           col_aq2 = c("#04103B", "#DD0400", "#0057D9", "#007C91",
+                       "#008A3B", "#2E6B00", "#C45500",
+                       "#9A6A00", "#6A1BB1", "#B0005A",
+                       "#4A5568", "#005F73"),
+           fredr_key = NULL,
+           secaxis = 1, base_size = 24, legend_rows = 2)
+  {
+    library(ggplot2)
+    library(tidyr)
+    library(dplyr)
+
+    names(df)[1] <- "date"
+    df$date <- as.Date(df$date)
+
+    df_long <- pivot_longer(df,
+                            cols = -date,
+                            names_to = "series",
+                            values_to = "value")
+
+    series_names <- unique(df_long$series)
+
+    cols <- setNames(col_aq2[1:length(series_names)],
+                     series_names)
+
+    p <- ggplot(df_long,
+                aes(x = date,
+                    y = value/secaxis,
+                    color = series)) +
+      geom_line(size = 0.8) +
+      scale_colour_manual(values = cols) +
+      theme_aq_black(base_size = base_size) +
+      labs(color = "", title = title,
+           subtitle = subtitle,
+           x = xcap, y = ycap) +
+      theme(
+        legend.position = "bottom",
+        legend.margin = margin(-20, -20, -20, -20),
+        legend.box.margin = margin(0, 0, 0, 0)
+      ) +
+      guides(colour = guide_legend(nrow = legend_rows)) +
+      scale_x_date(labels = date_format("%Y"))
+
+    if (!is.null(fredr_key)) {
+      p <- p + ggRec(as.Date(min(df$date)),
+                     as.Date(max(df$date)),
+                     fredr_key = fredr_key)
+    }
+
+    if (perc == TRUE) {
+      p <- p + scale_y_continuous(labels = scales::percent)
+    }
+
+    if (secaxis != 1) {
+      p <- p +
+        scale_y_continuous(
+          name = "",
+          sec.axis = sec_axis(trans = ~ . * secaxis, name = "")
+        )
+    }
+
+    return(p)
+  }
+
 #Life Performance
 gglineR<-function (df, title = "Title", subtitle = "Subtitle", xcap = "",
                    ycap = "", name1 = "Portfolio", perc = T, col_aq2 = c("#04103b",
