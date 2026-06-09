@@ -897,3 +897,47 @@ qp_sel_dbconnection<-function(dbconnection,sel_dbconnection="QP",dbname="gaa",dr
   }
   return(pool)
 }
+
+
+
+# --- fast bulk insert for the managed (Infomaniak) MySQL ---------------------
+# The managed server blocks LOAD DATA LOCAL INFILE, so dbWriteTable(append=TRUE)
+# inserts row-by-row (~60x slower). fast_append() builds chunked multi-row
+# INSERTs instead. Self-contained (no external file), accepts a pool or a DBI
+# connection. Drop-in for dbWriteTable(con, tbl, df, append=TRUE, row.names=FALSE).
+.fa_sql_literal <- function(x) {
+  if (inherits(x, "Date")) {
+    v <- paste0("'", format(x, "%Y-%m-%d"), "'")
+  } else if (inherits(x, c("POSIXct", "POSIXt"))) {
+    v <- paste0("'", format(x, "%Y-%m-%d %H:%M:%S"), "'")
+  } else if (is.numeric(x)) {
+    v <- trimws(formatC(x, format = "g", digits = 15))
+  } else if (is.logical(x)) {
+    v <- as.character(as.integer(x))
+  } else {
+    s <- gsub("\\\\", "\\\\\\\\", as.character(x))
+    s <- gsub("'", "''", s)
+    v <- paste0("'", s, "'")
+  }
+  v[is.na(x)] <- "NULL"
+  v
+}
+fast_append <- function(con, table, df, chunk_rows = 1000) {
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  if (nrow(df) == 0) return(invisible(0L))
+  col_list <- paste0("`", names(df), "`", collapse = ", ")
+  lit <- as.data.frame(lapply(df, .fa_sql_literal), stringsAsFactors = FALSE)
+  mat <- as.matrix(lit)
+  if (is.null(dim(mat))) mat <- matrix(mat, nrow = nrow(df))
+  row_tuples <- paste0("(", apply(mat, 1L, paste, collapse = ", "), ")")
+  total <- 0L
+  for (start in seq(1L, nrow(df), by = chunk_rows)) {
+    sel <- start:min(start + chunk_rows - 1L, nrow(df))
+    sql <- paste0("INSERT INTO `", table, "` (", col_list, ") VALUES ",
+                  paste(row_tuples[sel], collapse = ", "))
+    total <- total + DBI::dbExecute(con, sql)
+  }
+  invisible(total)
+}
+
+
